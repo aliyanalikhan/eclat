@@ -22,6 +22,7 @@
  *     the two oauth_* cookies, then redirect back to the validated
  *     oauth_return_to value (D-08).
  */
+import { timingSafeEqual } from 'node:crypto'
 import { createRemoteJWKSet, jwtVerify } from 'jose'
 import { sql } from '../../../lib/db.js'
 import {
@@ -33,6 +34,15 @@ import {
 } from '../../../lib/session.js'
 
 const GOOGLE_JWKS = createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'))
+
+// Constant-time comparison for the CSRF state double-submit check (WR-05).
+// timingSafeEqual throws on mismatched-length buffers, so the length check
+// must come first.
+function safeEqual(a, b) {
+  const bufA = Buffer.from(a ?? '')
+  const bufB = Buffer.from(b ?? '')
+  return bufA.length === bufB.length && timingSafeEqual(bufA, bufB)
+}
 
 function clearOauthCookies(headers) {
   headers.append('Set-Cookie', serializeCookie('oauth_state', '', { ...cookieOptions(), maxAge: 0 }))
@@ -63,7 +73,7 @@ export default {
     // Double-submit CSRF guard: the state param must exactly match the
     // cookie set by this app's own outbound leg — never trust the
     // callback's own query string alone (Pattern 1).
-    if (!stateParam || !oauthState || stateParam !== oauthState || !code) {
+    if (!stateParam || !oauthState || !safeEqual(stateParam, oauthState) || !code) {
       return redirectWithError(returnTo, headers)
     }
 
