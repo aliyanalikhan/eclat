@@ -1,0 +1,26 @@
+{
+  "name": "eclat",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Éclat — a quarterly magazine, its archive, children's books and essays.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist/server && node prerender.js",
+    "build:client": "vite build",
+    "preview": "vite preview",
+    "serve": "vite preview --port 4173"
+  },
+  "dependencies": {
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "react-router-dom": "6.28.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "4.3.4",
+    "vite": "5.4.11"
+  },
+  "browserslist": [
+    "defaults and supports es6-module"
+  ]
+}

@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.vite/
+*.local
+.DS_Store
+Thumbs.db
+
+# verify-hero.mjs screenshot output
+hero-rest.png
+hero-open.png

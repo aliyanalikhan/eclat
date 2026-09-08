@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Reader-private and funnel pages carry no indexable content.
+Disallow: /account
+Disallow: /subscribe
+
+Sitemap: https://eclat.example/sitemap.xml

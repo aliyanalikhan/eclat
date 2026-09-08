@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;0,6..96,700;1,6..96,400&family=Archivo:wght@400;500;600&family=Archivo+Narrow:wght@500&display=swap" rel="stylesheet" />
+<style>
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin: 0; background: #f7f3ec; color: #16130f; font-family: Archivo, Helvetica, sans-serif; }
+  * { box-sizing: border-box; }
+  a { color: #16130f; text-decoration: none; }
+  a:hover { color: oklch(0.56 0.14 38); }
+  @keyframes pulseDot { 0%,100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.9); opacity: 0; } }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  @keyframes drawIn { from { stroke-dashoffset: 60; } to { stroke-dashoffset: 0; } }
+  @media (prefers-reduced-motion: reduce) { * { animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+</style>
+</helmet>
+
+<div style="min-height:100vh;background:#f7f3ec">
+
+  <header style="position:fixed;top:0;left:0;right:0;z-index:60;backdrop-filter:blur(14px);background:rgba(247,243,236,0.82);border-bottom:1px solid rgba(22,19,15,0.10);transition:padding .4s cubic-bezier(.2,.7,.2,1)" data-nav="1">
+    <div style="max-width:1360px;margin:0 auto;padding:0 32px;height:70px;display:flex;align-items:center;justify-content:space-between;gap:24px">
+      <a href="#" onClick="{{ goHome }}" style="font-family:'Bodoni Moda',serif;font-size:26px;letter-spacing:0.22em;font-weight:500;line-height:1">ÉCLAT</a>
+      <nav style="display:flex;align-items:center;gap:30px;font-size:13px;letter-spacing:0.09em;text-transform:uppercase">
+        <a href="#" onClick="{{ goArchive }}" style="background-image:linear-gradient(currentColor,currentColor);background-size:0% 1px;background-position:0 calc(100% + 3px);background-repeat:no-repeat;transition:background-size .35s cubic-bezier(.2,.7,.2,1)" style-hover="background-size:100% 1px">Archive</a>
+        <a href="#" onClick="{{ goBooks }}" style="background-image:linear-gradient(currentColor,currentColor);background-size:0% 1px;background-position:0 calc(100% + 3px);background-repeat:no-repeat;transition:background-size .35s cubic-bezier(.2,.7,.2,1)" style-hover="background-size:100% 1px">Children's Books</a>
+        <a href="#" onClick="{{ goWritings }}" style="background-image:linear-gradient(currentColor,currentColor);background-size:0% 1px;background-position:0 calc(100% + 3px);background-repeat:no-repeat;transition:background-size .35s cubic-bezier(.2,.7,.2,1)" style-hover="background-size:100% 1px">Writings</a>
+        <a href="#" onClick="{{ goAccount }}" style="background-image:linear-gradient(currentColor,currentColor);background-size:0% 1px;background-position:0 calc(100% + 3px);background-repeat:no-repeat;transition:background-size .35s cubic-bezier(.2,.7,.2,1)" style-hover="background-size:100% 1px">Account</a>
+        <button onClick="{{ goSubscribe }}" style="font:inherit;letter-spacing:0.09em;text-transform:uppercase;cursor:pointer;border:0;background:#16130f;color:#f7f3ec;padding:12px 22px;border-radius:999px;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,background .3s" style-hover="transform:translateY(-2px);box-shadow:0 10px 24px rgba(22,19,15,0.22);background:oklch(0.56 0.14 38)" style-active="transform:translateY(0) scale(0.98)">Subscribe</button>
+      </nav>
+    </div>
+  </header>
+
+  <sc-if value="{{ isHome }}" hint-placeholder-val="{{ true }}">
+  <main>
+    <section data-hero="1" style="position:relative;height:100vh;min-height:780px;overflow:hidden">
+      <div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 50% 4%,#fffdf8 0%,#f2ece1 55%,#e7dfd1 100%)"></div>
+
+      <div data-fan-origin="1" style="position:absolute;left:50%;top:78%;width:0;height:0;z-index:2">
+        <div data-fan="1" data-fx="-420" data-fy="34" data-fr="-15" style="z-index:1;position:absolute;width:230px;height:306px;margin:-142px -115px;transform:translate(-420px,34px) rotate(-15deg);box-shadow:0 30px 60px rgba(22,19,15,0.22)">
+          <div style="position:absolute;inset:0;background:oklch(0.46 0.09 148)"></div>
+          <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.14) 0 2px,transparent 2px 10px)"></div>
+          <div style="position:absolute;inset:0;padding:16px;display:flex;flex-direction:column;justify-content:space-between;color:#fbf8f2">
+            <div style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;font-size:15px">ÉCLAT</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:26px;line-height:1.05">Paper<br />Birds</div>
+          </div>
+        </div>
+        <div data-fan="1" data-fx="-215" data-fy="6" data-fr="-8" style="z-index:2;position:absolute;width:230px;height:306px;margin:-142px -115px;transform:translate(-215px,6px) rotate(-8deg);box-shadow:0 30px 60px rgba(22,19,15,0.22)">
+          <div style="position:absolute;inset:0;background:oklch(0.42 0.10 262)"></div>
+          <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.14) 0 2px,transparent 2px 10px)"></div>
+          <div style="position:absolute;inset:0;padding:16px;display:flex;flex-direction:column;justify-content:space-between;color:#fbf8f2">
+            <div style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;font-size:15px">ÉCLAT</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:26px;line-height:1.05">Blue<br />Hour</div>
+          </div>
+        </div>
+        <div data-fan="1" data-fx="0" data-fy="-14" data-fr="0" style="position:absolute;width:252px;height:336px;margin:-168px -126px;transform:translate(0px,-14px);box-shadow:0 44px 90px rgba(22,19,15,0.30);z-index:4">
+          <div style="position:absolute;inset:0;background:oklch(0.40 0.11 38)"></div>
+          <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.15) 0 2px,transparent 2px 10px)"></div>
+          <div style="position:absolute;inset:0;padding:18px;display:flex;flex-direction:column;justify-content:space-between;color:#fbf8f2">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;font-size:16px">ÉCLAT</div>
+              <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.14em">NO. 48</div>
+            </div>
+            <div>
+              <div style="font-family:'Bodoni Moda',serif;font-size:34px;line-height:0.98">The Slow<br />Bloom</div>
+              <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.16em;margin-top:10px;opacity:0.8">SEPTEMBER 2026</div>
+            </div>
+          </div>
+        </div>
+        <div data-fan="1" data-fx="215" data-fy="6" data-fr="8" data-mirror="1" style="z-index:2;position:absolute;width:230px;height:306px;margin:-142px -115px;transform:translate(215px,6px) rotate(8deg);box-shadow:0 30px 60px rgba(22,19,15,0.22)">
+          <div style="position:absolute;inset:0;background:oklch(0.44 0.08 84)"></div>
+          <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.14) 0 2px,transparent 2px 10px)"></div>
+          <div style="position:absolute;inset:0;padding:16px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;text-align:right;color:#fbf8f2">
+            <div style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;font-size:15px">ÉCLAT</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:26px;line-height:1.05">Field<br />Notes</div>
+          </div>
+        </div>
+        <div data-fan="1" data-fx="420" data-fy="34" data-fr="15" data-mirror="1" style="z-index:1;position:absolute;width:230px;height:306px;margin:-142px -115px;transform:translate(420px,34px) rotate(15deg);box-shadow:0 30px 60px rgba(22,19,15,0.22)">
+          <div style="position:absolute;inset:0;background:oklch(0.38 0.06 300)"></div>
+          <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.14) 0 2px,transparent 2px 10px)"></div>
+          <div style="position:absolute;inset:0;padding:16px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;text-align:right;color:#fbf8f2">
+            <div style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;font-size:15px">ÉCLAT</div>
+            <div style="font-family:'Bodoni Moda',serif;font-size:26px;line-height:1.05">Lanterns</div>
+          </div>
+        </div>
+      </div>
+
+      <div data-copy-block="1" style="position:absolute;left:0;right:0;top:clamp(104px,15vh,190px);z-index:4;max-width:1360px;margin:0 auto;padding:0 32px;width:100%;text-align:center;pointer-events:none">
+        <div style="position:absolute;left:50%;top:44%;width:min(1100px,96vw);height:520px;transform:translate(-50%,-50%);z-index:-1;background:radial-gradient(closest-side,rgba(250,247,240,0.94) 0%,rgba(250,247,240,0.78) 52%,rgba(250,247,240,0) 100%)"></div>
+        <div data-hero-copy="1" style="display:inline-flex;align-items:center;gap:10px;font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:oklch(0.56 0.14 38);margin-bottom:18px">
+          <span style="position:relative;display:inline-block;width:7px;height:7px;border-radius:50%;background:oklch(0.56 0.14 38)"><span style="position:absolute;inset:0;border-radius:50%;background:oklch(0.56 0.14 38);animation:pulseDot 2.4s ease-out infinite"></span></span>
+          New issue — September 1
+        </div>
+        <h1 data-hero-copy="1" style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(44px,7vw,104px);line-height:0.9;margin:0;letter-spacing:-0.02em;text-wrap:balance">Forty-eight issues<br /><span style="font-style:italic">of paying attention</span></h1>
+        <p data-hero-copy="1" style="max-width:560px;margin:26px auto 0;font-size:17px;line-height:1.6;color:#6f665b;text-wrap:pretty">The complete Éclat archive, the children's books, and the essays — one subscription, every edition, from No. 1 to whatever comes next.</p>
+      </div>
+
+      <div data-hero-copy="1" style="position:absolute;bottom:26px;left:0;right:0;display:flex;justify-content:center;font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.24em;color:#8b8175;z-index:5">SCROLL</div>
+    </section>
+
+    <section style="max-width:1360px;margin:0 auto;padding:130px 32px 40px">
+      <div data-rev="0" style="opacity:0;transform:translateY(26px);display:flex;align-items:flex-end;justify-content:space-between;gap:30px;border-bottom:1px solid rgba(22,19,15,0.14);padding-bottom:20px">
+        <h2 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(30px,4vw,52px);margin:0;letter-spacing:-0.01em">Newest issue</h2>
+        <div style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6f665b;padding-bottom:8px">No. 48 · September 2026</div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:minmax(0,0.9fr) minmax(0,1.1fr);gap:70px;align-items:center;padding:70px 0 40px">
+        <div data-rev="1" style="opacity:0;transform:translateY(26px)">
+          <div style="overflow:hidden">
+            <div data-par="6" style="position:relative;aspect-ratio:3/4;background:oklch(0.40 0.11 38);will-change:transform">
+              <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.15) 0 2px,transparent 2px 11px)"></div>
+              <div style="position:absolute;inset:0;padding:34px;display:flex;flex-direction:column;justify-content:space-between;color:#fbf8f2">
+                <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                  <div style="font-family:'Bodoni Moda',serif;letter-spacing:0.22em;font-size:24px">ÉCLAT</div>
+                  <div style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.16em">NO. 48</div>
+                </div>
+                <div>
+                  <div style="font-family:'Bodoni Moda',serif;font-size:clamp(34px,4.4vw,62px);line-height:0.95">The Slow<br />Bloom</div>
+                  <div style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.18em;margin-top:16px;opacity:0.82">SEPTEMBER 2026 · 112 PAGES</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.16em;color:#9a9083;margin-top:10px">COVER ART — 1200×1600 DROP-IN</div>
+        </div>
+        <div data-rev="2" style="opacity:0;transform:translateY(26px)">
+          <p style="font-family:'Bodoni Moda',serif;font-size:clamp(24px,2.6vw,34px);line-height:1.28;margin:0 0 26px;letter-spacing:-0.01em;text-wrap:pretty">A late-season issue about the things that take their time: orchards, letters answered a year late, a village that rebuilt its bakery by hand.</p>
+          <p style="font-size:16px;line-height:1.75;color:#6f665b;margin:0 0 34px;max-width:52ch;text-wrap:pretty">Nine features, a new short story, and the first instalment of a year-long photo essay from the northern coast. Free preview opens the first eighteen pages to everyone.</p>
+          <div style="display:flex;gap:14px;flex-wrap:wrap">
+            <button onClick="{{ openNewest }}" style="font:inherit;font-size:13px;letter-spacing:0.09em;text-transform:uppercase;cursor:pointer;border:0;background:#16130f;color:#f7f3ec;padding:15px 28px;border-radius:999px;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,background .3s" style-hover="transform:translateY(-2px);box-shadow:0 12px 28px rgba(22,19,15,0.24);background:oklch(0.56 0.14 38)" style-active="transform:translateY(0) scale(0.98)">See inside this edition</button>
+            <button onClick="{{ goSubscribe }}" style="font:inherit;font-size:13px;letter-spacing:0.09em;text-transform:uppercase;cursor:pointer;background:transparent;color:#16130f;border:1px solid rgba(22,19,15,0.3);padding:15px 28px;border-radius:999px;transition:transform .3s cubic-bezier(.2,.7,.2,1),border-color .3s,background .3s" style-hover="transform:translateY(-2px);border-color:#16130f;background:rgba(22,19,15,0.04)" style-active="transform:translateY(0) scale(0.98)">Subscribe — $9/mo</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section style="max-width:1360px;margin:0 auto;padding:80px 32px">
+      <div data-rev="0" style="opacity:0;transform:translateY(26px);display:flex;align-items:flex-end;justify-content:space-between;gap:30px;border-bottom:1px solid rgba(22,19,15,0.14);padding-bottom:20px;margin-bottom:52px">
+        <h2 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(30px,4vw,52px);margin:0">Featured articles</h2>
+        <a href="#" onClick="{{ goArchive }}" style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6f665b;padding-bottom:8px">All issues →</a>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:44px">
+        <sc-for list="{{ articles }}" as="a" hint-placeholder-count="3">
+          <a href="#" onClick="{{ a.onOpen }}" data-rev="{{ a.i }}" style="opacity:0;transform:translateY(26px);display:block;cursor:pointer">
+            <div style="overflow:hidden;position:relative">
+              <div data-par="4" style="position:relative;aspect-ratio:4/3;background:{{ a.tint }};will-change:transform;transition:transform .7s cubic-bezier(.2,.7,.2,1)">
+                <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.13) 0 2px,transparent 2px 10px)"></div>
+                <div style="position:absolute;left:14px;bottom:12px;font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.16em;color:rgba(255,255,255,0.72)">{{ a.slot }}</div>
+              </div>
+            </div>
+            <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:oklch(0.56 0.14 38);margin:18px 0 10px">{{ a.kicker }}</div>
+            <h3 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:27px;line-height:1.15;margin:0 0 10px;letter-spacing:-0.01em">{{ a.title }}</h3>
+            <p style="font-size:15px;line-height:1.65;color:#6f665b;margin:0">{{ a.dek }}</p>
+          </a>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="position:relative;overflow:hidden;margin-top:60px;background:#efe8db">
+      <div style="max-width:1360px;margin:0 auto;padding:110px 32px">
+        <div data-rev="0" style="opacity:0;transform:translateY(26px);display:flex;align-items:flex-end;justify-content:space-between;gap:30px;border-bottom:1px solid rgba(22,19,15,0.14);padding-bottom:20px;margin-bottom:52px">
+          <h2 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(30px,4vw,52px);margin:0">Books &amp; writings</h2>
+          <div style="display:flex;gap:22px;padding-bottom:8px">
+            <a href="#" onClick="{{ goBooks }}" style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6f665b">Children's books →</a>
+            <a href="#" onClick="{{ goWritings }}" style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:#6f665b">Writings →</a>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:34px">
+          <sc-for list="{{ homeBooks }}" as="b" hint-placeholder-count="5">
+            <a href="#" onClick="{{ goBooks }}" data-rev="{{ b.i }}" style="opacity:0;transform:translateY(26px);display:block;cursor:pointer">
+              <div style="position:relative;aspect-ratio:3/4;background:{{ b.tint }};box-shadow:0 8px 20px rgba(22,19,15,0.12);transition:transform .55s cubic-bezier(.2,.7,.2,1),box-shadow .55s" style-hover="transform:translateY(-10px) rotate(-1.6deg);box-shadow:0 26px 48px rgba(22,19,15,0.22)">
+                <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.13) 0 2px,transparent 2px 10px)"></div>
+                <div style="position:absolute;inset:0;padding:16px;display:flex;align-items:flex-end;color:#fbf8f2;font-family:'Bodoni Moda',serif;font-size:21px;line-height:1.1">{{ b.title }}</div>
+              </div>
+              <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6f665b;margin-top:12px">{{ b.meta }}</div>
+            </a>
+          </sc-for>
+        </div>
+      </div>
+    </section>
+
+    <section style="position:relative;overflow:hidden;background:#16130f;color:#f7f3ec">
+      <div data-par="10" style="position:absolute;inset:-14% 0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.05) 0 2px,transparent 2px 14px);will-change:transform"></div>
+      <div style="position:relative;max-width:1360px;margin:0 auto;padding:140px 32px;text-align:center">
+        <div data-cta="1" style="transition:transform .8s cubic-bezier(.2,.7,.2,1),opacity .8s">
+          <div style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.22em;text-transform:uppercase;color:oklch(0.68 0.12 38);margin-bottom:22px">One subscription</div>
+          <h2 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(38px,6.4vw,88px);line-height:0.98;margin:0 0 26px;letter-spacing:-0.02em">Everything, always,<br /><span style="font-style:italic">including what's next</span></h2>
+          <p style="max-width:520px;margin:0 auto 40px;font-size:17px;line-height:1.65;color:rgba(247,243,236,0.66)">Forty-eight back issues, four children's books, every essay. New editions land quarterly.</p>
+          <button onClick="{{ goSubscribe }}" style="font:inherit;font-size:13px;letter-spacing:0.09em;text-transform:uppercase;cursor:pointer;border:0;background:#f7f3ec;color:#16130f;padding:18px 40px;border-radius:999px;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s" style-hover="transform:translateY(-3px);box-shadow:0 18px 40px rgba(0,0,0,0.4)" style-active="transform:translateY(0) scale(0.98)">Start subscribing</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isArchive }}">
+  <main style="max-width:1360px;margin:0 auto;padding:150px 32px 120px">
+    <div style="animation:fadeUp .7s cubic-bezier(.2,.7,.2,1) both">
+      <h1 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(44px,7vw,104px);line-height:0.92;margin:0;letter-spacing:-0.02em">The archive</h1>
+      <p style="font-size:17px;line-height:1.6;color:#6f665b;max-width:46ch;margin:22px 0 0">Every edition since 2013. Covers are free to browse; full issues open with a subscription.</p>
+    </div>
+
+    <div style="display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap;border-bottom:1px solid rgba(22,19,15,0.14);padding:34px 0 18px;margin:52px 0 46px">
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <sc-for list="{{ years }}" as="y" hint-placeholder-count="5">
+          <button onClick="{{ y.onPick }}" style="font:inherit;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;padding:10px 18px;border-radius:999px;border:1px solid {{ y.border }};background:{{ y.bg }};color:{{ y.fg }};transition:all .3s cubic-bezier(.2,.7,.2,1)" style-hover="transform:translateY(-2px)">{{ y.label }}</button>
+        </sc-for>
+      </div>
+      <button onClick="{{ toggleSort }}" style="font:inherit;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;cursor:pointer;background:transparent;border:0;color:#6f665b;display:flex;align-items:center;gap:10px" style-hover="color:#16130f">{{ sortLabel }}</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:46px 34px">
+      <sc-for list="{{ shown }}" as="ed" hint-placeholder-count="12">
+        <a href="#" onClick="{{ ed.onOpen }}" data-rev="{{ ed.i }}" style="opacity:0;transform:translateY(26px);display:block;cursor:pointer">
+          <div data-cover="1" style="position:relative;aspect-ratio:3/4;background:{{ ed.tint }};box-shadow:0 8px 20px rgba(22,19,15,0.12);transition:transform .55s cubic-bezier(.2,.7,.2,1),box-shadow .55s" style-hover="transform:translateY(-10px) rotate(-1.4deg);box-shadow:0 28px 50px rgba(22,19,15,0.24)">
+            <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.14) 0 2px,transparent 2px 10px)"></div>
+            <div style="position:absolute;inset:0;padding:16px;display:flex;flex-direction:column;justify-content:space-between;color:#fbf8f2">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;font-size:14px">ÉCLAT</div>
+                <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.14em">{{ ed.no }}</div>
+              </div>
+              <div style="font-family:'Bodoni Moda',serif;font-size:25px;line-height:1.04">{{ ed.title }}</div>
+            </div>
+            <sc-if value="{{ ed.isNew }}">
+              <div style="position:absolute;top:-10px;left:-10px;background:oklch(0.56 0.14 38);color:#fff;font-family:'Archivo Narrow',sans-serif;font-size:9px;letter-spacing:0.16em;padding:6px 10px;border-radius:999px">NEW</div>
+            </sc-if>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:14px;font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6f665b">
+            <span>{{ ed.date }}</span>
+            <span>{{ ed.access }}</span>
+          </div>
+        </a>
+      </sc-for>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isEdition }}">
+  <main>
+    <section style="position:relative;overflow:hidden;background:#16130f;color:#f7f3ec;padding:118px 0 0">
+      <div style="max-width:1360px;margin:0 auto;padding:0 32px;display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:64px;align-items:end;padding-bottom:78px">
+        <div>
+          <div data-flip-in="1" style="position:relative;aspect-ratio:3/4;background:{{ ed.tint }};box-shadow:0 40px 80px rgba(0,0,0,0.5)">
+            <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.14) 0 2px,transparent 2px 11px)"></div>
+            <div style="position:absolute;inset:0;padding:24px;display:flex;flex-direction:column;justify-content:space-between;color:#fbf8f2">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start">
+                <div style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;font-size:18px">ÉCLAT</div>
+                <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.14em">{{ ed.no }}</div>
+              </div>
+              <div style="font-family:'Bodoni Moda',serif;font-size:34px;line-height:1">{{ ed.title }}</div>
+            </div>
+          </div>
+        </div>
+        <div style="animation:fadeUp .8s cubic-bezier(.2,.7,.2,1) .12s both">
+          <a href="#" onClick="{{ goArchive }}" style="color:rgba(247,243,236,0.6);font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase">← Archive</a>
+          <h1 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(40px,6.6vw,92px);line-height:0.94;margin:22px 0 0;letter-spacing:-0.02em">{{ ed.title }}</h1>
+          <div style="display:flex;gap:26px;flex-wrap:wrap;font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.18em;text-transform:uppercase;color:rgba(247,243,236,0.62);margin:26px 0 24px">
+            <span>Issue {{ ed.no }}</span>
+            <span>{{ ed.date }}</span>
+            <span>{{ ed.pages }} pages</span>
+          </div>
+          <p style="font-size:17px;line-height:1.7;color:rgba(247,243,236,0.76);max-width:56ch;margin:0">{{ ed.blurb }}</p>
+        </div>
+      </div>
+    </section>
+
+    <section style="max-width:1360px;margin:0 auto;padding:96px 32px 40px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap;border-bottom:1px solid rgba(22,19,15,0.14);padding-bottom:20px">
+        <div style="display:flex;align-items:baseline;gap:18px;flex-wrap:wrap">
+          <h2 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(28px,3.6vw,46px);margin:0">Inside this edition</h2>
+          <span style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:oklch(0.56 0.14 38);border:1px solid oklch(0.56 0.14 38);padding:5px 10px;border-radius:999px">Free preview</span>
+        </div>
+        <div style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.16em;text-transform:uppercase;color:#6f665b;padding-bottom:8px">Drag to browse · click to zoom</div>
+      </div>
+
+      <div data-strip="1" style="display:flex;gap:22px;overflow-x:auto;padding:44px 0 24px;cursor:grab;scrollbar-width:none">
+        <sc-for list="{{ samples }}" as="s" hint-placeholder-count="7">
+          <div onClick="{{ s.onZoom }}" style="flex:0 0 auto;width:{{ s.w }};position:relative;overflow:hidden;background:{{ s.tint }};aspect-ratio:{{ s.ratio }};transition:transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .5s" style-hover="transform:translateY(-8px) rotate(-1.2deg) scale(1.02);box-shadow:0 26px 48px rgba(22,19,15,0.24)">
+            <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.13) 0 2px,transparent 2px 10px)"></div>
+            <div style="position:absolute;left:16px;bottom:14px;font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.16em;color:rgba(255,255,255,0.78)">{{ s.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="max-width:1360px;margin:0 auto;padding:60px 32px 130px">
+      <sc-if value="{{ locked }}">
+        <div style="position:relative;border-top:1px solid rgba(22,19,15,0.14);padding-top:56px">
+          <div style="position:relative;max-height:320px;overflow:hidden">
+            <div style="max-width:62ch;color:#3a352e">
+              <p style="font-family:'Bodoni Moda',serif;font-size:27px;line-height:1.45;margin:0 0 24px">The orchard road is closed for the season, which is how you know the season has turned.</p>
+              <p style="font-size:17px;line-height:1.85;margin:0 0 20px">For eleven years the bakery on the square opened at five. When the roof went, the village decided that rebuilding it slowly was not a compromise but the point — and so the ovens came back one at a time, over fourteen months, each one lit by whoever had paid for it.</p>
+              <p style="font-size:17px;line-height:1.85;margin:0;filter:blur(3px)">There is a photograph on the wall behind the counter of everyone who carried a brick. It is not a good photograph. Nobody is looking at the camera and the light is wrong and it is, by a distance, the most valuable object in the building.</p>
+            </div>
+            <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(247,243,236,0) 34%,#f7f3ec 96%)"></div>
+          </div>
+          <div style="text-align:center;margin-top:-10px;position:relative;z-index:2">
+            <div style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#6f665b;margin-bottom:16px">{{ ed.remaining }} more pages for subscribers</div>
+            <h3 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(28px,3.6vw,44px);margin:0 0 26px;letter-spacing:-0.01em">Read the full issue</h3>
+            <button onClick="{{ goSubscribe }}" style="font:inherit;font-size:13px;letter-spacing:0.09em;text-transform:uppercase;cursor:pointer;border:0;background:#16130f;color:#f7f3ec;padding:17px 36px;border-radius:999px;transition:transform .3s cubic-bezier(.2,.7,.2,1),box-shadow .3s,background .3s" style-hover="transform:translateY(-2px);box-shadow:0 14px 32px rgba(22,19,15,0.26);background:oklch(0.56 0.14 38)" style-active="transform:translateY(0) scale(0.98)">Subscribe — $9/mo</button>
+            <div style="font-size:13px;color:#8b8175;margin-top:16px">Cancel anytime. Covers and previews stay free.</div>
+          </div>
+        </div>
+      </sc-if>
+      <sc-if value="{{ unlocked }}">
+        <div style="border-top:1px solid rgba(22,19,15,0.14);padding-top:56px;max-width:62ch;color:#3a352e">
+          <div style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:oklch(0.56 0.14 38);margin-bottom:22px">Full issue unlocked</div>
+          <p style="font-family:'Bodoni Moda',serif;font-size:27px;line-height:1.45;margin:0 0 24px">The orchard road is closed for the season, which is how you know the season has turned.</p>
+          <p style="font-size:17px;line-height:1.85;margin:0 0 20px">For eleven years the bakery on the square opened at five. When the roof went, the village decided that rebuilding it slowly was not a compromise but the point — and so the ovens came back one at a time, over fourteen months, each one lit by whoever had paid for it.</p>
+          <p style="font-size:17px;line-height:1.85;margin:0 0 20px">There is a photograph on the wall behind the counter of everyone who carried a brick. It is not a good photograph. Nobody is looking at the camera and the light is wrong and it is, by a distance, the most valuable object in the building.</p>
+          <p style="font-size:17px;line-height:1.85;margin:0">Continue to page 19 →</p>
+        </div>
+      </sc-if>
+    </section>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isBooks }}">
+  <main style="max-width:1360px;margin:0 auto;padding:150px 32px 130px">
+    <div style="animation:fadeUp .7s cubic-bezier(.2,.7,.2,1) both;max-width:52ch">
+      <div style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:oklch(0.56 0.14 38);margin-bottom:20px">Ages 3–11</div>
+      <h1 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(44px,7vw,104px);line-height:0.92;margin:0;letter-spacing:-0.02em">Children's<br /><span style="font-style:italic">books</span></h1>
+      <p style="font-size:17px;line-height:1.6;color:#6f665b;margin:24px 0 0">Six picture books, read aloud in the subscriber library. First spread of each is free.</p>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:60px 40px;margin-top:80px">
+      <sc-for list="{{ books }}" as="b" hint-placeholder-count="6">
+        <div data-rev="{{ b.i }}" style="opacity:0;transform:translateY(26px)">
+          <div onClick="{{ b.onZoom }}" style="position:relative;aspect-ratio:1/1;background:{{ b.tint }};box-shadow:0 10px 26px rgba(22,19,15,0.14);cursor:pointer;transition:transform .6s cubic-bezier(.2,.7,.2,1),box-shadow .6s" style-hover="transform:translateY(-12px) rotate(2deg) scale(1.02);box-shadow:0 34px 60px rgba(22,19,15,0.26)">
+            <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.15) 0 2px,transparent 2px 11px)"></div>
+            <div style="position:absolute;inset:0;padding:24px;display:flex;flex-direction:column;justify-content:flex-end;color:#fbf8f2">
+              <div style="font-family:'Bodoni Moda',serif;font-size:30px;line-height:1.02">{{ b.title }}</div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:space-between;gap:12px;margin-top:16px;font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6f665b">
+            <span>{{ b.meta }}</span>
+            <span>{{ b.access }}</span>
+          </div>
+          <p style="font-size:15px;line-height:1.65;color:#6f665b;margin:12px 0 0">{{ b.dek }}</p>
+        </div>
+      </sc-for>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isWritings }}">
+  <main style="max-width:1360px;margin:0 auto;padding:150px 32px 130px">
+    <div style="animation:fadeUp .7s cubic-bezier(.2,.7,.2,1) both;max-width:52ch">
+      <h1 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(44px,7vw,104px);line-height:0.92;margin:0;letter-spacing:-0.02em">Writings</h1>
+      <p style="font-size:17px;line-height:1.6;color:#6f665b;margin:24px 0 0">Essays, reportage and two collections, oldest to newest.</p>
+    </div>
+    <div style="margin-top:76px;border-top:1px solid rgba(22,19,15,0.14)">
+      <sc-for list="{{ writings }}" as="w" hint-placeholder-count="6">
+        <a href="#" onClick="{{ w.onZoom }}" data-rev="{{ w.i }}" style="opacity:0;transform:translateY(26px);display:grid;grid-template-columns:130px minmax(0,1fr) 150px;gap:34px;align-items:center;padding:26px 0;border-bottom:1px solid rgba(22,19,15,0.14);cursor:pointer;transition:background .4s,padding-left .4s" style-hover="background:rgba(22,19,15,0.03);padding-left:14px">
+          <div style="position:relative;aspect-ratio:3/2;background:{{ w.tint }};overflow:hidden">
+            <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.14) 0 2px,transparent 2px 10px)"></div>
+          </div>
+          <div>
+            <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:oklch(0.56 0.14 38);margin-bottom:8px">{{ w.type }}</div>
+            <h3 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(24px,2.6vw,34px);line-height:1.12;margin:0 0 8px">{{ w.title }}</h3>
+            <p style="font-size:15px;line-height:1.6;color:#6f665b;margin:0;max-width:60ch">{{ w.dek }}</p>
+          </div>
+          <div style="text-align:right;font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.16em;text-transform:uppercase;color:#6f665b">{{ w.year }}<br /><span style="color:#a2988a">{{ w.access }}</span></div>
+        </a>
+      </sc-for>
+    </div>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isSubscribe }}">
+  <main style="max-width:1020px;margin:0 auto;padding:150px 32px 140px;min-height:100vh">
+    <sc-if value="{{ stepPlan }}">
+      <div style="animation:fadeUp .45s ease-out both">
+        <div style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#6f665b;margin-bottom:18px">Step 1 of 2 — choose a plan</div>
+        <h1 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(36px,5vw,64px);line-height:1.02;margin:0 0 12px;letter-spacing:-0.02em">Subscribe to Éclat</h1>
+        <p style="font-size:16px;line-height:1.6;color:#6f665b;margin:0 0 46px;max-width:52ch">Full archive, all children's books, every essay, and each new edition as it publishes.</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:18px">
+          <button onClick="{{ pickMonthly }}" style="font:inherit;text-align:left;cursor:pointer;background:{{ monthlyBg }};border:1px solid {{ monthlyBorder }};border-radius:4px;padding:28px;transition:border-color .25s,background .25s">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font-family:'Bodoni Moda',serif;font-size:24px">Monthly</span>
+              <span style="font-family:'Bodoni Moda',serif;font-size:30px">$9</span>
+            </div>
+            <div style="font-size:14px;color:#6f665b;margin-top:10px">Billed monthly. Cancel anytime.</div>
+          </button>
+          <button onClick="{{ pickAnnual }}" style="font:inherit;text-align:left;cursor:pointer;background:{{ annualBg }};border:1px solid {{ annualBorder }};border-radius:4px;padding:28px;transition:border-color .25s,background .25s">
+            <div style="display:flex;justify-content:space-between;align-items:baseline">
+              <span style="font-family:'Bodoni Moda',serif;font-size:24px">Annual</span>
+              <span style="font-family:'Bodoni Moda',serif;font-size:30px">$84</span>
+            </div>
+            <div style="font-size:14px;color:#6f665b;margin-top:10px">$7/mo, billed yearly. Two issues free.</div>
+          </button>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:36px;padding-top:26px;border-top:1px solid rgba(22,19,15,0.14)">
+          <div style="font-size:15px;color:#6f665b">Total today <span style="color:#16130f;font-family:'Bodoni Moda',serif;font-size:20px;margin-left:8px">{{ totalToday }}</span></div>
+          <button onClick="{{ toDetails }}" style="font:inherit;font-size:13px;letter-spacing:0.09em;text-transform:uppercase;cursor:pointer;border:0;background:#16130f;color:#f7f3ec;padding:16px 34px;border-radius:999px;transition:background .25s" style-hover="background:oklch(0.56 0.14 38)">Continue</button>
+        </div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ stepPay }}">
+      <div style="animation:fadeUp .45s ease-out both;max-width:560px">
+        <div style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#6f665b;margin-bottom:18px">Step 2 of 2 — payment</div>
+        <h1 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(32px,4.4vw,52px);line-height:1.04;margin:0 0 34px;letter-spacing:-0.02em">{{ planLabel }} · {{ totalToday }}</h1>
+        <div style="display:grid;gap:16px">
+          <label style="display:grid;gap:8px;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:#6f665b">Email
+            <input type="email" placeholder="you@example.com" style="font:inherit;font-size:16px;color:#16130f;padding:14px;border:1px solid rgba(22,19,15,0.22);border-radius:3px;background:#fffdf8;text-transform:none;letter-spacing:0" />
+          </label>
+          <label style="display:grid;gap:8px;font-size:13px;letter-spacing:0.06em;text-transform:uppercase;color:#6f665b">Card
+            <input type="text" placeholder="4242 4242 4242 4242" style="font:inherit;font-size:16px;color:#16130f;padding:14px;border:1px solid rgba(22,19,15,0.22);border-radius:3px;background:#fffdf8;text-transform:none;letter-spacing:0" />
+          </label>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+            <input type="text" placeholder="MM / YY" style="font:inherit;font-size:16px;color:#16130f;padding:14px;border:1px solid rgba(22,19,15,0.22);border-radius:3px;background:#fffdf8" />
+            <input type="text" placeholder="CVC" style="font:inherit;font-size:16px;color:#16130f;padding:14px;border:1px solid rgba(22,19,15,0.22);border-radius:3px;background:#fffdf8" />
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;gap:18px;margin-top:32px">
+          <button onClick="{{ pay }}" style="font:inherit;font-size:13px;letter-spacing:0.09em;text-transform:uppercase;cursor:pointer;border:0;background:#16130f;color:#f7f3ec;padding:16px 34px;border-radius:999px;transition:background .25s" style-hover="background:oklch(0.56 0.14 38)">Pay {{ totalToday }}</button>
+          <button onClick="{{ backToPlan }}" style="font:inherit;font-size:13px;cursor:pointer;background:transparent;border:0;color:#6f665b;text-decoration:underline">Back</button>
+        </div>
+        <div style="font-size:13px;color:#8b8175;margin-top:22px;line-height:1.6">Renews {{ renewal }}. Cancel from your account at any time.</div>
+      </div>
+    </sc-if>
+    <sc-if value="{{ stepDone }}">
+      <div style="text-align:center;padding:60px 0;animation:fadeUp .55s cubic-bezier(.2,.7,.2,1) both">
+        <svg viewBox="0 0 60 60" width="72" height="72" style="margin-bottom:30px">
+          <circle cx="30" cy="30" r="28" fill="none" stroke="rgba(22,19,15,0.16)" stroke-width="1"></circle>
+          <path d="M18 31 L27 39 L43 22" fill="none" stroke="oklch(0.56 0.14 38)" stroke-width="2" stroke-linecap="round" stroke-dasharray="60" style="animation:drawIn .7s cubic-bezier(.4,0,.2,1) .15s both"></path>
+        </svg>
+        <h1 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(34px,5vw,64px);line-height:1.02;margin:0 0 16px;letter-spacing:-0.02em">You're in.</h1>
+        <p style="font-size:17px;line-height:1.6;color:#6f665b;margin:0 auto 40px;max-width:44ch">The full archive is open. No. 48 arrives in your library on September 1.</p>
+        <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+          <button onClick="{{ goArchive }}" style="font:inherit;font-size:13px;letter-spacing:0.09em;text-transform:uppercase;cursor:pointer;border:0;background:#16130f;color:#f7f3ec;padding:16px 32px;border-radius:999px;transition:background .25s" style-hover="background:oklch(0.56 0.14 38)">Open the archive</button>
+          <button onClick="{{ goAccount }}" style="font:inherit;font-size:13px;letter-spacing:0.09em;text-transform:uppercase;cursor:pointer;background:transparent;border:1px solid rgba(22,19,15,0.3);color:#16130f;padding:16px 32px;border-radius:999px;transition:border-color .25s" style-hover="border-color:#16130f">Account</button>
+        </div>
+      </div>
+    </sc-if>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isAccount }}">
+  <main style="max-width:1020px;margin:0 auto;padding:150px 32px 140px;min-height:100vh">
+    <div style="animation:fadeUp .5s ease-out both">
+      <div style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#6f665b;margin-bottom:18px">Account</div>
+      <h1 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:clamp(34px,5vw,64px);line-height:1.02;margin:0 0 44px;letter-spacing:-0.02em">Reader since 2021</h1>
+
+      <div style="border:1px solid rgba(22,19,15,0.14);border-radius:4px;background:#fffdf8;padding:30px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:28px">
+        <div>
+          <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#6f665b;margin-bottom:10px">Status</div>
+          <div style="display:flex;align-items:center;gap:10px;font-family:'Bodoni Moda',serif;font-size:22px">
+            <span style="width:7px;height:7px;border-radius:50%;background:{{ statusDot }};display:inline-block"></span>{{ statusLabel }}
+          </div>
+        </div>
+        <div>
+          <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#6f665b;margin-bottom:10px">Plan</div>
+          <div style="font-family:'Bodoni Moda',serif;font-size:22px">{{ planLabel }}</div>
+        </div>
+        <div>
+          <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#6f665b;margin-bottom:10px">Renews</div>
+          <div style="font-family:'Bodoni Moda',serif;font-size:22px">{{ renewal }}</div>
+        </div>
+        <div>
+          <div style="font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#6f665b;margin-bottom:10px">Card</div>
+          <div style="font-family:'Bodoni Moda',serif;font-size:22px">•••• 4242</div>
+        </div>
+      </div>
+
+      <sc-if value="{{ locked }}">
+        <div style="margin-top:22px;display:flex;align-items:center;justify-content:space-between;gap:20px;flex-wrap:wrap;padding:22px 26px;border:1px solid oklch(0.56 0.14 38);border-radius:4px">
+          <div style="font-size:15px;line-height:1.6;color:#3a352e;max-width:52ch">You're on the free tier — covers and previews only. Subscribe to open all forty-eight issues.</div>
+          <button onClick="{{ goSubscribe }}" style="font:inherit;font-size:12px;letter-spacing:0.09em;text-transform:uppercase;cursor:pointer;border:0;background:oklch(0.56 0.14 38);color:#fff;padding:14px 26px;border-radius:999px">Subscribe</button>
+        </div>
+      </sc-if>
+
+      <h2 style="font-family:'Bodoni Moda',serif;font-weight:400;font-size:30px;margin:66px 0 0">Billing history</h2>
+      <div style="margin-top:24px;border-top:1px solid rgba(22,19,15,0.14)">
+        <sc-for list="{{ invoices }}" as="v" hint-placeholder-count="4">
+          <div style="display:grid;grid-template-columns:150px minmax(0,1fr) 90px 110px;gap:20px;align-items:center;padding:18px 0;border-bottom:1px solid rgba(22,19,15,0.1);font-size:15px;transition:padding-left .35s" style-hover="padding-left:10px">
+            <span style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#6f665b">{{ v.date }}</span>
+            <span>{{ v.desc }}</span>
+            <span>{{ v.amount }}</span>
+            <a href="#" style="font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.14em;text-transform:uppercase;color:#6f665b">Receipt →</a>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+  </main>
+  </sc-if>
+
+  <footer style="border-top:1px solid rgba(22,19,15,0.14);padding:56px 32px;background:#f7f3ec">
+    <div style="max-width:1360px;margin:0 auto;display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;align-items:baseline">
+      <div style="font-family:'Bodoni Moda',serif;font-size:22px;letter-spacing:0.22em">ÉCLAT</div>
+      <div style="font-size:13px;color:#8b8175">Quarterly since 2013 · Prototype — imagery to be supplied</div>
+    </div>
+  </footer>
+
+  <sc-if value="{{ lightboxOpen }}">
+    <div onClick="{{ closeLightbox }}" style="position:fixed;inset:0;z-index:90;background:rgba(14,12,10,0.92);display:flex;align-items:center;justify-content:center;padding:6vh 6vw;cursor:zoom-out;animation:fadeUp .3s ease-out both">
+      <div data-lb-img="1" style="position:relative;max-width:100%;max-height:100%;width:min(1000px,100%);aspect-ratio:{{ lb.ratio }};background:{{ lb.tint }};box-shadow:0 40px 100px rgba(0,0,0,0.6)">
+        <div style="position:absolute;inset:0;background-image:repeating-linear-gradient(140deg,rgba(255,255,255,0.13) 0 2px,transparent 2px 12px)"></div>
+        <div style="position:absolute;left:22px;bottom:18px;font-family:'Archivo Narrow',sans-serif;font-size:11px;letter-spacing:0.18em;color:rgba(255,255,255,0.8)">{{ lb.label }}</div>
+      </div>
+      <div style="position:absolute;bottom:22px;left:0;right:0;text-align:center;font-family:'Archivo Narrow',sans-serif;font-size:10px;letter-spacing:0.2em;color:rgba(247,243,236,0.5)">CLICK ANYWHERE TO CLOSE</div>
+    </div>
+  </sc-if>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440,&quot;height&quot;:900}}">
+class Component extends DCLogic {
+  state = { route: 'home', edId: 48, sort: 'new', year: 'All', lb: null, step: 'plan', plan: 'annual', subscribed: false };
+
+  editions = [
+    { no: 48, title: 'The Slow Bloom', date: 'September 2026', year: '2026', pages: 112, tint: 'oklch(0.40 0.11 38)', isNew: true, blurb: 'A late-season issue about the things that take their time: orchards, letters answered a year late, a village that rebuilt its bakery by hand.' },
+    { no: 47, title: 'Salt & Paper', date: 'June 2026', year: '2026', pages: 104, tint: 'oklch(0.42 0.09 210)', blurb: 'Coastal printers, a swimming club that has met every morning since 1962, and the last hand-cut typeface in the country.' },
+    { no: 46, title: 'Nightingale', date: 'March 2026', year: '2026', pages: 96, tint: 'oklch(0.34 0.08 300)', blurb: 'On night work: bakers, radio hosts, nurses, and the birds that keep them company.' },
+    { no: 45, title: 'The Winter Rooms', date: 'December 2025', year: '2025', pages: 120, tint: 'oklch(0.38 0.07 258)', blurb: 'Twelve interiors and the people who never intended to stay in them.' },
+    { no: 44, title: 'Field Notes', date: 'September 2025', year: '2025', pages: 100, tint: 'oklch(0.44 0.08 84)', blurb: 'A season with three botanists, one of whom has been drawing the same meadow since 1988.' },
+    { no: 43, title: 'Blue Hour', date: 'June 2025', year: '2025', pages: 108, tint: 'oklch(0.42 0.10 262)', blurb: 'Photographs made in the twenty minutes before sunrise, from six cities.' },
+    { no: 42, title: 'Small Machines', date: 'March 2025', year: '2025', pages: 92, tint: 'oklch(0.40 0.06 160)', blurb: 'Repair shops, watchmakers, and an argument for owning fewer, better things.' },
+    { no: 41, title: 'Hearthlight', date: 'December 2024', year: '2024', pages: 116, tint: 'oklch(0.38 0.10 26)', blurb: 'Winter food, winter light, and a long piece on the return of the communal oven.' },
+    { no: 40, title: 'The Long Table', date: 'September 2024', year: '2024', pages: 128, tint: 'oklch(0.46 0.09 148)', blurb: 'Fortieth issue. Forty meals, forty households, one recipe repeated across a century.' },
+    { no: 39, title: 'Wildwater', date: 'June 2024', year: '2024', pages: 96, tint: 'oklch(0.44 0.09 232)', blurb: 'Rivers reclaimed, dams removed, and swimming as a civic act.' },
+    { no: 38, title: 'Paper Birds', date: 'March 2024', year: '2024', pages: 88, tint: 'oklch(0.46 0.09 148)', blurb: 'Folding, printing, binding: an issue about paper, made on paper.' },
+    { no: 37, title: 'Lanterns', date: 'December 2023', year: '2023', pages: 104, tint: 'oklch(0.38 0.06 300)', blurb: 'Midwinter processions in four countries, photographed over one week.' }
+  ];
+
+  books = [
+    { title: 'The Boy Who Counted Rain', meta: 'Ages 4–7 · 32 pages', dek: 'A picture book about patience, told in forty-one raindrops.', tint: 'oklch(0.50 0.10 232)' },
+    { title: 'Marta and the Long Night', meta: 'Ages 5–8 · 40 pages', dek: 'A lighthouse, a storm, and a girl who refuses to be frightened.', tint: 'oklch(0.44 0.10 300)' },
+    { title: 'Small Bear, Big Snow', meta: 'Ages 3–6 · 28 pages', dek: 'First winter, first friend, first genuinely bad idea.', tint: 'oklch(0.52 0.09 84)' },
+    { title: 'The Orchard Keeper', meta: 'Ages 7–11 · 64 pages', dek: 'An illustrated chapter book about inheriting something alive.', tint: 'oklch(0.46 0.10 148)' },
+    { title: 'Twelve Ways Home', meta: 'Ages 6–9 · 36 pages', dek: 'Twelve routes across one city, none of them the fastest.', tint: 'oklch(0.48 0.10 38)' },
+    { title: 'Nobody\u2019s Cat', meta: 'Ages 4–8 · 32 pages', dek: 'Everyone on the street claims her. She claims nobody.', tint: 'oklch(0.42 0.08 258)' }
+  ];
+
+  writings = [
+    { title: 'On Rebuilding Slowly', type: 'Essay', year: '2026', dek: 'Fourteen months, one oven at a time, and what speed costs.', tint: 'oklch(0.48 0.10 38)' },
+    { title: 'The Bakery on the Square', type: 'Reportage', year: '2025', dek: 'A village, a roof, and eleven hundred bricks carried by hand.', tint: 'oklch(0.44 0.08 84)' },
+    { title: 'Letters to the Meadow', type: 'Collection', year: '2024', dek: 'Thirty-eight years of a botanist\u2019s correspondence, annotated.', tint: 'oklch(0.46 0.09 148)' },
+    { title: 'Night Shift', type: 'Essay', year: '2023', dek: 'What the country looks like between two and five in the morning.', tint: 'oklch(0.38 0.08 300)' },
+    { title: 'A Short History of the Long Table', type: 'Nonfiction', year: '2021', dek: 'One recipe, six households, a hundred years of substitutions.', tint: 'oklch(0.42 0.09 210)' },
+    { title: 'Cold Water', type: 'Collection', year: '2019', dek: 'Swimming pieces, collected — rivers, harbours, one reservoir.', tint: 'oklch(0.44 0.09 232)' }
+  ];
+
+  samples = [
+    { label: 'SPREAD 02–03 · ORCHARD ROAD', tint: 'oklch(0.44 0.08 84)', w: '640px', ratio: '16/10' },
+    { label: 'PAGE 07 · PORTRAIT', tint: 'oklch(0.40 0.11 38)', w: '320px', ratio: '3/4' },
+    { label: 'SPREAD 08–09 · THE OVENS', tint: 'oklch(0.38 0.07 258)', w: '640px', ratio: '16/10' },
+    { label: 'PAGE 11 · STILL LIFE', tint: 'oklch(0.46 0.09 148)', w: '320px', ratio: '3/4' },
+    { label: 'SPREAD 12–13 · MARKET', tint: 'oklch(0.42 0.10 262)', w: '640px', ratio: '16/10' },
+    { label: 'PAGE 16 · LETTERS', tint: 'oklch(0.34 0.08 300)', w: '320px', ratio: '3/4' },
+    { label: 'PAGE 18 · END OF PREVIEW', tint: 'oklch(0.40 0.06 160)', w: '400px', ratio: '4/5' }
+  ];
+
+  articles = [
+    { kicker: 'From No. 48', title: 'Fourteen Months, One Oven at a Time', dek: 'How a village decided that rebuilding slowly was the point.', tint: 'oklch(0.44 0.08 84)', slot: 'FEATURE PHOTO 1600×1200' },
+    { kicker: 'From No. 47', title: 'The Last Hand-Cut Typeface', dek: 'A punchcutter, an apprentice, and eight remaining steel blanks.', tint: 'oklch(0.42 0.09 210)', slot: 'FEATURE PHOTO 1600×1200' },
+    { kicker: 'From No. 46', title: 'Between Two and Five', dek: 'Night work, in six portraits and one very long walk.', tint: 'oklch(0.34 0.08 300)', slot: 'FEATURE PHOTO 1600×1200' }
+  ];
+
+  invoices = [
+    { date: '12 Aug 2026', desc: 'Annual subscription — Éclat', amount: '$84.00' },
+    { date: '12 Aug 2025', desc: 'Annual subscription — Éclat', amount: '$84.00' },
+    { date: '12 Aug 2024', desc: 'Annual subscription — Éclat', amount: '$78.00' },
+    { date: '12 Aug 2023', desc: 'Annual subscription — Éclat', amount: '$78.00' }
+  ];
+
+  componentDidMount() {
+    this.reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    this.mobile = window.innerWidth < 720;
+    this.scrolled = false;
+    this.attach();
+    if (!this.reduced) {
+      this.loop = () => { this.tick(); this.raf = requestAnimationFrame(this.loop); };
+      this.raf = requestAnimationFrame(this.loop);
+    }
+  }
+
+  componentWillUnmount() { if (this.raf) cancelAnimationFrame(this.raf); if (this.io) this.io.disconnect(); }
+
+  componentDidUpdate() {
+    this.attach();
+    if (this.flip) { this.runFlip('[data-flip-in]', this.flip); this.flip = null; }
+    if (this.lbFlip) { this.runFlip('[data-lb-img]', this.lbFlip); this.lbFlip = null; }
+  }
+
+  runFlip(sel, from) {
+    const el = document.querySelector(sel);
+    if (!el || this.reduced) return;
+    const to = el.getBoundingClientRect();
+    if (!to.width || !to.height) return;
+    el.animate([
+      { transformOrigin: 'top left', transform: 'translate(' + (from.left - to.left) + 'px,' + (from.top - to.top) + 'px) scale(' + (from.width / to.width) + ',' + (from.height / to.height) + ')' },
+      { transformOrigin: 'top left', transform: 'none' }
+    ], { duration: 620, easing: 'cubic-bezier(.72,0,.16,1)' });
+  }
+
+  attach() {
+    const reveals = document.querySelectorAll('[data-rev]');
+    if (this.reduced) {
+      reveals.forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
+    } else {
+      if (!this.io) {
+        this.io = new IntersectionObserver(entries => entries.forEach(e => {
+          if (!e.isIntersecting) return;
+          const el = e.target, d = Math.min(6, parseInt(el.dataset.rev || '0', 10)) * 0.08;
+          el.style.transition = 'opacity .85s cubic-bezier(.2,.7,.2,1) ' + d + 's, transform .95s cubic-bezier(.2,.7,.2,1) ' + d + 's';
+          el.style.opacity = '1'; el.style.transform = 'none';
+          this.io.unobserve(el);
+        }), { threshold: 0.1, rootMargin: '0px 0px -8% 0px' });
+      }
+      reveals.forEach(el => { if (el.style.opacity !== '1') this.io.observe(el); });
+    }
+    const strip = document.querySelector('[data-strip]');
+    if (strip && !strip.dataset.bound) {
+      strip.dataset.bound = '1';
+      let down = false, sx = 0, sl = 0;
+      strip.addEventListener('pointerdown', e => { down = true; sx = e.clientX; sl = strip.scrollLeft; strip.style.cursor = 'grabbing'; });
+      strip.addEventListener('pointermove', e => { if (!down) return; strip.scrollLeft = sl - (e.clientX - sx); });
+      const up = () => { down = false; strip.style.cursor = 'grab'; };
+      strip.addEventListener('pointerup', up);
+      strip.addEventListener('pointerleave', up);
+    }
+    if (!this.scrollBound) {
+      this.scrollBound = true;
+      window.addEventListener('scroll', () => {
+        const s = window.scrollY > 30;
+        if (s !== this.scrolled) { this.scrolled = s; this.paintNav(s); }
+      }, { passive: true });
+    }
+    this.paintNav(window.scrollY > 30);
+    if (this.reduced) for (let i = 0; i < 30; i++) this.tick(true);
+  }
+
+  paintNav(s) {
+    const nav = document.querySelector('[data-nav]');
+    if (nav) nav.style.boxShadow = s ? '0 8px 26px rgba(22,19,15,0.07)' : 'none';
+  }
+
+  tick(finalOnly) {
+    const vh = window.innerHeight;
+    const fan = document.querySelectorAll('[data-fan]');
+    if (fan.length) {
+      const raw = Math.min(1, Math.max(0, window.scrollY / (vh * 0.62)));
+      const p = finalOnly ? 1 : 1 - Math.pow(1 - Math.min(1, raw + 0.12), 3);
+      const fit = Math.min(1, (window.innerWidth - 48) / 1120);
+      const hero = document.querySelector('[data-hero]');
+      const origin = document.querySelector('[data-fan-origin]');
+      const copy = document.querySelector('[data-copy-block]');
+      let s = 0.72 + 0.28 * fit;
+      let H = 0, hTop = 0;
+      if (hero && origin) {
+        H = hero.clientHeight; hTop = hero.getBoundingClientRect().top;
+        const cBot = copy ? copy.getBoundingClientRect().bottom - hTop : H * 0.4;
+        const band = Math.max(210, H - 26 - (cBot + 18));
+        s = Math.min(s, band / 340);
+        origin.style.top = (H - 26 - 176 * s - (this.fanShift || 0)) + 'px';
+      }
+      const bound = window.innerWidth / 2 - 152;
+      fan.forEach(el => {
+        let x = parseFloat(el.dataset.fx) * p * fit;
+        x = Math.max(-bound, Math.min(bound, x));
+        const y = parseFloat(el.dataset.fy) * p * s, r = parseFloat(el.dataset.fr) * p;
+        el.style.transform = 'translate(' + x.toFixed(1) + 'px,' + y.toFixed(1) + 'px) rotate(' + r.toFixed(2) + 'deg) scale(' + ((0.9 + 0.1 * p) * s).toFixed(3) + ')';
+      });
+      if (H) {
+        let maxB = 0;
+        fan.forEach(el => { maxB = Math.max(maxB, el.getBoundingClientRect().bottom - hTop); });
+        const over = maxB - (H - 22);
+        if (Math.abs(over) > 1) this.fanShift = Math.max(0, Math.min(H * 0.4, (this.fanShift || 0) + over));
+      }
+      document.querySelectorAll('[data-hero-copy]').forEach(el => {
+        el.style.opacity = String(Math.max(0, 1 - raw * 1.4));
+        el.style.transform = 'translateY(' + (-raw * 40).toFixed(1) + 'px)';
+      });
+    }
+    if (finalOnly) return;
+    const k = this.mobile ? 0.4 : 1;
+    document.querySelectorAll('[data-par]').forEach(el => {
+      const s = parseFloat(el.dataset.par) * k;
+      const r = el.getBoundingClientRect();
+      if (r.bottom < -200 || r.top > vh + 200) return;
+      const off = (r.top + r.height / 2 - vh / 2) / vh;
+      el.style.transform = 'translate3d(0,' + (-off * s * 10).toFixed(2) + 'px,0) scale(1.06)';
+    });
+    document.querySelectorAll('[data-cta]').forEach(el => {
+      const r = el.getBoundingClientRect();
+      const v = Math.min(1, Math.max(0, (vh - r.top) / (vh * 0.8)));
+      el.style.transform = 'scale(' + (0.94 + 0.06 * v).toFixed(3) + ')';
+      el.style.opacity = String(0.5 + 0.5 * v);
+    });
+  }
+
+  nav(route, extra) {
+    this.setState(Object.assign({ route: route, lb: null }, extra || {}));
+    window.scrollTo(0, 0);
+  }
+
+  openEdition(ed, e) {
+    if (e) { e.preventDefault(); const n = e.currentTarget.querySelector('[data-cover]') || e.currentTarget; this.flip = n.getBoundingClientRect(); }
+    this.nav('edition', { edId: ed.no });
+  }
+
+  zoom(item, e) {
+    if (e) { e.preventDefault(); this.lbFlip = e.currentTarget.getBoundingClientRect(); }
+    this.setState({ lb: item });
+  }
+
+  renderVals() {
+    const st = this.state;
+    const ed = this.editions.find(e => e.no === st.edId) || this.editions[0];
+    let list = this.editions.filter(e => st.year === 'All' || e.year === st.year);
+    list = list.slice().sort((a, b) => st.sort === 'new' ? b.no - a.no : a.no - b.no);
+    const annual = st.plan === 'annual';
+    const gate = txt => st.subscribed ? 'Included' : txt;
+
+    return {
+      isHome: st.route === 'home', isArchive: st.route === 'archive', isEdition: st.route === 'edition',
+      isBooks: st.route === 'books', isWritings: st.route === 'writings', isSubscribe: st.route === 'subscribe', isAccount: st.route === 'account',
+      goHome: e => { e.preventDefault(); this.nav('home'); },
+      goArchive: e => { e.preventDefault(); this.nav('archive'); },
+      goBooks: e => { e.preventDefault(); this.nav('books'); },
+      goWritings: e => { e.preventDefault(); this.nav('writings'); },
+      goAccount: e => { e.preventDefault(); this.nav('account'); },
+      goSubscribe: e => { e.preventDefault(); this.nav('subscribe', { step: st.subscribed ? 'done' : 'plan' }); },
+      openNewest: e => this.openEdition(this.editions[0], e),
+
+      articles: this.articles.map((a, i) => Object.assign({}, a, { i: i, onOpen: e => this.openEdition(this.editions[i], e) })),
+      homeBooks: this.books.slice(0, 5).map((b, i) => Object.assign({}, b, { i: i })),
+      books: this.books.map((b, i) => Object.assign({}, b, { i: i, access: gate('First spread free'), onZoom: e => this.zoom({ tint: b.tint, label: b.title.toUpperCase() + ' · COVER', ratio: '1/1' }, e) })),
+      writings: this.writings.map((w, i) => Object.assign({}, w, { i: i, access: gate('Subscribers'), onZoom: e => this.zoom({ tint: w.tint, label: w.title.toUpperCase(), ratio: '3/2' }, e) })),
+      samples: this.samples.map(s => Object.assign({}, s, { onZoom: e => this.zoom(s, e) })),
+      invoices: st.subscribed || true ? this.invoices : [],
+
+      years: ['All', '2026', '2025', '2024', '2023'].map(y => ({
+        label: y, onPick: () => this.setState({ year: y }),
+        bg: st.year === y ? '#16130f' : 'transparent',
+        fg: st.year === y ? '#f7f3ec' : '#16130f',
+        border: st.year === y ? '#16130f' : 'rgba(22,19,15,0.22)'
+      })),
+      shown: list.map((e, i) => Object.assign({}, e, {
+        i: i, no: 'No. ' + e.no, access: gate('Preview free'),
+        onOpen: ev => this.openEdition(e, ev)
+      })),
+      sortLabel: st.sort === 'new' ? 'Newest first ↓' : 'Oldest first ↑',
+      toggleSort: () => this.setState({ sort: st.sort === 'new' ? 'old' : 'new' }),
+
+      ed: Object.assign({}, ed, { no: 'No. ' + ed.no, remaining: ed.pages - 18 }),
+      locked: !st.subscribed, unlocked: st.subscribed,
+
+      stepPlan: st.step === 'plan', stepPay: st.step === 'pay', stepDone: st.step === 'done',
+      pickMonthly: () => this.setState({ plan: 'monthly' }), pickAnnual: () => this.setState({ plan: 'annual' }),
+      monthlyBg: annual ? 'transparent' : '#fffdf8', monthlyBorder: annual ? 'rgba(22,19,15,0.16)' : '#16130f',
+      annualBg: annual ? '#fffdf8' : 'transparent', annualBorder: annual ? '#16130f' : 'rgba(22,19,15,0.16)',
+      totalToday: annual ? '$84.00' : '$9.00',
+      planLabel: annual ? 'Annual' : 'Monthly',
+      renewal: annual ? '27 August 2027' : '27 September 2026',
+      toDetails: () => this.setState({ step: 'pay' }),
+      backToPlan: () => this.setState({ step: 'plan' }),
+      pay: () => { this.setState({ step: 'done', subscribed: true }); window.scrollTo(0, 0); },
+      statusDot: st.subscribed ? 'oklch(0.56 0.14 148)' : 'oklch(0.56 0.14 38)',
+      statusLabel: st.subscribed ? 'Active' : 'Free tier',
+
+      lightboxOpen: !!st.lb, lb: st.lb || { tint: '#333', label: '', ratio: '16/10' },
+      closeLightbox: () => this.setState({ lb: null })
+    };
+  }
+}
+</script>
+</body>
+</html>
