@@ -33,7 +33,7 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. A Postgres database is provisioned and reachable from a Vercel serverless function, with tables for users, sessions/customers, subscriptions, and processed webhook events created
   4. A build-time check scans the `dist/` output for secret substrings and fails if any are found
 
-**Plans**: 1/3 plans executed
+**Plans**: 2/3 plans executed
 Plans:
 **Wave 1**
 
@@ -41,7 +41,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 01-02-PLAN.md — Provision Vercel Postgres and verify the live schema
+- [x] 01-02-PLAN.md — Provision Vercel Postgres and verify the live schema
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -116,7 +116,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|-----------------|--------|-----------|
-| 1. Foundation — Environment, Secrets & Data Layer | 1/3 | In Progress|  |
+| 1. Foundation — Environment, Secrets & Data Layer | 2/3 | In Progress|  |
 | 2. Authentication — Google Sign-In & Server-Side Sessions | TBD | Not started | - |
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | TBD | Not started | - |
 | 4. Content Gating — Real Server-Side Entitlement Enforcement | TBD | Not started | - |
