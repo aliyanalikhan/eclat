@@ -6,12 +6,13 @@
   "description": "Éclat — a quarterly magazine, its archive, children's books and essays.",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && vite build --ssr src/entry-server.jsx --outDir dist/server && node prerender.js",
+    "build": "node scripts/migrate.js && vite build && vite build --ssr src/entry-server.jsx --outDir dist/server && node prerender.js",
     "build:client": "vite build",
     "preview": "vite preview",
     "serve": "vite preview --port 4173"
   },
   "dependencies": {
+    "@vercel/postgres": "0.10.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router-dom": "6.28.0"
