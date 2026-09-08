@@ -18,8 +18,8 @@ Requirements for this milestone. Each maps to roadmap phases.
 - [x] **AUTH-02**: Server verifies the Google ID token's signature, audience, expiry, and issuer before creating a session — never trusts an unverified client-supplied identity
 - [x] **AUTH-03**: User is identified internally by Google's stable `sub` claim, not by email address
 - [x] **AUTH-04**: User's signed-in session persists across page reloads without re-authenticating with Google each time
-- [ ] **AUTH-05**: User can sign out, which clears their server session
-- [ ] **AUTH-06**: No email/password sign-in option exists anywhere on the site
+- [x] **AUTH-05**: User can sign out, which clears their server session
+- [x] **AUTH-06**: No email/password sign-in option exists anywhere on the site
 
 ### Billing & Checkout (BILL)
 
@@ -82,8 +82,8 @@ Explicitly excluded. Documented to prevent scope creep.
 | AUTH-02 | Phase 2 | Complete |
 | AUTH-03 | Phase 2 | Complete |
 | AUTH-04 | Phase 2 | Complete |
-| AUTH-05 | Phase 2 | Pending |
-| AUTH-06 | Phase 2 | Pending |
+| AUTH-05 | Phase 2 | Complete |
+| AUTH-06 | Phase 2 | Complete |
 | BILL-01 | Phase 3 | Pending |
 | BILL-02 | Phase 3 | Pending |
 | BILL-03 | Phase 3 | Pending |

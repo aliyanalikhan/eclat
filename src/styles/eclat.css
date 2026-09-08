@@ -384,6 +384,115 @@ a:hover {
   display: block;
 }
 
+/* --- auth-aware nav slot -------------------------------------------------
+   Three states (02-UI-SPEC.md Component Notes §1-2): an invisible
+   reserved-width placeholder while the session check is in flight, a plain
+   .link-underline anchor when signed out, or the trigger+menu below when
+   signed in. */
+.auth-slot {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.auth-slot--loading {
+  min-width: 90px;
+  visibility: hidden;
+}
+
+.auth-trigger {
+  display: inline-flex;
+  align-items: center;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+
+.auth-avatar {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 4px;
+}
+
+.auth-avatar--fallback {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--narrow);
+  font-size: 10px;
+}
+
+.auth-trigger__name {
+  margin-right: 8px;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-weight: 500;
+}
+
+.auth-caret {
+  flex-shrink: 0;
+  transition: transform 0.3s var(--ease);
+}
+
+.auth-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  z-index: 70;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  padding: 8px;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 0 12px 28px rgba(22, 19, 15, 0.12);
+}
+
+.auth-menu__item {
+  display: block;
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink);
+  text-align: left;
+  cursor: pointer;
+}
+
+.auth-menu__item:hover,
+.auth-menu__item:focus-visible {
+  background: rgba(22, 19, 15, 0.04);
+}
+
+.auth-menu__item.is-pending {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.auth-menu__error {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--line-soft);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ink-soft);
+  text-transform: none;
+  letter-spacing: normal;
+}
+
 /* --- hero --------------------------------------------------------------- */
 .hero {
   position: relative;

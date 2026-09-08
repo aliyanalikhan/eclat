@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useScrolled } from '../lib/motion.js'
+import { useSession } from '../lib/useSession.js'
 
 const LINKS = [
   { to: '/archive', label: 'Archive' },
@@ -8,13 +9,29 @@ const LINKS = [
   { to: '/writings', label: 'Writings' },
 ]
 
+/** Truncates a display name to 18 characters with an ellipsis, falling back
+ * to "Account" if the name claim is empty (Copywriting Contract). */
+function truncateName(name) {
+  const trimmed = (name || '').trim()
+  if (!trimmed) return 'Account'
+  return trimmed.length > 18 ? `${trimmed.slice(0, 18)}…` : trimmed
+}
+
 export default function Header() {
   const scrolled = useScrolled(30)
   const [open, setOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const { pathname } = useLocation()
   const navId = useId()
+  const authMenuId = useId()
   const toggleRef = useRef(null)
+
+  const { user, loading, refetch } = useSession()
+  const [authMenuOpen, setAuthMenuOpen] = useState(false)
+  const [avatarFailed, setAvatarFailed] = useState(false)
+  const [signOutState, setSignOutState] = useState('idle') // idle | pending | error
+  const authSlotRef = useRef(null)
+  const authTriggerRef = useRef(null)
 
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 900px)')
@@ -27,8 +44,11 @@ export default function Header() {
     return () => mq.removeEventListener('change', sync)
   }, [])
 
-  // Close the menu whenever the route changes.
-  useEffect(() => setOpen(false), [pathname])
+  // Close both the mobile nav and the auth menu whenever the route changes.
+  useEffect(() => {
+    setOpen(false)
+    setAuthMenuOpen(false)
+  }, [pathname])
 
   useEffect(() => {
     if (!open) return
@@ -42,7 +62,53 @@ export default function Header() {
     return () => document.removeEventListener('keydown', onKey)
   }, [open])
 
+  // A stale avatar-load-failure flag shouldn't survive a different picture URL.
+  useEffect(() => setAvatarFailed(false), [user?.picture])
+
+  useEffect(() => {
+    if (!authMenuOpen) return
+    const onKey = (e) => {
+      if (e.key === 'Escape') {
+        setAuthMenuOpen(false)
+        authTriggerRef.current?.focus()
+      }
+    }
+    const onClickOutside = (e) => {
+      if (authSlotRef.current && !authSlotRef.current.contains(e.target)) {
+        setAuthMenuOpen(false)
+      }
+    }
+    document.addEventListener('keydown', onKey)
+    document.addEventListener('mousedown', onClickOutside)
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.removeEventListener('mousedown', onClickOutside)
+    }
+  }, [authMenuOpen])
+
+  function toggleAuthMenu() {
+    setAuthMenuOpen((v) => {
+      const next = !v
+      if (next) setSignOutState('idle')
+      return next
+    })
+  }
+
+  async function handleSignOut() {
+    setSignOutState('pending')
+    try {
+      const res = await fetch('/api/auth/logout', { method: 'POST' })
+      if (!res.ok) throw new Error(`logout failed: ${res.status}`)
+      setSignOutState('idle')
+      setAuthMenuOpen(false)
+      refetch()
+    } catch {
+      setSignOutState('error')
+    }
+  }
+
   const navHidden = isMobile && !open
+  const displayName = user ? truncateName(user.name) : ''
 
   return (
     <header className={`header${scrolled ? ' header--scrolled' : ''}`}>
@@ -83,19 +149,93 @@ export default function Header() {
           ))}
           {/*
             Auth-aware nav slot (D-06): reuses the single "Account" nav
-            position rather than adding a second nav item. The signed-out
-            state is a plain <a href> — NOT a React Router <Link>/<NavLink> —
-            because /api/* is a serverless function route, not a client-side
-            route; React Router would otherwise intercept it and render
-            NotFound (Pitfall 1). Loading and signed-in states are added in
-            the next plan once useSession() exists.
+            position rather than adding a second nav item. Renders exactly
+            one of three states — an invisible reserved-width placeholder
+            while useSession()'s fetch is in flight, a plain <a href> when
+            signed out, or a name+avatar disclosure trigger with a sign-out
+            menu when signed in (02-UI-SPEC.md Component Notes §1-2). The
+            signed-out anchor is a plain <a href> — NOT a React Router
+            <Link>/<NavLink> — because /api/* is a serverless function
+            route, not a client-side route; React Router would otherwise
+            intercept it and render NotFound (Pitfall 1).
           */}
-          <a
-            href={`/api/auth/google?return_to=${encodeURIComponent(pathname)}`}
-            className="link-underline"
-          >
-            Sign in
-          </a>
+          {loading ? (
+            <span className="auth-slot auth-slot--loading" aria-hidden="true" />
+          ) : user ? (
+            <div className="auth-slot" ref={authSlotRef}>
+              <button
+                ref={authTriggerRef}
+                type="button"
+                className="auth-trigger"
+                aria-expanded={authMenuOpen}
+                aria-controls={authMenuId}
+                onClick={toggleAuthMenu}
+              >
+                {!avatarFailed && user.picture ? (
+                  <img
+                    className="auth-avatar"
+                    src={user.picture}
+                    alt=""
+                    referrerPolicy="no-referrer"
+                    onError={() => setAvatarFailed(true)}
+                  />
+                ) : (
+                  <span className="auth-avatar auth-avatar--fallback" aria-hidden="true">
+                    {displayName.charAt(0)}
+                  </span>
+                )}
+                <span className="auth-trigger__name">{displayName}</span>
+                <svg
+                  className="auth-caret"
+                  width="8"
+                  height="8"
+                  viewBox="0 0 8 8"
+                  aria-hidden="true"
+                  style={authMenuOpen ? { transform: 'rotate(180deg)' } : undefined}
+                >
+                  <path
+                    d="M1 2.5L4 5.5L7 2.5"
+                    stroke="currentColor"
+                    strokeWidth="1"
+                    fill="none"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </button>
+
+              {authMenuOpen && (
+                <div id={authMenuId} className="auth-menu" role="menu">
+                  <Link
+                    to="/account"
+                    className="auth-menu__item"
+                    role="menuitem"
+                    onClick={() => setAuthMenuOpen(false)}
+                  >
+                    Account
+                  </Link>
+                  <button
+                    type="button"
+                    className={`auth-menu__item${signOutState === 'pending' ? ' is-pending' : ''}`}
+                    role="menuitem"
+                    onClick={handleSignOut}
+                  >
+                    Sign out
+                  </button>
+                  {signOutState === 'error' && (
+                    <p className="auth-menu__error">Couldn&rsquo;t sign out — try again.</p>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : (
+            <a
+              href={`/api/auth/google?return_to=${encodeURIComponent(pathname)}`}
+              className="link-underline"
+            >
+              Sign in
+            </a>
+          )}
           <Link to="/subscribe" className="btn btn--sm">
             Subscribe
           </Link>
