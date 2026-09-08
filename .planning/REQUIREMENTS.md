@@ -14,10 +14,10 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Authentication (AUTH)
 
-- [ ] **AUTH-01**: User can sign in with their Google account via a single "Sign in with Google" action
-- [ ] **AUTH-02**: Server verifies the Google ID token's signature, audience, expiry, and issuer before creating a session — never trusts an unverified client-supplied identity
-- [ ] **AUTH-03**: User is identified internally by Google's stable `sub` claim, not by email address
-- [ ] **AUTH-04**: User's signed-in session persists across page reloads without re-authenticating with Google each time
+- [x] **AUTH-01**: User can sign in with their Google account via a single "Sign in with Google" action
+- [x] **AUTH-02**: Server verifies the Google ID token's signature, audience, expiry, and issuer before creating a session — never trusts an unverified client-supplied identity
+- [x] **AUTH-03**: User is identified internally by Google's stable `sub` claim, not by email address
+- [x] **AUTH-04**: User's signed-in session persists across page reloads without re-authenticating with Google each time
 - [ ] **AUTH-05**: User can sign out, which clears their server session
 - [ ] **AUTH-06**: No email/password sign-in option exists anywhere on the site
 
@@ -78,10 +78,10 @@ Explicitly excluded. Documented to prevent scope creep.
 |-------------|-------|--------|
 | ENV-01 | Phase 1 | Complete |
 | ENV-02 | Phase 1 | Complete |
-| AUTH-01 | Phase 2 | Pending |
-| AUTH-02 | Phase 2 | Pending |
-| AUTH-03 | Phase 2 | Pending |
-| AUTH-04 | Phase 2 | Pending |
+| AUTH-01 | Phase 2 | Complete |
+| AUTH-02 | Phase 2 | Complete |
+| AUTH-03 | Phase 2 | Complete |
+| AUTH-04 | Phase 2 | Complete |
 | AUTH-05 | Phase 2 | Pending |
 | AUTH-06 | Phase 2 | Pending |
 | BILL-01 | Phase 3 | Pending |

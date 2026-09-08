@@ -6,7 +6,6 @@ const LINKS = [
   { to: '/archive', label: 'Archive' },
   { to: '/books', label: "Children's Books" },
   { to: '/writings', label: 'Writings' },
-  { to: '/account', label: 'Account' },
 ]
 
 export default function Header() {
@@ -82,6 +81,21 @@ export default function Header() {
               {l.label}
             </NavLink>
           ))}
+          {/*
+            Auth-aware nav slot (D-06): reuses the single "Account" nav
+            position rather than adding a second nav item. The signed-out
+            state is a plain <a href> — NOT a React Router <Link>/<NavLink> —
+            because /api/* is a serverless function route, not a client-side
+            route; React Router would otherwise intercept it and render
+            NotFound (Pitfall 1). Loading and signed-in states are added in
+            the next plan once useSession() exists.
+          */}
+          <a
+            href={`/api/auth/google?return_to=${encodeURIComponent(pathname)}`}
+            className="link-underline"
+          >
+            Sign in
+          </a>
           <Link to="/subscribe" className="btn btn--sm">
             Subscribe
           </Link>
