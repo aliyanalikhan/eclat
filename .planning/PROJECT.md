@@ -23,6 +23,7 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 - ✓ Content data model (`src/data/content.js`) covering editions, books, writings, articles — existing
 - ✓ Stripe account and 4 real recurring subscription products already created (product IDs known) — existing, external to this codebase
 - ✓ Google OAuth client already created — existing, external to this codebase
+- ✓ Server-side secrets boundary and database schema (users, sessions, subscriptions, webhook_events, addresses) — provisioned on Vercel Postgres, enforced by a build-time secret-leak scanner in `npm run build` — Phase 1
 
 ### Active
 
@@ -58,6 +59,7 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
   - Children's Book — Online: `prod_VCuT7Wcy4yQDrc`
   - Children's Book — Hard Copy: `prod_VCuJDGHg6vxcE6`
 - Existing pricing shown on `/subscribe` ($9/mo, $84/year) is currently just UI copy tied to no real billing — it should be reconciled with whatever the actual prices are on the 4 Stripe products above during implementation.
+- **Phase 1 complete (2026-09-08):** Server-side secrets boundary, Postgres schema, and a build-time secret-leak scanner are live and verified against the real, already-provisioned Vercel Postgres database. Discovered mid-phase that this Vercel project already had prior out-of-band work done on it (a `users`/`addresses` schema with 2 real rows, plus `GOOGLE_CLIENT_ID`/`STRIPE_SECRET_KEY`/`SESSION_SECRET` env vars already set, ~7 days old) — confirmed intentional by the user. **Phase 2/3 planning should explicitly check for other pre-existing artifacts (partial auth/billing code, other tables/routes) rather than assuming a blank slate**, since this milestone's actual starting point is not as clean as the original codebase map assumed.
 
 ## Constraints
 
@@ -76,6 +78,7 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 | Backend on Vercel serverless/Edge + managed DB | Fits the existing Vercel deployment with minimal new infra to operate; specific DB provider to be decided during research | — Pending |
 | Reuse existing Stripe products instead of new pricing | 4 real recurring subscription products already exist in the live Stripe account (magazine + children's book, each online/hard-copy) | — Pending |
 | "Multi-tenant" clarified to mean multi-user, single brand | Initial request used "multi-tenant" loosely; user confirmed it means many individual reader accounts on one Éclat product, not a white-label platform for other businesses | ✓ Good |
+| `users.id` is `BIGINT`, not `UUID` | Phase 1 execution discovered a live Vercel Postgres database (~7 days old, prior out-of-band work on this same project) already had a `users` table with a `BIGINT` identity PK and 2 real rows, plus an `addresses` table. User confirmed this was intentional prior work and chose to adopt it as canonical rather than drop the data. Reverses the original UUID-PK decision (Phase 1 CONTEXT.md D-08). | ✓ Applied — Phase 1 |
 
 ## Evolution
 
@@ -95,4 +98,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-08 after initialization*
+*Last updated: 2026-09-08 after Phase 1 completion*
