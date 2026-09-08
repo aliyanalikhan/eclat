@@ -126,7 +126,12 @@ export default {
       serializeCookie('session', raw, { ...cookieOptions(), maxAge: 60 * 60 * 24 * 30 }),
     )
     clearOauthCookies(headers)
-    headers.set('Location', returnTo)
+    // Belt-and-suspenders (CR-01): never trust the raw returnTo string
+    // directly for a Location header — reconstruct via URL so any value
+    // that isSafeReturnTo() failed to catch still can't smuggle a host
+    // (e.g. WHATWG backslash-as-slash resolution) into the redirect.
+    const safeLocation = new URL(returnTo, 'http://placeholder.local')
+    headers.set('Location', safeLocation.pathname + safeLocation.search)
     return new Response(null, { status: 302, headers })
   },
 }
