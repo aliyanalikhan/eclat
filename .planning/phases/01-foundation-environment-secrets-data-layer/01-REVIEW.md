@@ -16,7 +16,13 @@ findings:
   warning: 5
   info: 2
   total: 8
-status: issues_found
+status: fixed
+fixed: 2026-09-08T00:00:00Z
+fix_summary: |
+  CR-01, WR-01 through WR-05 all fixed and re-verified (real npm run build now
+  succeeds standalone with no manual workarounds; leak detection + import-boundary
+  check re-confirmed). IN-01/IN-02 left as documented (not fixed, out of the
+  agreed fix scope — informational only, both fail-safe/over-inclusive today).
 ---
 
 # Phase 1: Code Review Report
@@ -164,8 +170,24 @@ const ext = extname(file).toLowerCase()
 
 **Fix:** Either resolve symlinks explicitly (`stat` instead of `dirent` type checks) or, at minimum, log a warning when a non-file/non-directory entry is encountered so the gap is visible rather than silent.
 
+## Fix Log
+
+All findings except IN-01/IN-02 were fixed and re-verified:
+
+- **CR-01:** `package.json`'s `build` script now runs `node --env-file-if-exists=.env.local` for `scripts/migrate.js` and `scripts/check-secrets.js` (the two bare Node invocations that read `process.env` secrets). No-op on Vercel (file absent there — real env vars are injected directly), loads `.env.local` locally. Added `"engines": {"node": ">=20.6.0"}` since `--env-file-if-exists` requires it. Re-verified: a plain `npm run build` now succeeds end-to-end with no manual env-loading workaround.
+- **WR-01:** `.gitignore` gained `!.env.example` after the broad `.env*` rule. Re-verified via `git check-ignore -v --no-index .env.example` — no longer ignored.
+- **WR-02:** `check-secrets.js` now derives its tracked-var list from `.env.example` at scan time (minus a `KNOWN_PUBLIC_VAR_NAMES` allowlist for `GOOGLE_CLIENT_ID`), instead of a disconnected hardcoded list.
+- **WR-03:** `check-secrets.js` now also checks `encodeURIComponent(value)` and `JSON.stringify(value)`-escaped variants of each tracked secret, not just the byte-for-byte value.
+- **WR-04:** `migrate.js` gained an explicit "SAFETY CONTRACT" header comment documenting that apply+record is non-transactional and every migration file must therefore be idempotent — chosen over an untested transaction API on `@vercel/postgres`'s HTTP-based driver, per the review's own suggested alternative.
+- **WR-05:** `check-secrets.js` gained an import-boundary check: it now also scans `dist/assets/*` (the client bundle) for a marker string unique to `lib/db.js`'s own error text, failing the build if `lib/db.js` ever ends up bundled into client code (T-01-01).
+
+Re-verification after fixes: real `npm run build` (clean pass, no workaround), leak-detection re-confirmed (dynamically injected `POSTGRES_URL` test value caught, exit 1, value never printed; clean pass resumes after cleanup).
+
+- **IN-01, IN-02:** Left as documented findings — not fixed. Both are fail-safe/over-inclusive today (no exploit path currently exists), and were out of the agreed fix scope for this pass.
+
 ---
 
 _Reviewed: 2026-09-08T00:00:00Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
+_Fixed: 2026-09-08T00:00:00Z_

@@ -6,7 +6,9 @@
  * server secret env vars, not prefix/pattern matching (e.g. `sk_live_`,
  * `whsec_`) — pattern matching risks false positives on unrelated strings
  * that merely look like a secret. Exact-value matching only flags an actual
- * leak of a real, currently-set secret.
+ * leak of a real, currently-set secret. It also checks a couple of common
+ * encoded variants (URL-encoded, JSON-escaped) since a connection string can
+ * end up serialized that way without ever appearing byte-for-byte verbatim.
  *
  * Runs as the final step of `npm run build`, after prerender.js, so it scans
  * the complete dist/ contents (prerendered HTML included, not just the Vite
@@ -15,6 +17,11 @@
  *
  * On finding a leak, this prints WHICH env var leaked and WHERE, but never
  * the secret's own value, to avoid further exposing it in CI/terminal logs.
+ *
+ * The tracked var list is derived from .env.example rather than hardcoded,
+ * so a future phase that adds a new secret there is automatically covered —
+ * minus a small allowlist of vars that are intentionally public (OAuth
+ * client IDs are not secrets).
  */
 import { readdir, readFile } from 'node:fs/promises'
 import { dirname, join, relative, resolve } from 'node:path'
@@ -22,16 +29,26 @@ import { fileURLToPath } from 'node:url'
 
 const here = dirname(fileURLToPath(import.meta.url))
 const dist = resolve(here, '..', 'dist')
+const envExamplePath = resolve(here, '..', '.env.example')
 
-// Tracked server secrets — per Phase 1 CONTEXT.md D-13, exactly these 6.
-const TRACKED_VAR_NAMES = [
-  'GOOGLE_CLIENT_SECRET',
-  'STRIPE_SECRET_KEY',
-  'STRIPE_WEBHOOK_SECRET',
-  'SESSION_SECRET',
-  'POSTGRES_URL',
-  'POSTGRES_URL_NON_POOLING',
-]
+// Vars documented in .env.example that are intentionally public, not secret.
+const KNOWN_PUBLIC_VAR_NAMES = new Set(['GOOGLE_CLIENT_ID'])
+
+async function trackedVarNamesFromEnvExample() {
+  const text = await readFile(envExamplePath, 'utf8')
+  const names = []
+  for (const line of text.split('\n')) {
+    const m = line.match(/^([A-Z][A-Z0-9_]*)=/)
+    if (m && !KNOWN_PUBLIC_VAR_NAMES.has(m[1])) names.push(m[1])
+  }
+  return names
+}
+
+// lib/db.js's own error text — a unique marker that should never appear in
+// client-bundled JS. If it does, lib/db.js (server-only, per its own header
+// comment) got imported into client code despite that contract (T-01-01).
+const SERVER_ONLY_IMPORT_MARKER = 'Provision Vercel Postgres and run `vercel env pull .env.local`'
+const CLIENT_BUNDLE_DIR = join(dist, 'assets')
 
 // Binary/image/font assets never contain leaked text secrets and reading
 // them as utf8 would be both wasteful and meaningless — skip by extension.
@@ -52,9 +69,18 @@ async function walk(dir) {
 }
 
 async function main() {
-  const tracked = TRACKED_VAR_NAMES.map((name) => ({ name, value: process.env[name] })).filter(
+  const trackedVarNames = await trackedVarNamesFromEnvExample()
+  const tracked = trackedVarNames.map((name) => ({ name, value: process.env[name] })).filter(
     ({ value }) => value !== undefined && value !== '',
   )
+
+  // For each secret value, also check the URL-encoded and JSON-escaped forms
+  // it might take once serialized — a byte-for-byte-only check would miss
+  // those even though the secret is genuinely present and extractable.
+  const variantsFor = (value) => {
+    const variants = new Set([value, encodeURIComponent(value), JSON.stringify(value).slice(1, -1)])
+    return [...variants]
+  }
 
   const files = await walk(dist)
   let leaked = false
@@ -65,11 +91,20 @@ async function main() {
 
     const content = await readFile(file, 'utf8')
     for (const { name, value } of tracked) {
-      if (content.includes(value)) {
+      if (variantsFor(value).some((v) => content.includes(v))) {
         const relPath = relative(dist, file)
         console.error(`check-secrets: ${name} found in ${relPath}`)
         leaked = true
       }
+    }
+
+    // Import-boundary check (T-01-01): lib/db.js is server-only and must
+    // never end up in the client bundle. If it did, its own error text
+    // would be recognizable in the bundled JS even after minification.
+    if (file.startsWith(CLIENT_BUNDLE_DIR) && content.includes(SERVER_ONLY_IMPORT_MARKER)) {
+      const relPath = relative(dist, file)
+      console.error(`check-secrets: lib/db.js appears to be bundled into client code at ${relPath} (server-only import boundary violated)`)
+      leaked = true
     }
   }
 

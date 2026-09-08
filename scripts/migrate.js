@@ -10,6 +10,14 @@
  * lib/db.js throws immediately if POSTGRES_URL is unset (fail-fast, D-02) —
  * that throw is caught here and reported as a clean, actionable CLI message
  * instead of a raw stack trace.
+ *
+ * SAFETY CONTRACT: applying a migration file and recording it in _migrations
+ * are two separate statements, not one transaction (@vercel/postgres's HTTP-
+ * based driver doesn't support multi-statement transactions the same way a
+ * persistent connection would). If the process dies between them, the file
+ * will be re-run on the next invocation. Every migration file MUST therefore
+ * be safe to re-run in full (e.g. CREATE ... IF NOT EXISTS) — never write a
+ * migration that mutates data non-idempotently (plain ALTER/UPDATE/DELETE).
  */
 import { readdir, readFile } from 'node:fs/promises'
 import { dirname, resolve } from 'node:path'
