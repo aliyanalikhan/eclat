@@ -32,7 +32,7 @@ const dist = resolve(here, '..', 'dist')
 const envExamplePath = resolve(here, '..', '.env.example')
 
 // Vars documented in .env.example that are intentionally public, not secret.
-const KNOWN_PUBLIC_VAR_NAMES = new Set(['GOOGLE_CLIENT_ID'])
+const KNOWN_PUBLIC_VAR_NAMES = new Set(['GOOGLE_CLIENT_ID', 'GOOGLE_REDIRECT_URI'])
 
 async function trackedVarNamesFromEnvExample() {
   const text = await readFile(envExamplePath, 'utf8')
