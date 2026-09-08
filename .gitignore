@@ -5,6 +5,11 @@ dist/
 .DS_Store
 Thumbs.db
 
+# environment secrets
+.env
+.env.local
+.env*.local
+
 # verify-hero.mjs screenshot output
 hero-rest.png
 hero-open.png
