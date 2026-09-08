@@ -59,7 +59,7 @@ Plans:
   3. The signed-in user is identified internally by Google's stable `sub` claim, and their session persists across page reloads without re-authenticating
   4. User can sign out from the site, which clears their server-side session so subsequent requests are treated as signed-out
 
-**Plans**: 2/3 plans executed
+**Plans**: 3/3 plans executed
 Plans:
 **Wave 1**
 
@@ -71,7 +71,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 02-03-PLAN.md — /account auth gate and inline sign-in error notice
+- [x] 02-03-PLAN.md — /account auth gate and inline sign-in error notice
 
 **UI hint**: yes
 
@@ -130,7 +130,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|-----------------|--------|-----------|
 | 1. Foundation — Environment, Secrets & Data Layer | 3/3 | Complete    | 2026-09-08 |
-| 2. Authentication — Google Sign-In & Server-Side Sessions | 2/3 | In Progress|  |
+| 2. Authentication — Google Sign-In & Server-Side Sessions | 3/3 | In Progress|  |
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | TBD | Not started | - |
 | 4. Content Gating — Real Server-Side Entitlement Enforcement | TBD | Not started | - |
 | 5. Account Management — Real Status, Cancellation & Billing Portal | TBD | Not started | - |
