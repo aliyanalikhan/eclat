@@ -1,10 +1,11 @@
 ---
 phase: 2
 slug: authentication-google-sign-in-server-side-sessions
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-09-08
+reviewed_at: 2026-09-08
 ---
 
 # Phase 2 — UI Design Contract
@@ -131,23 +132,30 @@ Three states, same single slot position (last item in `.nav`, before the "Subscr
 
 ## UI Considerations
 
-Applicable state considerations resolved: 8 covered, 1 backstop, 0 unresolved (4 dismissed with reason)
+Applicable state considerations resolved: 9 covered, 1 backstop, 0 unresolved (8 dismissed with reason)
+
+*(Ran through the `ui-consideration-probe` engine post-verification per the standard state-coverage gate; the engine's collection-oriented taxonomy — `empty`/`populated`/`partial`/`zero-one-many` — over-fires on fixed single-instance controls that aren't data collections. Those are dismissed below with element-specific reasoning rather than silently dropped. One item came back `unclassified` (E4, the error notice) and is resolved by direct reclassification rather than auto-dismissed, per protocol.)*
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
 | loading | header auth-aware nav slot (`nav`, `interactive-control`) | ✅ covered | Renders a reserved-width, invisible placeholder (matches the widest expected label's box) until `GET /api/auth/session` resolves, then fades to the resolved state — no flash between "Sign in" and "Account" text (RESEARCH.md Pitfall 2) |
 | error | header auth-aware nav slot | ✅ covered | The header itself carries no separate error UI — a failed sign-in only ever shows the page-level inline notice (see below); the header simply reflects the resulting signed-out state |
 | overflow, long-text | header auth-aware nav slot | ✅ covered | Signed-in label truncates the Google display name to 18 characters + ellipsis, max-width ~140px, single line, never wraps or breaks the fixed-height header (see Copywriting Contract) |
+| empty, populated | header auth-aware nav slot | dismissed | Not a data collection — the slot always renders exactly one of three fixed states (loading placeholder / signed-out link / signed-in control, per Component Notes §1), never a list that can be empty or populated at volume |
 | loading | "Sign in" CTA link (`interactive-control`) | ✅ covered | Plain `<a href="/api/auth/google">` triggers a full browser navigation on click; no JS `onClick` handler or spinner is added — the browser's native loading UI is the loading state, and any interception would break the flow per Pitfall 1 |
 | error | "Sign in" CTA link | dismissed | Duplicate of the header/nav-slot error row and the inline-error-notice row above/below — a failed attempt is handled entirely by the page-level notice, not by the link itself |
 | long-text | "Sign in" CTA link | ✅ covered | Copy is the fixed short string "Sign in" — never dynamic, no truncation risk |
+| overflow | "Sign in" CTA link | dismissed | Fixed short string "Sign in", single line, no container width constraint that could cause overflow — same reasoning as the long-text row above |
 | loading | sign-out disclosure trigger + menu (`interactive-control`) | ✅ covered | The "Sign out" menu item dims/disables for the duration of the in-flight `POST /api/auth/logout` request |
 | error | sign-out disclosure trigger + menu | ✅ covered | On request failure the menu stays open and shows the inline "Couldn't sign out — try again." message inside the dropdown (see Copywriting Contract) — it does not close or navigate away |
 | long-text | sign-out disclosure trigger + menu | dismissed | Menu items are two fixed short labels ("Account", "Sign out") — never dynamic content |
+| empty, populated, partial, overflow, zero-one-many | sign-out disclosure trigger + menu | dismissed | Not a data collection — the menu always renders exactly two fixed rows ("Account", "Sign out", per Component Notes §2), never zero/variable-count/partial content that could be empty, populated at volume, partially present, overflowing, or vary in item count |
 | overflow, long-text | inline sign-in error notice (`static-content`) | dismissed | Copy is a single fixed short string ("Sign-in failed — try again.") — no user-supplied or dynamic text is ever rendered in this notice, so no truncation/wrap risk exists |
+| unclassified | inline sign-in error notice | ✅ covered (reclassified) | Element kind confirmed as static conditional-content, not an async/collection surface: it renders in full whenever `?auth_error=1` is present on load and is absent otherwise (Component Notes §3) — no loading/empty/populated state applies beyond the overflow/long-text row already resolved above |
 | loading | `/account` route auth gate (`nav`) | ✅ covered | While the session check is in flight, `/account` renders the "Checking your session…" line instead of the pre-existing mocked page content (Pitfall 2 / D-09) |
 | error | `/account` route auth gate | 🧪 backstop | If `GET /api/auth/session` itself fails (network/5xx), the gate fails closed — treated identically to a `null`/signed-out response and redirected into sign-in, never left rendering the stale mocked page or a raw error state |
 | overflow, long-text | `/account` route auth gate | dismissed | The gate's only visible content is the fixed short "Checking your session…" string — no variable-length content |
+| empty, populated, partial, overflow, zero-one-many | `/account` route auth gate | dismissed | Not a data collection — the gate is a single boolean session-check outcome (signed-in / signed-out / pending, per Component Notes §4), never a list that can be empty, populated at volume, partially present, overflowing, or vary in item count |
 
 ---
 
@@ -162,11 +170,11 @@ Applicable state considerations resolved: 8 covered, 1 backstop, 0 unresolved (4
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-09-08 — 6/6 dimensions PASS, no recommendations
