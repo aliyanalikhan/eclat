@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { invoices } from '../data/content.js'
 import { staticSeo } from '../data/seo.js'
@@ -12,6 +13,19 @@ export default function Account() {
   const { subscribed, setSubscribed, plan } = useApp()
 
   useSeo({ ...staticSeo['/account'], path: '/account' })
+
+  // Signed out, or the session-check request itself failed — fail closed
+  // in both cases (D-09): never render the mocked page content, always
+  // send the visitor back into sign-in via a plain navigation. Performed
+  // in an effect, not during render (WR-04) — render must stay pure, and
+  // window.location.assign is a side effect that could otherwise fire
+  // twice under Strict Mode's dev-time double-invocation or be started
+  // and discarded under concurrent rendering.
+  useEffect(() => {
+    if (!loading && !user) {
+      window.location.assign('/api/auth/google?return_to=/account')
+    }
+  }, [loading, user])
 
   if (loading) {
     return (
@@ -31,10 +45,6 @@ export default function Account() {
   }
 
   if (!user) {
-    // Signed out, or the session-check request itself failed — fail closed
-    // in both cases (D-09): never render the mocked page content, always
-    // send the visitor back into sign-in via a plain navigation.
-    window.location.assign('/api/auth/google?return_to=/account')
     return null
   }
 
