@@ -25,16 +25,24 @@ export default {
     if (!raw) return Response.json({ user: null })
 
     const hash = hashToken(raw)
-    const { rows } = await sql`
-      SELECT u.name, u.email, u.picture, s.id AS session_id
-      FROM sessions s JOIN users u ON u.id = s.user_id
-      WHERE s.token_hash = ${hash} AND s.expires_at > now()
-    `
-    if (!rows.length) return Response.json({ user: null })
+    let rows
+    try {
+      ;({ rows } = await sql`
+        SELECT u.name, u.email, u.picture, s.id AS session_id
+        FROM sessions s JOIN users u ON u.id = s.user_id
+        WHERE s.token_hash = ${hash} AND s.expires_at > now()
+      `)
+      if (!rows.length) return Response.json({ user: null })
 
-    // Sliding window (D-10): bump only this session row's expiry — never
-    // any other session row for the same user (multi-device isolation).
-    await sql`UPDATE sessions SET expires_at = now() + interval '30 days' WHERE id = ${rows[0].session_id}`
+      // Sliding window (D-10): bump only this session row's expiry — never
+      // any other session row for the same user (multi-device isolation).
+      await sql`UPDATE sessions SET expires_at = now() + interval '30 days' WHERE id = ${rows[0].session_id}`
+    } catch {
+      // Fail closed on a DB error, matching this endpoint's own documented
+      // contract (see header comment) rather than letting the exception
+      // escape unhandled (WR-02).
+      return Response.json({ user: null })
+    }
 
     const { name, email, picture } = rows[0]
     return Response.json({ user: { name, email, picture } })
