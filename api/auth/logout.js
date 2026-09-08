@@ -21,13 +21,26 @@ export default {
     const cookies = parseCookies(request.headers.get('cookie'))
     const raw = cookies.session
 
+    // WR-03 decision: sign-out always clears the browser's cookie — even if
+    // the DB delete below fails — so the client stops presenting it. But a
+    // failed delete means the sessions row is still live server-side (a
+    // copy of the raw cookie captured before sign-out would still
+    // authenticate, per this file's own header comment), so we deliberately
+    // report a 5xx in that case rather than silently claiming success; the
+    // client already surfaces this via signOutState === 'error'
+    // (src/components/Header.jsx).
+    let dbError = false
     if (raw) {
       const hash = hashToken(raw)
-      await sql`DELETE FROM sessions WHERE token_hash = ${hash}`
+      try {
+        await sql`DELETE FROM sessions WHERE token_hash = ${hash}`
+      } catch {
+        dbError = true
+      }
     }
 
     const headers = new Headers()
     headers.append('Set-Cookie', serializeCookie('session', '', { ...cookieOptions(), maxAge: 0 }))
-    return new Response(null, { status: 204, headers })
+    return new Response(null, { status: dbError ? 500 : 204, headers })
   },
 }
