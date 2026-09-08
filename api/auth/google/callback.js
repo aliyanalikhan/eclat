@@ -103,23 +103,31 @@ export default {
 
     const { sub, email, name, picture } = payload
 
-    const { rows: userRows } = await sql`
-      INSERT INTO users (google_sub, email, name, picture, last_login_at)
-      VALUES (${sub}, ${email}, ${name}, ${picture}, now())
-      ON CONFLICT (google_sub) DO UPDATE SET
-        name = EXCLUDED.name,
-        email = EXCLUDED.email,
-        picture = EXCLUDED.picture,
-        last_login_at = now()
-      RETURNING id
-    `
-    const userId = userRows[0].id
-
-    const { raw, hash } = newSessionToken()
-    await sql`
-      INSERT INTO sessions (user_id, token_hash, expires_at)
-      VALUES (${userId}, ${hash}, now() + interval '30 days')
-    `
+    let userId, raw, hash
+    try {
+      const { rows: userRows } = await sql`
+        INSERT INTO users (google_sub, email, name, picture, last_login_at)
+        VALUES (${sub}, ${email}, ${name}, ${picture}, now())
+        ON CONFLICT (google_sub) DO UPDATE SET
+          name = EXCLUDED.name,
+          email = EXCLUDED.email,
+          picture = EXCLUDED.picture,
+          last_login_at = now()
+        RETURNING id
+      `
+      userId = userRows[0].id
+      ;({ raw, hash } = newSessionToken())
+      await sql`
+        INSERT INTO sessions (user_id, token_hash, expires_at)
+        VALUES (${userId}, ${hash}, now() + interval '30 days')
+      `
+    } catch {
+      // A DB failure here (transient outage, constraint violation, pool
+      // exhaustion) should surface as the same graceful ?auth_error=1 UX
+      // as every other failure path in this file, not an unhandled
+      // rejection (WR-01).
+      return redirectWithError(returnTo, headers)
+    }
 
     headers.append(
       'Set-Cookie',
