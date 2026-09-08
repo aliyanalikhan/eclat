@@ -13,7 +13,7 @@
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Foundation — Environment, Secrets & Data Layer** - Server-only secrets boundary and database schema in place before any auth or billing code exists
+- [x] **Phase 1: Foundation — Environment, Secrets & Data Layer** - Server-only secrets boundary and database schema in place before any auth or billing code exists (completed 2026-09-08)
 - [ ] **Phase 2: Authentication — Google Sign-In & Server-Side Sessions** - Users sign in with Google only, verified server-side, with persistent sessions
 - [ ] **Phase 3: Billing & Webhooks — Stripe Checkout and Subscription Sync** - Users subscribe via Stripe Checkout; webhook-verified events are the single source of truth for subscription state
 - [ ] **Phase 4: Content Gating — Real Server-Side Entitlement Enforcement** - Every gated page checks real per-user entitlement server-side; the fake `subscribed` flag is gone
@@ -116,7 +116,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|-----------------|--------|-----------|
-| 1. Foundation — Environment, Secrets & Data Layer | 3/3 | In Progress|  |
+| 1. Foundation — Environment, Secrets & Data Layer | 3/3 | Complete    | 2026-09-08 |
 | 2. Authentication — Google Sign-In & Server-Side Sessions | TBD | Not started | - |
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | TBD | Not started | - |
 | 4. Content Gating — Real Server-Side Entitlement Enforcement | TBD | Not started | - |

@@ -9,8 +9,8 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Environment & Secrets (ENV)
 
-- [ ] **ENV-01**: All server-side secrets (Google OAuth client secret, Stripe secret key, Stripe webhook signing secret, session encryption key) live only in server-side environment variables — never in client-shipped code, never committed to the repo
-- [ ] **ENV-02**: `.gitignore` excludes local env files so secrets can never be accidentally committed
+- [x] **ENV-01**: All server-side secrets (Google OAuth client secret, Stripe secret key, Stripe webhook signing secret, session encryption key) live only in server-side environment variables — never in client-shipped code, never committed to the repo
+- [x] **ENV-02**: `.gitignore` excludes local env files so secrets can never be accidentally committed
 
 ### Authentication (AUTH)
 
@@ -76,8 +76,8 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENV-01 | Phase 1 | Pending |
-| ENV-02 | Phase 1 | Pending |
+| ENV-01 | Phase 1 | Complete |
+| ENV-02 | Phase 1 | Complete |
 | AUTH-01 | Phase 2 | Pending |
 | AUTH-02 | Phase 2 | Pending |
 | AUTH-03 | Phase 2 | Pending |
@@ -101,6 +101,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | ACCT-04 | Phase 5 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 23 total
 - Mapped to phases: 23
 - Unmapped: 0 ✓
