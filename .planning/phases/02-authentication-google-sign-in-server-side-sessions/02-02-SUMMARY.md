@@ -164,6 +164,15 @@ None. This plan introduced no new environment variables or external service conf
 - `Header.jsx` is now fully auth-aware and is the site's one and only sign-in/sign-out entry point (AUTH-01, AUTH-06 complete for this phase's scope).
 - No blockers. Open items carried to end-of-phase UAT: the live sign-out click-through, the real Google-account header render (avatar + fallback), and `/account`'s middleware redirect in an actual browser.
 
+## Self-Check: PASSED
+
+- FOUND: `api/auth/logout.js`
+- FOUND: `middleware.js`
+- FOUND: `.planning/phases/02-authentication-google-sign-in-server-side-sessions/02-02-SUMMARY.md`
+- FOUND: commit `981f066` (Task 1)
+- FOUND: commit `9f82841` (Task 2)
+- FOUND: commit `b188978` (docs: plan metadata)
+
 ---
 *Phase: 02-authentication-google-sign-in-server-side-sessions*
 *Completed: 2026-09-09*
