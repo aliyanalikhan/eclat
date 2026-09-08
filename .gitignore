@@ -13,3 +13,5 @@ Thumbs.db
 # verify-hero.mjs screenshot output
 hero-rest.png
 hero-open.png
+.vercel
+.env*
