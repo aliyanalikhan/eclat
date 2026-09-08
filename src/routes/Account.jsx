@@ -2,14 +2,41 @@ import { Link } from 'react-router-dom'
 import { invoices } from '../data/content.js'
 import { staticSeo } from '../data/seo.js'
 import { useSeo } from '../lib/useSeo.js'
+import { useSession } from '../lib/useSession.js'
 import { useApp } from '../store.jsx'
 
 const RENEWAL = { monthly: '27 September 2026', annual: '27 August 2027' }
 
 export default function Account() {
+  const { user, loading } = useSession()
   const { subscribed, setSubscribed, plan } = useApp()
 
   useSeo({ ...staticSeo['/account'], path: '/account' })
+
+  if (loading) {
+    return (
+      <main className="page--narrow" id="main">
+        <div
+          style={{
+            minHeight: '60vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <p className="eyebrow">Checking your session…</p>
+        </div>
+      </main>
+    )
+  }
+
+  if (!user) {
+    // Signed out, or the session-check request itself failed — fail closed
+    // in both cases (D-09): never render the mocked page content, always
+    // send the visitor back into sign-in via a plain navigation.
+    window.location.assign('/api/auth/google?return_to=/account')
+    return null
+  }
 
   const annual = plan === 'annual'
   const planLabel = subscribed ? (annual ? 'Annual' : 'Monthly') : '—'
