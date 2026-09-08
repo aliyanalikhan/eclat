@@ -29,7 +29,11 @@ Decimal phases appear between their surrounding integers in numeric order.
   2. Local env files (`.env`, `.env.local`, etc.) are excluded by `.gitignore`, and no secret has ever been committed to the repo
   3. A Postgres database is provisioned and reachable from a Vercel serverless function, with tables for users, sessions/customers, subscriptions, and processed webhook events created
   4. A build-time check scans the `dist/` output for secret substrings and fails if any are found
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 01-01-PLAN.md — Server-only DB client, full schema migration, migration runner wired into build
+- [ ] 01-02-PLAN.md — Provision Vercel Postgres and verify the live schema
+- [ ] 01-03-PLAN.md — Build-time secret scan gate wired into npm run build
 
 ### Phase 2: Authentication — Google Sign-In & Server-Side Sessions
 **Goal**: A user can sign in with Google, and the server independently verifies their identity before trusting it — no client-supplied identity claim is ever trusted directly.
@@ -88,7 +92,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|-----------------|--------|-----------|
-| 1. Foundation — Environment, Secrets & Data Layer | TBD | Not started | - |
+| 1. Foundation — Environment, Secrets & Data Layer | 0/3 | Planned | - |
 | 2. Authentication — Google Sign-In & Server-Side Sessions | TBD | Not started | - |
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | TBD | Not started | - |
 | 4. Content Gating — Real Server-Side Entitlement Enforcement | TBD | Not started | - |
