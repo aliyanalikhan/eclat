@@ -15,7 +15,7 @@
  */
 import { sql } from '../../lib/db.js'
 import { isProductKey, PRODUCTS } from '../../lib/products.js'
-import { hashToken, parseCookies } from '../../lib/session.js'
+import { getSessionUser } from '../../lib/session-user.js'
 
 const PRODUCT_ID_TO_KEY = Object.fromEntries(
   Object.entries(PRODUCTS).map(([key, { productId }]) => [productId, key]),
@@ -23,26 +23,15 @@ const PRODUCT_ID_TO_KEY = Object.fromEntries(
 
 export default {
   async fetch(request) {
-    const cookies = parseCookies(request.headers.get('cookie'))
-    const raw = cookies.session
-    if (!raw) {
+    const session = await getSessionUser(request)
+    if (!session) {
       return Response.json({ subscriptions: {} }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
     }
 
-    const hash = hashToken(raw)
     try {
-      const { rows: userRows } = await sql`
-        SELECT u.id FROM sessions s
-        JOIN users u ON u.id = s.user_id
-        WHERE s.token_hash = ${hash} AND s.expires_at > now()
-      `
-      if (!userRows.length) {
-        return Response.json({ subscriptions: {} }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
-      }
-
       const { rows } = await sql`
         SELECT stripe_product_id, status, current_period_end
-        FROM subscriptions WHERE user_id = ${userRows[0].id}
+        FROM subscriptions WHERE user_id = ${session.user.id}
       `
 
       const subscriptions = {}
