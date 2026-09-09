@@ -7,11 +7,16 @@ import { editionJsonLd, editionSeo } from '../data/seo.js'
 import { useSeo } from '../lib/useSeo.js'
 import { runFlip, useDragScroll } from '../lib/motion.js'
 import { useApp } from '../store.jsx'
+import { useSession } from '../lib/useSession.js'
+import { useGatedContent } from '../lib/useGatedContent.js'
 
 export default function Edition() {
   const { no } = useParams()
   const ed = editionByNo(no)
-  const { subscribed, openLightbox, flipFrom, setFlipFrom } = useApp()
+  const { openLightbox, flipFrom, setFlipFrom } = useApp()
+  const { user, loading: sessionLoading } = useSession()
+  const sessionOk = !sessionLoading && Boolean(user)
+  const { kind, paragraphs } = useGatedContent(ed?.no, { ok: sessionOk })
   const stripRef = useRef(null)
 
   useDragScroll(stripRef)
@@ -118,30 +123,55 @@ export default function Edition() {
 
       {/* --- article body / paywall --- */}
       <section className="section" style={{ padding: '60px var(--gut) 130px' }}>
-        {subscribed ? (
+        {kind === 'entitled' && paragraphs ? (
           <div className="prose" style={{ borderTop: '1px solid var(--line)', paddingTop: 56 }}>
             <p className="eyebrow eyebrow--accent" style={{ marginBottom: 22 }}>
               Full issue unlocked
             </p>
-            {ed.excerpt.map((p, i) => (
+            {paragraphs.map((p, i) => (
               <p key={i} className={i === 0 ? 'prose__open' : undefined}>
                 {p}
               </p>
             ))}
             {ed.excerptBy && <p>— {ed.excerptBy}</p>}
           </div>
-        ) : (
+        ) : kind === 'loading' ? (
           <div className="paywall">
             <div className="paywall__clip">
               <div className="prose">
-                {ed.excerpt.slice(0, -1).map((p, i) => (
+                {ed.excerpt.map((p, i) => (
                   <p key={i} className={i === 0 ? 'prose__open' : undefined}>
                     {p}
                   </p>
                 ))}
-                <p className="prose__blur" aria-hidden="true">
-                  {ed.excerpt[ed.excerpt.length - 1]}
-                </p>
+              </div>
+              <div className="paywall__fade" aria-hidden="true" />
+            </div>
+
+            <div className="paywall__cta">
+              {/* Silent pending placeholder (D-12) — no spinner text, no
+                  lock icon; never the CTA copy until resolved. */}
+              <div className="plan__skeleton" aria-hidden="true" style={{ width: '58%', height: 18, marginTop: 18 }} />
+            </div>
+          </div>
+        ) : (
+          <div className="paywall">
+            <div className="paywall__clip">
+              <div className="prose">
+                {ed.excerpt.map((p, i) => (
+                  <p key={i} className={i === 0 ? 'prose__open' : undefined}>
+                    {p}
+                  </p>
+                ))}
+                {/* Neutral skeleton placeholder (D-11) — the gated paragraph
+                    itself never ships to the client, so this slot (still the
+                    same .prose__blur position/DOM shape as before) can no
+                    longer render real gated text, blurred or otherwise. */}
+                <div
+                  className="prose__blur plan__skeleton"
+                  aria-hidden="true"
+                  style={{ width: '72%', height: 22, marginTop: 12 }}
+                />
               </div>
               <div className="paywall__fade" aria-hidden="true" />
             </div>
@@ -156,9 +186,15 @@ export default function Edition() {
               <Link to="/subscribe" className="btn">
                 Subscribe — $9/mo
               </Link>
-              <p className="fine" style={{ marginTop: 16 }}>
-                Cancel anytime. Covers and previews stay free.
-              </p>
+              {kind === 'unknown' && sessionOk ? (
+                <p className="fine" style={{ marginTop: 16, color: 'var(--bad)' }}>
+                  Couldn't confirm your subscription — reload to try again.
+                </p>
+              ) : (
+                <p className="fine" style={{ marginTop: 16 }}>
+                  Cancel anytime. Covers and previews stay free.
+                </p>
+              )}
             </div>
           </div>
         )}
