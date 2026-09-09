@@ -132,5 +132,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation — Environment, Secrets & Data Layer | 3/3 | Complete    | 2026-09-08 |
 | 2. Authentication — Google Sign-In & Server-Side Sessions | 3/3 | Complete    | 2026-09-09 |
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | 3/3 | Complete    | 2026-09-09 |
-| 4. Content Gating — Real Server-Side Entitlement Enforcement | TBD | Not started | - |
+| 4. Content Gating — Real Server-Side Entitlement Enforcement | 1/2 | In Progress|  |
 | 5. Account Management — Real Status, Cancellation & Billing Portal | TBD | Not started | - |

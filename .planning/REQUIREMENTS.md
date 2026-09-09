@@ -32,10 +32,10 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Content Gating (GATE)
 
-- [ ] **GATE-01**: Every gated page/route (edition full issues, book full spreads, paywalled writings) checks the signed-in user's real entitlement from the database on each request — no client-side-only gating remains
+- [x] **GATE-01**: Every gated page/route (edition full issues, book full spreads, paywalled writings) checks the signed-in user's real entitlement from the database on each request — no client-side-only gating remains
 - [ ] **GATE-02**: The existing `subscribed` localStorage flag and all its read sites (`Edition.jsx`, `Archive.jsx`, `Books.jsx`, `Account.jsx`) are removed and replaced by the real server-side check
-- [ ] **GATE-03**: A Hard Copy subscription does not grant Online/digital access to the same product — Online and Hard Copy are separate, independent entitlements (decided 2026-09-08)
-- [ ] **GATE-04**: When a subscription is canceled or lapses, the user's access to that product's gated content is revoked on their very next request — no stale cached access
+- [x] **GATE-03**: A Hard Copy subscription does not grant Online/digital access to the same product — Online and Hard Copy are separate, independent entitlements (decided 2026-09-08)
+- [x] **GATE-04**: When a subscription is canceled or lapses, the user's access to that product's gated content is revoked on their very next request — no stale cached access
 - [ ] **GATE-05**: Publicly-intended content (covers, previews, marketing pages) continues to render exactly as it does today, unaffected by the new gating
 
 ### Account Management (ACCT)
@@ -90,10 +90,10 @@ Explicitly excluded. Documented to prevent scope creep.
 | BILL-04 | Phase 3 | Complete |
 | BILL-05 | Phase 3 | Complete |
 | BILL-06 | Phase 3 | Complete |
-| GATE-01 | Phase 4 | Pending |
+| GATE-01 | Phase 4 | Complete |
 | GATE-02 | Phase 4 | Pending |
-| GATE-03 | Phase 4 | Pending |
-| GATE-04 | Phase 4 | Pending |
+| GATE-03 | Phase 4 | Complete |
+| GATE-04 | Phase 4 | Complete |
 | GATE-05 | Phase 4 | Pending |
 | ACCT-01 | Phase 5 | Pending |
 | ACCT-02 | Phase 5 | Pending |
