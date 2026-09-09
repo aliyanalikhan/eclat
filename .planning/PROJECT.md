@@ -24,11 +24,11 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 - ✓ Stripe account and 4 real recurring subscription products already created (product IDs known) — existing, external to this codebase
 - ✓ Google OAuth client already created — existing, external to this codebase
 - ✓ Server-side secrets boundary and database schema (users, sessions, subscriptions, webhook_events, addresses) — provisioned on Vercel Postgres, enforced by a build-time secret-leak scanner in `npm run build` — Phase 1
+- ✓ User can sign in with Google (no email/password option — Google is the only sign-in method) — Phase 2
+- ✓ User's session is verified server-side (jose-verified ID token, opaque hashed session cookie, DB-backed session lookup on every `/api/auth/session` call) — Phase 2
 
 ### Active
 
-- [ ] User can sign in with Google (no email/password option — Google is the only sign-in method)
-- [ ] User's session is verified server-side on every request that serves gated content (not trusted from the client)
 - [ ] User can subscribe to any of the 4 existing Stripe products (ÉCLAT Online/Hard Copy, Children's Book Online/Hard Copy) via Stripe Checkout
 - [ ] User's subscription status is kept in sync via verified Stripe webhooks (signature-checked), not by trusting the client
 - [ ] Gated content (edition full issues, book full spreads, paywalled writings) is served/rendered based on the user's real, server-verified entitlement — replacing the current `subscribed` localStorage flag entirely
@@ -60,6 +60,7 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
   - Children's Book — Hard Copy: `prod_VCuJDGHg6vxcE6`
 - Existing pricing shown on `/subscribe` ($9/mo, $84/year) is currently just UI copy tied to no real billing — it should be reconciled with whatever the actual prices are on the 4 Stripe products above during implementation.
 - **Phase 1 complete (2026-09-08):** Server-side secrets boundary, Postgres schema, and a build-time secret-leak scanner are live and verified against the real, already-provisioned Vercel Postgres database. Discovered mid-phase that this Vercel project already had prior out-of-band work done on it (a `users`/`addresses` schema with 2 real rows, plus `GOOGLE_CLIENT_ID`/`STRIPE_SECRET_KEY`/`SESSION_SECRET` env vars already set, ~7 days old) — confirmed intentional by the user. **Phase 2/3 planning should explicitly check for other pre-existing artifacts (partial auth/billing code, other tables/routes) rather than assuming a blank slate**, since this milestone's actual starting point is not as clean as the original codebase map assumed.
+- **Phase 2 complete (2026-09-09):** Google OAuth sign-in and server-side sessions are live: `api/auth/google.js` + `api/auth/google/callback.js` handle the full authorization-code flow (jose-verified ID token, constant-time state check, `isSafeReturnTo` open-redirect guard), sessions are opaque tokens hashed before storage (`lib/session.js`, `sessions.token_hash`), `middleware.js` does a cheap cookie-presence pre-filter for `/account` while `api/auth/session.js` is the real DB-backed entitlement check, and the header/`Account.jsx`/`App.jsx` are fully auth-aware with no more mocked sign-in state. 24/24 automated must-have truths verified plus 5/5 human UAT checks passed. Security review (`02-SECURITY.md`) closed 14 STRIDE threats (9 mitigated, 5 accepted) with `threats_open: 0`. One cosmetic carry-forward: `.env.example` still documents an unused `SESSION_SECRET=` line (WR-07, blocked by a sandbox permission restriction during the fix pass — not a functional issue, `hashToken()` uses plain SHA-256 by design).
 
 ## Constraints
 
@@ -73,7 +74,8 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Google-only sign-in (no email/password) | Avoids password storage, reset flows, and credential-leak surface entirely; user explicitly chose this over adding password auth | — Pending |
+| Google-only sign-in (no email/password) | Avoids password storage, reset flows, and credential-leak surface entirely; user explicitly chose this over adding password auth | ✓ Applied — Phase 2 |
+| Session token stored as SHA-256 hash, raw value only ever in an httpOnly/Secure cookie | A DB read/dump alone can never be replayed as a live session; matches D-12 from Phase 2 planning | ✓ Applied — Phase 2 |
 | Full rebuild rather than bolt-on accounts layer | User wants the real site's gated content (editions/books/writings) to actually be protected, not just an added account page on top of a still-fake paywall | — Pending |
 | Backend on Vercel serverless/Edge + managed DB | Fits the existing Vercel deployment with minimal new infra to operate; specific DB provider to be decided during research | — Pending |
 | Reuse existing Stripe products instead of new pricing | 4 real recurring subscription products already exist in the live Stripe account (magazine + children's book, each online/hard-copy) | — Pending |
@@ -98,4 +100,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-08 after Phase 1 completion*
+*Last updated: 2026-09-09 after Phase 2 completion*

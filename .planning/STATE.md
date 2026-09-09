@@ -2,35 +2,35 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 2
-current_phase_name: Authentication — Google Sign-In & Server-Side Sessions
-status: executing
-stopped_at: Phase 2 UI-SPEC approved
-last_updated: "2026-09-08T12:54:01.276Z"
-last_activity: 2026-09-08
-last_activity_desc: Roadmap created (5 phases, horizontal-layers structure), 23/23 v1 requirements mapped
+current_phase: 3
+current_phase_name: Billing & Webhooks — Stripe Checkout and Subscription Sync
+status: planning
+stopped_at: Phase 2 complete, ready to plan Phase 3
+last_updated: "2026-09-09T00:37:54.824Z"
+last_activity: 2026-09-09
+last_activity_desc: Phase 02 complete, transitioned to Phase 3
 progress:
   total_phases: 2
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 6
-  completed_plans: 3
+  completed_plans: 6
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-09-08)
+See: .planning/PROJECT.md (updated 2026-09-09)
 
 **Core value:** A signed-in subscriber's paid access is real and enforced server-side — no page, download, or API response leaks paid content to someone who hasn't actually paid for it.
-**Current focus:** Phase 1 — Foundation — Environment, Secrets & Data Layer
+**Current focus:** Phase 3 — Billing & Webhooks — Stripe Checkout and Subscription Sync
 
 ## Current Position
 
-Phase: 2 — Authentication — Google Sign-In & Server-Side Sessions
+Phase: 3 — Billing & Webhooks — Stripe Checkout and Subscription Sync
 Plan: Not started
-Status: Ready to execute
-Last activity: 2026-09-08 — Phase 1 complete, transitioned to Phase 2
+Status: Ready to plan
+Last activity: 2026-09-09 — Phase 02 complete, transitioned to Phase 3
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -38,7 +38,7 @@ Progress: [░░░░░░░░░░] 0%
 
 **Velocity:**
 
-- Total plans completed: 3
+- Total plans completed: 6
 - Average duration: - min
 - Total execution time: 0 hours
 
@@ -47,6 +47,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 1 | 3 | - | - |
+| 02 | 3 | - | - |
 
 **Recent Trend:**
 
@@ -65,6 +66,8 @@ Recent decisions affecting current work:
 - Roadmap: Structure mode is Horizontal Layers (user's explicit choice) — env/secrets+DB foundation, then auth, then billing/webhooks, then content gating, then account UI, each a complete testable layer before the next depends on it
 - Research: Server-initiated redirect flows chosen for both Google sign-in and Stripe Checkout/Billing Portal (not client-loaded SDKs) — keeps CSP changes minimal
 - Research: Session (identity) and entitlement (access) are kept structurally separate — entitlement is always a live DB read per gated request, never baked into a session cookie/JWT
+- Phase 2: Session tokens are opaque random values, only the SHA-256 hash is ever persisted (`sessions.token_hash`) — a DB compromise alone cannot yield a replayable session
+- Phase 2: `middleware.js` is a cheap cookie-presence UX pre-filter only; `api/auth/session.js` (DB-backed) is the sole authoritative entitlement check — this same identity/entitlement split now has a concrete precedent for Phase 3's billing entitlement checks
 
 ### Pending Todos
 
@@ -75,6 +78,7 @@ None yet.
 - Format-aware gating decision (GATE-03): Hard Copy and Online are separate, independent entitlements — already decided 2026-09-08, carry into Phase 4 schema design
 - Phase 3 (Billing & Webhooks): exact current Stripe API shapes/field names, `apiVersion` pinning, and real product prices should be verified against docs.stripe.com and the live Stripe account at planning time, not assumed from research
 - Phase 4 (Content Gating): the prerender split (what stays static vs. becomes dynamic) needs verification against the actual current route list in the codebase, not assumed from research alone
+- [Phase 2] Cosmetic: `.env.example` documents an unused `SESSION_SECRET=` line (WR-07) — no code reads it, `hashToken()` uses plain SHA-256 by design. Fix was blocked by a sandbox permission restriction on that filename during the review-fix pass; low priority, safe to clean up whenever that file is next touched.
 
 ## Deferred Items
 
@@ -86,6 +90,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-08T12:07:14.254Z
-Stopped at: Phase 2 UI-SPEC approved
-Resume file: .planning/phases/02-authentication-google-sign-in-server-side-sessions/02-UI-SPEC.md
+Last session: 2026-09-09
+Stopped at: Phase 2 complete, ready to plan Phase 3
+Resume file: None
