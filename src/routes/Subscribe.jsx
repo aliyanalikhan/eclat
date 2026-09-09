@@ -70,7 +70,7 @@ function ProductTile({ product, priceInfo, pricesLoading, subs, preselected, set
         </span>
       </span>
 
-      <span className="plan__note" style={{ display: 'block', marginTop: 18 }}>
+      <span className="plan__note">
         {owned ? (
           <Link to="/account" className="btn btn--ghost">
             Manage

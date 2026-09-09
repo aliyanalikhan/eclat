@@ -1329,7 +1329,7 @@ a:hover .cover--book {
 /* --- subscribe ---------------------------------------------------------- */
 .plans {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 18px;
 }
 
@@ -1342,6 +1342,8 @@ a:hover .cover--book {
   border-radius: 4px;
   padding: 28px;
   transition: border-color 0.25s, background 0.25s;
+  display: flex;
+  flex-direction: column;
 }
 
 .plan__row {
@@ -1363,7 +1365,8 @@ a:hover .cover--book {
 .plan__note {
   font-size: 14px;
   color: var(--muted);
-  margin-top: 10px;
+  margin-top: auto;
+  padding-top: 18px;
 }
 
 .plan__badge {
@@ -1956,6 +1959,10 @@ a:hover .cover--book {
 
   .field-pair {
     grid-template-columns: 1fr;
+  }
+
+  .plans {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .footer__inner {
