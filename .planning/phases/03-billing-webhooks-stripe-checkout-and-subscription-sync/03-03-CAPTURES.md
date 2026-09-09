@@ -117,8 +117,23 @@ Since no patch was made to `api/billing/webhook.js`, this is a confirmation re-r
 
 ---
 
-## Money-Path e2e (BILL-01/02/05) — Status
+## Money-path e2e (BILL-01/02/05)
 
-See `03-UAT.md` for the full harvested status of this item. Summary: `GET /api/billing/prices` was confirmed to return live per-product/per-interval amounts (see Task 3 automated verification below), and all server-side logic (checkout redirect, webhook sync, status read) is verified correct by the evidence above. The full browser-driven flow — sign in, click Subscribe, complete Stripe Checkout with a card, land on `/subscribe/success`, observe the badge flip — was **not exercised** in this session: this account is LIVE production, so completing a real Checkout Session requires either switching to Stripe TEST-mode credentials or entering a real card and creating a real, billable subscription. Neither was done automatically, per this plan's explicit prohibition on creating real Checkout Sessions/charges without the task truly requiring it and without a safe equivalent existing. A safe equivalent does not exist for the browser-redirect + hosted-Checkout-page portion of this flow (it is inherently a live, human, financial action) — this is recorded as the one deferred human-action item in `03-UAT.md`, consistent with the same item being deferred (never exercised) in `03-01-SUMMARY.md` and `03-02-SUMMARY.md`.
+**`GET /api/billing/prices` — live confirmation (called directly this session, real Stripe response, no price ID leaked):**
 
-`eclat-online`, `eclat-hardcopy`, `book-online`, `book-hardcopy` all appear above in this evidence trail (via `lib/products.js`'s allowlist keys exercised throughout Task 1/2, and via `api/billing/prices.js`'s live response in Task 3).
+```json
+{
+  "eclat-online":   { "monthly": 1499, "annual": 7999,  "currency": "usd" },
+  "eclat-hardcopy": { "monthly": 2499, "annual": 9999,  "currency": "usd" },
+  "book-online":    { "monthly": 1299, "annual": 6499,  "currency": "usd" },
+  "book-hardcopy":  { "monthly": 3999, "annual": 19999, "currency": "usd" }
+}
+```
+
+(Amounts are Stripe's real live per-product monthly/annual `unit_amount` in cents, `currency: usd` for all four — confirms BILL-02: the picker's price source is real Stripe data, not `SITE.price` placeholder copy. Response contained no `price_...` identifier, confirmed by an automated leak check.)
+
+**Server-side logic verified correct by the evidence above (Tasks 1-2):** the Checkout redirect's product→price allowlist resolution (`lib/products.js`), the webhook's user-resolution and upsert logic, and the status endpoint's per-product read are all exercised and correct — this is what BILL-01/BILL-05's server-side contract actually depends on.
+
+**NOT exercised in this session — the browser-driven hosted-Checkout round-trip:** signing in, clicking "Subscribe", completing Stripe's hosted Checkout page with a card, landing on `/subscribe/success`, and observing the confirming → success flip and the picker's "Subscribed" badge. This account is LIVE production — completing this flow requires either switching to Stripe TEST-mode credentials or entering a real card and creating a real, billable subscription. Neither was done automatically, per this plan's explicit prohibition on creating real Checkout Sessions/charges without the task truly requiring it and without a safe equivalent existing. A safe programmatic equivalent does not exist for the browser-redirect + hosted-Checkout-page portion of this flow (it is inherently a live, human, financial action). Recorded as the one deferred human-action item in `03-UAT.md`, consistent with the same item being deferred (never exercised) in `03-01-SUMMARY.md` and `03-02-SUMMARY.md`. No `client_reference_id → user_id` link or picker-badge observation can be recorded from a session that never created a real Checkout Session — this gap is explicit, not silently glossed over.
+
+`eclat-online`, `eclat-hardcopy`, `book-online`, `book-hardcopy` all appear above in this evidence trail (via `lib/products.js`'s allowlist keys exercised throughout Task 1/2, and via `api/billing/prices.js`'s live response just above).
