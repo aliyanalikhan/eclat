@@ -6,7 +6,7 @@ import { useReveal } from '../lib/motion.js'
 import { useApp } from '../store.jsx'
 
 export default function Books() {
-  const { gate, openLightbox } = useApp()
+  const { openLightbox } = useApp()
 
   useSeo({ ...staticSeo['/books'], path: '/books' })
   useReveal('books')
@@ -58,7 +58,7 @@ export default function Books() {
 
             <div className="book-meta">
               <span>{b.meta}</span>
-              <span>{gate('First spread free')}</span>
+              <span>First spread free</span>
             </div>
             <p className="card__dek" style={{ marginTop: 12 }}>
               {b.dek}

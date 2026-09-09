@@ -4,13 +4,11 @@ import { invoices } from '../data/content.js'
 import { staticSeo } from '../data/seo.js'
 import { useSeo } from '../lib/useSeo.js'
 import { useSession } from '../lib/useSession.js'
-import { useApp } from '../store.jsx'
-
-const RENEWAL = { monthly: '27 September 2026', annual: '27 August 2027' }
+import { useEntitlements } from '../lib/useEntitlements.js'
 
 export default function Account() {
   const { user, loading } = useSession()
-  const { subscribed, setSubscribed, plan } = useApp()
+  const { subs, loading: entitlementsLoading, error } = useEntitlements()
 
   useSeo({ ...staticSeo['/account'], path: '/account' })
 
@@ -27,7 +25,11 @@ export default function Account() {
     }
   }, [loading, user])
 
-  if (loading) {
+  // Extended to also cover entitlement loading (04-UI-SPEC) — the panel
+  // never renders until BOTH session and entitlement are resolved, so
+  // there is no intermediate flash of "Free tier" before "Active" (or the
+  // reverse) once the real subscription state arrives.
+  if (loading || entitlementsLoading) {
     return (
       <main className="page--narrow" id="main">
         <div
@@ -48,11 +50,16 @@ export default function Account() {
     return null
   }
 
-  const annual = plan === 'annual'
-  const planLabel = subscribed ? (annual ? 'Annual' : 'Monthly') : '—'
-  // The prototype had `subscribed || true` here, which always showed billing
-  // history even on the free tier. Gated properly now.
-  const rows = subscribed ? invoices : []
+  // Real server-side entitlement (D-06/GATE-02): only a live 'active'
+  // eclat-online subscriptions row counts. Fails closed to Free-tier
+  // presentation on any fetch error, exactly like the not-entitled case —
+  // never assumes ownership on an uncertain outcome.
+  const sub = subs['eclat-online']
+  const active = Boolean(!error && sub && sub.status === 'active')
+  // Real plan metadata (monthly vs. annual, renewal date, card on file) is
+  // Phase 5's ACCT-01/ACCT-04 concern — this fails closed to '—' for now.
+  const planLabel = '—'
+  const rows = active ? invoices : []
 
   return (
     <main className="page--narrow" id="main">
@@ -73,9 +80,9 @@ export default function Account() {
             <p className="panel__val">
               <span
                 className="status-dot"
-                style={{ background: subscribed ? 'var(--ok)' : 'var(--accent)' }}
+                style={{ background: active ? 'var(--ok)' : 'var(--accent)' }}
               />
-              {subscribed ? 'Active' : 'Free tier'}
+              {active ? 'Active' : 'Free tier'}
             </p>
           </div>
           <div>
@@ -84,15 +91,15 @@ export default function Account() {
           </div>
           <div>
             <p className="panel__key">Renews</p>
-            <p className="panel__val">{subscribed ? RENEWAL[plan] : '—'}</p>
+            <p className="panel__val">—</p>
           </div>
           <div>
             <p className="panel__key">Card</p>
-            <p className="panel__val">{subscribed ? '•••• 4242' : '—'}</p>
+            <p className="panel__val">{active ? '•••• 4242' : '—'}</p>
           </div>
         </div>
 
-        {!subscribed && (
+        {!active && (
           <div className="upsell">
             <p className="upsell__text">
               You&rsquo;re on the free tier — covers and previews only. Subscribe to open the
@@ -124,17 +131,6 @@ export default function Account() {
                 </Link>
               </div>
             ))}
-          </div>
-        )}
-
-        {subscribed && (
-          <div style={{ marginTop: 46, paddingTop: 26, borderTop: '1px solid var(--line)' }}>
-            <p className="fine" style={{ margin: '0 0 14px' }}>
-              This site stores its subscriber state in your browser for demonstration purposes.
-            </p>
-            <button type="button" className="btn-text" onClick={() => setSubscribed(false)}>
-              Reset demo state
-            </button>
           </div>
         )}
       </div>

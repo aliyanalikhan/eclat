@@ -10,7 +10,7 @@ import { useApp } from '../store.jsx'
 export default function Archive() {
   const [params, setParams] = useSearchParams()
   const navigate = useNavigate()
-  const { gate, setFlipFrom } = useApp()
+  const { setFlipFrom } = useApp()
 
   // Filter and sort live in the URL, so a filtered archive can be linked and shared.
   const year = archiveYears.includes(params.get('year')) ? params.get('year') : 'All'
@@ -112,7 +112,7 @@ export default function Archive() {
               </Cover>
               <div className="cover-meta">
                 <span>{ed.date}</span>
-                <span>{gate('Preview free')}</span>
+                <span>Preview free</span>
               </div>
             </Link>
           ))}

@@ -6,7 +6,7 @@ import { useReveal } from '../lib/motion.js'
 import { useApp } from '../store.jsx'
 
 export default function Writings() {
-  const { gate, openLightbox } = useApp()
+  const { openLightbox } = useApp()
 
   useSeo({ ...staticSeo['/writings'], path: '/writings' })
   useReveal('writings')
@@ -59,7 +59,7 @@ export default function Writings() {
             <div className="writing__aside">
               {w.year}
               <br />
-              <span>{gate('Subscribers')}</span>
+              <span>Subscribers</span>
             </div>
           </button>
         ))}
