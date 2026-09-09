@@ -5,8 +5,8 @@ milestone_name: milestone
 current_phase: 3
 current_phase_name: Billing & Webhooks — Stripe Checkout and Subscription Sync
 status: planning
-stopped_at: Phase 3 context gathered
-last_updated: "2026-09-09T01:01:47.219Z"
+stopped_at: Phase 3 UI-SPEC approved
+last_updated: "2026-09-09T01:20:47.244Z"
 last_activity: 2026-09-09
 last_activity_desc: Phase 02 complete, transitioned to Phase 3
 progress:
@@ -90,6 +90,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-09T01:01:47.205Z
-Stopped at: Phase 3 context gathered
-Resume file: .planning/phases/03-billing-webhooks-stripe-checkout-and-subscription-sync/03-CONTEXT.md
+Last session: 2026-09-09T01:20:47.230Z
+Stopped at: Phase 3 UI-SPEC approved
+Resume file: .planning/phases/03-billing-webhooks-stripe-checkout-and-subscription-sync/03-UI-SPEC.md
