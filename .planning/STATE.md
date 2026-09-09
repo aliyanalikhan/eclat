@@ -2,18 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 3
-current_phase_name: Billing & Webhooks — Stripe Checkout and Subscription Sync
 status: executing
 stopped_at: Phase 3 UI-SPEC approved
-last_updated: "2026-09-09T03:46:23.448Z"
-last_activity: 2026-09-09
-last_activity_desc: Phase 02 complete, transitioned to Phase 3
+last_updated: "2026-09-09T03:52:06.396Z"
+last_activity: 2026-09-09 — Phase 03 execution started
 progress:
-  total_phases: 3
+  total_phases: 5
   completed_phases: 2
   total_plans: 9
   completed_plans: 6
+  percent: 40
 ---
 
 # Project State
@@ -23,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-09)
 
 **Core value:** A signed-in subscriber's paid access is real and enforced server-side — no page, download, or API response leaks paid content to someone who hasn't actually paid for it.
-**Current focus:** Phase 3 — Billing & Webhooks — Stripe Checkout and Subscription Sync
+**Current focus:** Phase 03 — Billing & Webhooks — Stripe Checkout and Subscription Sync
 
 ## Current Position
 
-Phase: 3 — Billing & Webhooks — Stripe Checkout and Subscription Sync
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-09-09 — Phase 02 complete, transitioned to Phase 3
+Phase: 03 (Billing & Webhooks — Stripe Checkout and Subscription Sync) — EXECUTING
+Plan: 1 of 3
+Status: Executing Phase 03
+Last activity: 2026-09-09 — Phase 03 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -79,6 +77,7 @@ None yet.
 - Phase 3 (Billing & Webhooks): exact current Stripe API shapes/field names, `apiVersion` pinning, and real product prices should be verified against docs.stripe.com and the live Stripe account at planning time, not assumed from research
 - Phase 4 (Content Gating): the prerender split (what stays static vs. becomes dynamic) needs verification against the actual current route list in the codebase, not assumed from research alone
 - [Phase 2] Cosmetic: `.env.example` documents an unused `SESSION_SECRET=` line (WR-07) — no code reads it, `hashToken()` uses plain SHA-256 by design. Fix was blocked by a sandbox permission restriction on that filename during the review-fix pass; low priority, safe to clean up whenever that file is next touched.
+- [Phase 3, 03-01 Task 1] BLOCKED: `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET` are not present in `.env.local` (confirmed via direct file read — both env vars absent from the file's 25 lines, which otherwise has Postgres/Google/session vars). `vercel` CLI is not installed or authenticated on this machine (`command not found`, no `~/.vercel` cache), so `vercel env pull .env.local` cannot be run non-interactively by the executor. D-02 price-shape verification (the mandatory first task of Plan 03-01, gating the rest of Phase 3) cannot proceed without live Stripe API access. Needs a human to run `vercel env pull .env.local` (after confirming both vars are set in the Vercel dashboard per Plan 03-01's `user_setup`) or manually populate both vars in `.env.local`, then resume Plan 03-01 Task 1.
 
 ## Deferred Items
 
