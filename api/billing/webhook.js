@@ -37,6 +37,16 @@
 import { db } from '../../lib/db.js'
 import { stripe } from '../../lib/stripe.js'
 
+// WR-05: fail fast at module load, mirroring lib/stripe.js (STRIPE_SECRET_KEY)
+// and lib/db.js (POSTGRES_URL) — an unset webhook signing secret must be a
+// loud, obvious cold-start error, not a generic "Invalid signature" 400 that
+// is indistinguishable from a forged-signature attack in the logs.
+if (!process.env.STRIPE_WEBHOOK_SECRET) {
+  throw new Error(
+    'STRIPE_WEBHOOK_SECRET is not set. Configure the webhook endpoint in Stripe and pull the signing secret.',
+  )
+}
+
 /**
  * Resolves the internal users.id for a Stripe Subscription object: first
  * via subscription.metadata.userId (set via Pattern 2's subscription_data
@@ -67,8 +77,17 @@ async function resolveUserId(client, sub) {
  * flows through here with Stripe's own 'canceled' status, so the row
  * always reflects Stripe's latest word and naturally falls out of D-04's
  * active/trialing/past_due entitlement check.
+ *
+ * WR-03 event-ordering guard: Stripe does not guarantee webhook delivery
+ * order (and retries reorder further), so `eventCreated` (the source
+ * event's `created` epoch, unix seconds) is stored as the row's
+ * `last_event_created` watermark and the ON CONFLICT ... DO UPDATE branch
+ * is guarded by `WHERE subscriptions.last_event_created IS NULL OR
+ * subscriptions.last_event_created <= EXCLUDED.last_event_created` — a
+ * delayed older event can never overwrite a row that already reflects a
+ * newer one (no resurrected-canceled / revoked-active subscriber).
  */
-async function upsertSubscription(client, sub) {
+async function upsertSubscription(client, sub, eventCreated) {
   const userId = await resolveUserId(client, sub)
   if (!userId) {
     // Cannot reconcile yet (e.g. checkout.session.completed hasn't landed
@@ -91,8 +110,8 @@ async function upsertSubscription(client, sub) {
 
   await client.query(
     `INSERT INTO subscriptions
-       (user_id, stripe_subscription_id, stripe_customer_id, stripe_product_id, stripe_price_id, status, current_period_end, updated_at)
-     VALUES ($1, $2, $3, $4, $5, $6, $7, now())
+       (user_id, stripe_subscription_id, stripe_customer_id, stripe_product_id, stripe_price_id, status, current_period_end, last_event_created, updated_at)
+     VALUES ($1, $2, $3, $4, $5, $6, $7, $8, now())
      ON CONFLICT (stripe_subscription_id) DO UPDATE SET
        user_id = EXCLUDED.user_id,
        stripe_customer_id = EXCLUDED.stripe_customer_id,
@@ -100,8 +119,11 @@ async function upsertSubscription(client, sub) {
        stripe_price_id = EXCLUDED.stripe_price_id,
        status = EXCLUDED.status,
        current_period_end = EXCLUDED.current_period_end,
-       updated_at = now()`,
-    [userId, sub.id, sub.customer, productId, priceId, sub.status, currentPeriodEnd],
+       last_event_created = EXCLUDED.last_event_created,
+       updated_at = now()
+     WHERE subscriptions.last_event_created IS NULL
+        OR subscriptions.last_event_created <= EXCLUDED.last_event_created`,
+    [userId, sub.id, sub.customer, productId, priceId, sub.status, currentPeriodEnd, eventCreated],
   )
 }
 
@@ -155,7 +177,7 @@ export default {
           }
           if (session.subscription) {
             const sub = await stripe.subscriptions.retrieve(session.subscription)
-            await upsertSubscription(client, sub)
+            await upsertSubscription(client, sub, event.created)
           }
           break
         }
@@ -163,7 +185,7 @@ export default {
         case 'customer.subscription.updated':
         case 'customer.subscription.deleted': {
           const sub = event.data.object
-          await upsertSubscription(client, sub)
+          await upsertSubscription(client, sub, event.created)
           break
         }
         case 'invoice.payment_failed': {
@@ -196,7 +218,7 @@ export default {
       // 500 — DB/business-logic error owns this status code. Roll back so
       // the webhook_events insert is undone too and Stripe's redelivery
       // can retry the whole event, never a half-applied state.
-      await client.query('ROLLBACK').catch(() => {})
+      await client.query('ROLLBACK').catch(() => { })
       console.error(`webhook: failed to process event ${event.id}: ${err.message}`)
       return new Response(null, { status: 500 })
     } finally {

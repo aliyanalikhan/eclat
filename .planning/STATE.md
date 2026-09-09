@@ -6,9 +6,9 @@ current_phase: 4
 current_phase_name: Content Gating — Real Server-Side Entitlement Enforcement
 status: planning
 stopped_at: Phase 4 context gathered
-last_updated: "2026-09-09T06:09:41.727Z"
+last_updated: "2026-09-09T08:37:51.000Z"
 last_activity: 2026-09-09
-last_activity_desc: Phase 03 complete, transitioned to Phase 4
+last_activity_desc: Phase 03 code-review fix pass complete (WR-01..WR-10, IN-01, IN-02); Phase 4 planning continues
 progress:
   total_phases: 4
   completed_phases: 3
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-09)
 Phase: 4 — Content Gating — Real Server-Side Entitlement Enforcement
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-09-09 — Phase 03 complete, transitioned to Phase 4
+Last activity: 2026-09-09 — Phase 03 code-review fix pass complete (all WR-01..WR-10 + IN-01/IN-02, build verified); transitioned to Phase 4
 
 Progress: [████████████░░░░░░░░] 60% (3/5 phases)
 
@@ -80,7 +80,8 @@ None yet.
 ### Blockers/Concerns
 
 - Phase 4 (Content Gating): the prerender split (what stays static vs. becomes dynamic) needs verification against the actual current route list in the codebase, not assumed from research alone
-- Phase 3 code review (`03-REVIEW.md`, non-blocking, worth addressing opportunistically in Phase 4/5 or a dedicated cleanup pass): no idempotency key on Checkout Session creation (double-click could double-bill), no event-ordering guard on subscription webhooks (a delayed `updated` after a `deleted` could resurrect access), `past_due` subscribers see "Subscribe" instead of "Manage" on the picker (silent bounce), and no automated lint/build guard enforces the "SERVER-ONLY" comment convention on `lib/db.js`/`lib/stripe.js`/`lib/products.js`
+- **NEW (fix-pass):** `PUBLIC_ORIGIN` env var must be set (`.env.local` + Vercel) to the canonical `https` origin before `api/billing/checkout.js` can run — it now fails fast at module load without it (WR-07). `src/data/seo-site.js`'s `SITE.url` is still the `https://eclat.example` placeholder and is NOT used for this.
+- Phase 3 code review fix pass: **complete** (2026-09-09) — all 10 warnings (WR-01..WR-10) and IN-01/IN-02 fixed and verified by a green `npm run build` (see `03-REVIEW.md` Fix-Pass Results). Remaining review items are non-blocking: IN-03 (`useEntitlements().refetch()` unmount-safety docs) and IN-04 (checkout sign-in redirect dropping product/interval selection) — deferred to Phase 4/5.
 - [Phase 2] Cosmetic: `.env.example` documents an unused `SESSION_SECRET=` line (WR-07) — no code reads it, `hashToken()` uses plain SHA-256 by design. Fix was blocked by a sandbox permission restriction on that filename during the review-fix pass; low priority, safe to clean up whenever that file is next touched.
 
 ## Deferred Items

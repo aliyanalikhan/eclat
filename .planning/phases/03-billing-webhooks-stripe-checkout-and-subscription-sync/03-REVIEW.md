@@ -158,6 +158,62 @@ const cancelUrl = `${origin}/subscribe`
 
 ---
 
+## Fix-Pass Results (2026-09-09)
+
+Executed as the Phase 3 code-review fix pass. All 10 warnings (WR-01..WR-10) and
+both info items (IN-01, IN-02) are **fixed and verified by a green `npm run build`**
+(which runs `scripts/migrate.js` → client build → SSR build → `prerender.js` →
+`scripts/check-secrets.js`). New migration `0005_subscriptions_last_event_created.sql`
+applied. `check-secrets: no leaked secrets found in dist/`.
+
+| ID | Fix | Status |
+|----|-----|--------|
+| WR-01 | `Subscribe.jsx` `owned` now includes `past_due` → past-due subscribers see "Manage" (→ /account) instead of a dead-end "Subscribe" | ✅ |
+| WR-02 | `checkout.js` passes `{ idempotencyKey: \`checkout:${user.id}:${key}:${interval}\` }` to `stripe.checkout.sessions.create` | ✅ |
+| WR-03 | `webhook.js` stores `event.created` as `subscriptions.last_event_created` (new column via migration 0005) and guards the upsert UPDATE with `WHERE last_event_created IS NULL OR last_event_created <= EXCLUDED.last_event_created` | ✅ |
+| WR-04 | `lib/stripe.js` pins `apiVersion: '2026-08-26.dahlia'` (confirmed live on this account 2026-09-09) | ✅ |
+| WR-05 | `webhook.js` throws at module load when `STRIPE_WEBHOOK_SECRET` is unset (mirrors lib/stripe.js / lib/db.js) | ✅ |
+| WR-06 | `checkout.js` rejects cross-site triggers before any work via `Sec-Fetch-Site`/`Referer` same-origin check (403) | ✅ |
+| WR-07 | `checkout.js` builds success/cancel URLs from `PUBLIC_ORIGIN` env var (fail-fast at module load) instead of the Host-derived origin | ✅ |
+| WR-08 | `prices.js` degrades per-product — one failed price lookup omits only that product, never zeroes the catalog | ✅ |
+| WR-09 | `SubscribeSuccess.jsx` clears the poll interval on success; timeout state still polls | ✅ |
+| WR-10 | `check-secrets.js` now scans the client bundle for markers from all three server-only lib modules (lib/db.js, lib/stripe.js, lib/products.js) and fails the build on any hit | ✅ |
+| IN-01 | `status.js` sets `Cache-Control: no-store` on all responses (success + both 401s) | ✅ |
+| IN-02 | Dead `.plan[aria-pressed='true']` rule removed from `eclat.css` | ✅ |
+
+### Files changed
+
+- `src/routes/Subscribe.jsx` (WR-01)
+- `api/billing/checkout.js` (WR-02, WR-06, WR-07)
+- `api/billing/webhook.js` (WR-03, WR-05)
+- `lib/stripe.js` (WR-04)
+- `api/billing/prices.js` (WR-08)
+- `src/routes/SubscribeSuccess.jsx` (WR-09)
+- `scripts/check-secrets.js` (WR-10)
+- `api/billing/status.js` (IN-01)
+- `src/styles/eclat.css` (IN-02)
+- `migrations/0005_subscriptions_last_event_created.sql` (WR-03, new)
+- `.env.example` (new `PUBLIC_ORIGIN=` entry, WR-07)
+
+### New operational requirement
+
+- **`PUBLIC_ORIGIN` must be set** (in `.env.local` and Vercel) to the canonical
+  `https` origin of the production deployment — `api/billing/checkout.js` now
+  fails fast at module load without it. The repo's `src/data/seo-site.js`
+  `SITE.url` is still the `https://eclat.example` placeholder, so the real value
+  must come from the env var.
+- Existing `subscriptions` rows keep `last_event_created = NULL`; the WR-03 guard
+  deliberately treats NULL as "no watermark yet" (next event accepted
+  unconditionally), which is the correct behavior for pre-existing live rows.
+
+### Not fixed (deferred — out of this pass's scope)
+
+- **IN-03** — `useEntitlements().refetch()` unmount-safety (documentation/restructure; no current caller violates it).
+- **IN-04** — sign-in redirect from checkout drops product/interval selection (`return_to=/subscribe?product=${key}` would close it; touches the auth round-trip, worth doing with Phase 4/5 work).
+
+---
+
 _Reviewed: 2026-09-09_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
+_Fix pass: 2026-09-09 — WR-01..WR-10, IN-01, IN-02 verified by green `npm run build`_

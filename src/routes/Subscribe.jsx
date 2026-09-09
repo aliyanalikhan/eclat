@@ -19,7 +19,11 @@ function formatAmount(amount) {
 function ProductTile({ product, priceInfo, pricesLoading, subs, preselected, setTileRef }) {
   const [interval, setInterval_] = useState('monthly')
   const record = subs[product.key]
-  const owned = !!record && (record.status === 'active' || record.status === 'trialing')
+  // WR-01: past_due subscribers are already entitled server-side (the D-04
+  // re-check in api/billing/checkout.js includes past_due), so they must see
+  // "Subscribed" + "Manage" (→ /account to fix billing) — never a dead-end
+  // "Subscribe" button that redirects silently back here.
+  const owned = !!record && ['active', 'trialing', 'past_due'].includes(record.status)
 
   const intervalData = priceInfo?.intervals?.[interval]
   const priceLabel = intervalData ? formatAmount(intervalData.amount) : null

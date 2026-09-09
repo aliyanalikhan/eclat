@@ -25,7 +25,9 @@ export default {
   async fetch(request) {
     const cookies = parseCookies(request.headers.get('cookie'))
     const raw = cookies.session
-    if (!raw) return Response.json({ subscriptions: {} }, { status: 401 })
+    if (!raw) {
+      return Response.json({ subscriptions: {} }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
+    }
 
     const hash = hashToken(raw)
     try {
@@ -34,7 +36,9 @@ export default {
         JOIN users u ON u.id = s.user_id
         WHERE s.token_hash = ${hash} AND s.expires_at > now()
       `
-      if (!userRows.length) return Response.json({ subscriptions: {} }, { status: 401 })
+      if (!userRows.length) {
+        return Response.json({ subscriptions: {} }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
+      }
 
       const { rows } = await sql`
         SELECT stripe_product_id, status, current_period_end
@@ -51,11 +55,11 @@ export default {
         }
       }
 
-      return Response.json({ subscriptions })
+      return Response.json({ subscriptions }, { headers: { 'Cache-Control': 'no-store' } })
     } catch {
       // Fail closed on a DB error (WR-02 precedent) — never let the
       // exception escape unhandled.
-      return Response.json({ subscriptions: {} }, { status: 401 })
+      return Response.json({ subscriptions: {} }, { status: 401, headers: { 'Cache-Control': 'no-store' } })
     }
   },
 }

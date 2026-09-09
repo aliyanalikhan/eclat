@@ -34,6 +34,7 @@ export default function SubscribeSuccess() {
 
   useEffect(() => {
     let cancelled = false
+    let interval
 
     const checkStatus = () => {
       fetch('/api/billing/status')
@@ -42,7 +43,14 @@ export default function SubscribeSuccess() {
           if (cancelled) return
           const record = (body.subscriptions || {})[productKey]
           const active = record && (record.status === 'active' || record.status === 'trialing')
-          if (active) setState('success')
+          if (active) {
+            // WR-09: once success is reached there is nothing left to poll
+            // for — stop the interval instead of firing every 2s forever.
+            // The 'timeout' state intentionally keeps polling (a late
+            // webhook can still flip the view while the route is mounted).
+            if (interval) clearInterval(interval)
+            setState('success')
+          }
         })
         .catch(() => {
           // Fail closed — a failed poll never flips the view; it just
@@ -51,7 +59,7 @@ export default function SubscribeSuccess() {
     }
 
     checkStatus()
-    const interval = setInterval(checkStatus, POLL_INTERVAL_MS)
+    interval = setInterval(checkStatus, POLL_INTERVAL_MS)
 
     return () => {
       cancelled = true

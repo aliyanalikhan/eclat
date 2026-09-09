@@ -32,7 +32,13 @@ const dist = resolve(here, '..', 'dist')
 const envExamplePath = resolve(here, '..', '.env.example')
 
 // Vars documented in .env.example that are intentionally public, not secret.
-const KNOWN_PUBLIC_VAR_NAMES = new Set(['GOOGLE_CLIENT_ID', 'GOOGLE_REDIRECT_URI'])
+const KNOWN_PUBLIC_VAR_NAMES = new Set([
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_REDIRECT_URI',
+  // PUBLIC_ORIGIN is the site's own canonical origin (WR-07) — public by
+  // definition, exactly like the OAuth client ID/redirect URI above.
+  'PUBLIC_ORIGIN',
+])
 
 async function trackedVarNamesFromEnvExample() {
   const text = await readFile(envExamplePath, 'utf8')
@@ -44,10 +50,22 @@ async function trackedVarNamesFromEnvExample() {
   return names
 }
 
-// lib/db.js's own error text — a unique marker that should never appear in
-// client-bundled JS. If it does, lib/db.js (server-only, per its own header
-// comment) got imported into client code despite that contract (T-01-01).
-const SERVER_ONLY_IMPORT_MARKER = 'Provision Vercel Postgres and run `vercel env pull .env.local`'
+// WR-10: server-only lib/ modules each carry a unique, recognizable marker
+// (their fail-fast error text, or a real Stripe product ID from the
+// allowlist) that must never appear in client-bundled JS. If any does, that
+// module — which reads process.env secrets at import time — got imported
+// into client code despite the SERVER-ONLY contract (T-01-01). Full error
+// strings, not bare env var names, avoid false positives on unrelated text
+// that merely mentions a name.
+const SERVER_ONLY_IMPORT_MARKERS = [
+  // lib/db.js — POSTGRES_URL fail-fast text.
+  'Provision Vercel Postgres and run `vercel env pull .env.local`',
+  // lib/stripe.js — STRIPE_SECRET_KEY fail-fast text.
+  'STRIPE_SECRET_KEY is not set. Pull it with `vercel env pull .env.local`',
+  // lib/products.js — a real Stripe product ID from the allowlist would
+  // only reach the client bundle if lib/products.js itself leaked.
+  'prod_VAyHWfX8XdHh2z',
+]
 const CLIENT_BUNDLE_DIR = join(dist, 'assets')
 
 // Binary/image/font assets never contain leaked text secrets and reading
@@ -98,13 +116,18 @@ async function main() {
       }
     }
 
-    // Import-boundary check (T-01-01): lib/db.js is server-only and must
-    // never end up in the client bundle. If it did, its own error text
-    // would be recognizable in the bundled JS even after minification.
-    if (file.startsWith(CLIENT_BUNDLE_DIR) && content.includes(SERVER_ONLY_IMPORT_MARKER)) {
-      const relPath = relative(dist, file)
-      console.error(`check-secrets: lib/db.js appears to be bundled into client code at ${relPath} (server-only import boundary violated)`)
-      leaked = true
+    // Import-boundary check (T-01-01, WR-10): lib/db.js, lib/stripe.js and
+    // lib/products.js are server-only and must never end up in the client
+    // bundle. If one did, its marker would be recognizable in the bundled
+    // JS even after minification (string literals are never stripped).
+    if (file.startsWith(CLIENT_BUNDLE_DIR)) {
+      for (const marker of SERVER_ONLY_IMPORT_MARKERS) {
+        if (content.includes(marker)) {
+          const relPath = relative(dist, file)
+          console.error(`check-secrets: a server-only lib module appears to be bundled into client code at ${relPath} (server-only import boundary violated)`)
+          leaked = true
+        }
+      }
     }
   }
 

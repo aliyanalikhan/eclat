@@ -21,9 +21,9 @@ export default {
       return new Response('Not found', { status: 404 })
     }
 
-    try {
-      const products = {}
-      for (const [key, product] of Object.entries(PRODUCTS)) {
+    const products = {}
+    for (const [key, product] of Object.entries(PRODUCTS)) {
+      try {
         const [monthly, annual] = await Promise.all([
           stripe.prices.retrieve(product.prices.monthly),
           stripe.prices.retrieve(product.prices.annual),
@@ -37,15 +37,14 @@ export default {
             annual: { amount: annual.unit_amount, currency: annual.currency },
           },
         }
+      } catch (err) {
+        // WR-08: degrade per-product, never zero the whole catalog — a
+        // single stale/archived price ID or transient Stripe blip omits
+        // only the affected product, not the other three. Log server-side
+        // only; never expose the underlying error detail to the client.
+        console.error(`prices: failed to fetch prices for ${key}: ${err.message}`)
       }
-      return Response.json({ products })
-    } catch {
-      // Fail closed on any Stripe/network error — never let the exception
-      // escape unhandled, and never expose the underlying error detail to
-      // the client (matches the other api/billing/* routes' discipline).
-      // The picker's fetch-failure fallback (Task 2) treats an empty
-      // products map the same as "still loading".
-      return Response.json({ products: {} }, { status: 500 })
     }
+    return Response.json({ products })
   },
 }
