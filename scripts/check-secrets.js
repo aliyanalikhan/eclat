@@ -67,8 +67,13 @@ const SERVER_ONLY_IMPORT_MARKERS = [
   'prod_VAyHWfX8XdHh2z',
   // lib/gated-content.js — a gated edition paragraph, unique to that
   // server-only module, would only reach the client bundle if the D-02
-  // bundling leak this phase fixes were ever reintroduced (D-11).
-  'the work of decades, not quarters',
+  // bundling leak this phase fixes were ever reintroduced (D-11). Note:
+  // 'the work of decades, not quarters' (the OLD marker) legitimately
+  // ships in the client bundle again as of Plan 04-02's free-excerpt
+  // restore (it is FREE paragraph 0 of Vol 2) — this marker is re-targeted
+  // to a phrase that exists ONLY in the gated Vol 1 paragraph 2, which
+  // never leaves lib/gated-content.js.
+  'quiet luxury of authenticity',
 ]
 const CLIENT_BUNDLE_DIR = join(dist, 'assets')
 

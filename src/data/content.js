@@ -31,6 +31,13 @@ export const editions = [
     h: 1698,
     blurb:
       'Paul Onuwanibe on leadership, legacy, and rebuilding Africa’s business landscape — plus Chef Efi’s culinary revolution, a World Cup retrospective, and women’s health in focus.',
+    // FREE-ONLY (D-11) — everything but the last paragraph, matching the
+    // exact free-preview boundary this page has always shown. The gated
+    // third paragraph lives only in lib/gated-content.js, server-side.
+    excerpt: [
+      'This issue opens with Paul Onuwanibe on leadership, legacy, and rebuilding Africa’s business landscape — a conversation about vision as the work of decades, not quarters.',
+      'Also inside: Chef Efi’s culinary revolution, a retrospective on the World Cup, women’s health in focus, and a look at fairways, finance, and fatherhood.',
+    ],
   },
   {
     no: 1,
@@ -46,6 +53,14 @@ export const editions = [
     h: 1600,
     blurb:
       'The maiden edition of ÉCLAT by LaDidiér, built around a conversation with Ebuka Osuorah on becoming the new architect of modern living — plus an editorial on essence over excess, a Minneapolis city guide, and LaDidiér Bridal’s elegance reimagined.',
+    // FREE-ONLY (D-11) — everything but the last paragraph, matching the
+    // exact free-preview boundary this page has always shown. The gated
+    // third paragraph lives only in lib/gated-content.js, server-side.
+    excerpt: [
+      'ÉCLAT is born from a simple belief: that style is not only what you wear, but how you move through the world. It lives in the confidence of a well-chosen outfit, the calm of a beautifully designed space, the glow of healthy skin, and the curiosity that leads you to new places.',
+      'Inside these pages, we bring together the worlds that shape modern living — fashion, beauty, lifestyle, and travel — curated with intention and a distinctly global perspective. We chose to celebrate Minnesota, our beautiful home state and the place where the stories of LaDidiér and ÉCLAT began.',
+    ],
+    excerptBy: 'Ebuka Osuorah, Founder',
   },
 ].map((e) => ({ ...e, img: `/assets/images/covers/no-${e.no}-${e.slug}.jpg` }))
 
