@@ -438,7 +438,9 @@ export default {
 
 **If this table is empty:** N/A — see rows above.
 
-## Open Questions
+## Open Questions (DEFERRED TO EXECUTION — GATED)
+
+Items 1 and 2 below could not be resolved in this research session (sandbox blocked `.env.local`/live Stripe access) — both are compensated for by blocking checkpoints in the plans rather than left unresolved: item 1 (D-02) is a `checkpoint:human-verify` in Plan 03-01 Task 1 before any Stripe code is written, and item 2 is a `checkpoint:human-action` capture-and-reconcile task in Plan 03-03 Task 1 before Wave 3 closes.
 
 1. **Real Price IDs and billing intervals for the 4 products (D-02) — BLOCKING**
    - What we know: The 4 Stripe Product IDs are confirmed (`.planning/PROJECT.md:57-60` [VERIFIED]). The current `/subscribe` UI shows placeholder pricing (`SITE.price = { monthly: 9, annual: 84 }`, `src/data/content.js:15` [VERIFIED: src/data/content.js:15] — `"price: { monthly: 9, annual: 84 },"`) unrelated to real Stripe prices.
