@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation — Environment, Secrets & Data Layer** - Server-only secrets boundary and database schema in place before any auth or billing code exists (completed 2026-09-08)
 - [x] **Phase 2: Authentication — Google Sign-In & Server-Side Sessions** - Users sign in with Google only, verified server-side, with persistent sessions (completed 2026-09-09)
 - [x] **Phase 3: Billing & Webhooks — Stripe Checkout and Subscription Sync** - Users subscribe via Stripe Checkout; webhook-verified events are the single source of truth for subscription state (completed 2026-09-09)
-- [x] **Phase 4: Content Gating — Real Server-Side Entitlement Enforcement** - Every gated page checks real per-user entitlement server-side; the fake `subscribed` flag is gone (completed 2026-09-10)
+- [ ] **Phase 4: Content Gating — Real Server-Side Entitlement Enforcement** - Every gated page checks real per-user entitlement server-side; the fake `subscribed` flag is gone (pending human verification — see 04-UAT.md)
 - [ ] **Phase 5: Account Management — Real Status, Cancellation & Billing Portal** - The Account page shows real subscription status, invoices, and payment-failure notices, backed by Stripe
 
 ## Phase Details
@@ -141,5 +141,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation — Environment, Secrets & Data Layer | 3/3 | Complete    | 2026-09-08 |
 | 2. Authentication — Google Sign-In & Server-Side Sessions | 3/3 | Complete    | 2026-09-09 |
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | 3/3 | Complete    | 2026-09-09 |
-| 4. Content Gating — Real Server-Side Entitlement Enforcement | 2/2 | Complete    | 2026-09-10 |
+| 4. Content Gating — Real Server-Side Entitlement Enforcement | 2/2 | Pending human verification | - |
 | 5. Account Management — Real Status, Cancellation & Billing Portal | TBD | Not started | - |

@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-02-PLAN.md
-last_updated: "2026-09-09T22:49:50.000Z"
-last_activity: 2026-09-09 -- Plan 04-02 executed (client-side gated render + GATE-02 cleanup); Phase 4 complete
+stopped_at: Phase 4 verified (human_needed) — awaiting 04-UAT.md sign-off
+last_updated: "2026-09-10T00:00:00.000Z"
+last_activity: 2026-09-10 -- Phase 4 goal-verified; status human_needed (live entitlement matrix + check-secrets.js WR-01 need human sign-off via 04-UAT.md)
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 3
   total_plans: 11
   completed_plans: 11
-  percent: 80
+  percent: 60
 ---
 
 # Project State
@@ -21,15 +21,15 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-09)
 
 **Core value:** A signed-in subscriber's paid access is real and enforced server-side — no page, download, or API response leaks paid content to someone who hasn't actually paid for it.
-**Current focus:** Phase 5 — Account Management — Real Status, Cancellation & Billing Portal
+**Current focus:** Phase 4 UAT — human verification of the live entitlement matrix and the check-secrets.js WR-01 gap (see 04-UAT.md) before advancing to Phase 5
 
 ## Current Position
 
-Phase: 4 — Content Gating — Real Server-Side Entitlement Enforcement — **Complete** (2/2 plans)
-Status: Phase 4 complete; Phase 5 not yet started
-Last activity: 2026-09-09 -- Plan 04-02 executed (client-side gated render + GATE-02 cleanup); Phase 4 complete
+Phase: 4 — Content Gating — Real Server-Side Entitlement Enforcement — **Pending human verification** (2/2 plans executed, 0/2 UAT items signed off)
+Status: All automated checks passed (8/8 must-haves, code review clean of blockers); phase held open pending human verification of 04-UAT.md before being marked complete
+Last activity: 2026-09-10 -- Phase 4 goal-verified (04-VERIFICATION.md); status human_needed — run /gsd-verify-work 04 to work through 04-UAT.md
 
-Progress: [████████████████░░░░] 80% (4/5 phases)
+Progress: [████████████░░░░░░░░] 60% (3/5 phases complete; Phase 4 executed and verified, pending human sign-off)
 
 ## Performance Metrics
 
