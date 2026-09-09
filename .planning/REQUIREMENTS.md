@@ -24,7 +24,7 @@ Requirements for this milestone. Each maps to roadmap phases.
 ### Billing & Checkout (BILL)
 
 - [x] **BILL-01**: User can start a Stripe Checkout session for any of the 4 existing products (Éclat Online, Éclat Hard Copy, Children's Book Online, Children's Book Hard Copy) from the relevant page
-- [ ] **BILL-02**: Checkout shows the real Stripe price for the selected product, not the current placeholder copy
+- [x] **BILL-02**: Checkout shows the real Stripe price for the selected product, not the current placeholder copy
 - [x] **BILL-03**: Stripe webhook events are verified via signature (`constructEvent` + webhook signing secret) before being trusted
 - [x] **BILL-04**: Stripe webhook handler is idempotent — processing the same event twice has no duplicate effect
 - [x] **BILL-05**: Subscription created/updated/deleted events from Stripe are synced into the database as the single source of truth for entitlement — the Checkout success redirect never grants access on its own
@@ -85,7 +85,7 @@ Explicitly excluded. Documented to prevent scope creep.
 | AUTH-05 | Phase 2 | Complete |
 | AUTH-06 | Phase 2 | Complete |
 | BILL-01 | Phase 3 | Complete |
-| BILL-02 | Phase 3 | Pending |
+| BILL-02 | Phase 3 | Complete |
 | BILL-03 | Phase 3 | Complete |
 | BILL-04 | Phase 3 | Complete |
 | BILL-05 | Phase 3 | Complete |
