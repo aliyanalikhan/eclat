@@ -193,6 +193,10 @@ None - no external service configuration required. No new environment variables 
 - **Blocker for Plan 04-02 (carried forward, not a blocker for this plan):** `npm run build` will continue to fail at the prerender step until `Edition.jsx` stops reading `ed.excerpt`/`ed.excerptBy` directly — Plan 04-02 must fix this before any deploy or even before a clean local build can succeed again.
 - The full live entitlement matrix (active/past_due/canceled `eclat-online`; `eclat-hardcopy`/`book-*` granting zero access) was not exercised against a real DB/session in this execution session (see D3 `human_judgment: true` above) — recommend exercising this during Phase 4's end-of-phase human UAT pass once Plan 04-02 makes the endpoint reachable from the UI.
 
+## Self-Check: PASSED
+
+All created/modified files confirmed present on disk (`lib/session-user.js`, `lib/gated-content.js`, `api/content/editions/[no].js`, `api/billing/status.js`, `src/data/content.js`, `vercel.json`, `scripts/check-secrets.js`, this SUMMARY.md). All 6 commits confirmed in `git log` (`1bba3c6`, `d501d46`, `6cade9d`, `a8fac13`, `0e0769f`, plan-metadata `e09d1ef`).
+
 ---
 *Phase: 04-content-gating-real-server-side-entitlement-enforcement*
 *Completed: 2026-09-09*
