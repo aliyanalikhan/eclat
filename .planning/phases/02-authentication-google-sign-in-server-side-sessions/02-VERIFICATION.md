@@ -1,24 +1,29 @@
 ---
 phase: 02-authentication-google-sign-in-server-side-sessions
 verified: 2026-09-09T00:00:00Z
-status: human_needed
+status: passed
 score: 24/24 must-haves verified
 behavior_unverified: 0
 overrides_applied: 0
 gaps: []
 human_verification:
+
   - test: "Run `vercel dev` with GOOGLE_CLIENT_SECRET/GOOGLE_REDIRECT_URI set (redirect URI registered in Google Cloud Console). Visit the site signed out, click 'Sign in' in the header, approve with a real Google account."
     expected: "Browser lands on Google's real consent screen (no branded intermediary page); on approval, returns to the exact originating page with the header showing the signed-in name/avatar instead of 'Sign in'."
     why_human: "A real OAuth round-trip against Google's live consent screen cannot be automated in this environment — no automated check can forge a Google-signed ID token (02-01-PLAN Task 1)."
+
   - test: "While signed in, reload the page several times."
     expected: "Header continues to show the signed-in name/avatar on every reload — no re-authentication prompt."
     why_human: "Confirms the session persists server-side across full page reloads in a real browser, not just in a scripted DB round-trip (02-01-PLAN Task 2)."
+
   - test: "While signed in, open the sign-out menu and click 'Sign out', reload. Separately, in a private window, visit /account directly while signed out."
     expected: "After sign-out, header returns to 'Sign in' and stays that way across reload. In the private window, /account redirects straight into Google sign-in without ever flashing the old mocked page content."
     why_human: "Confirms the middleware pre-filter and DB-backed sign-out behave correctly together in an actual browser (02-02-PLAN Task 1)."
+
   - test: "Reload the site while signed in and signed out. Sign in with a real Google account and observe the header transition. Open the sign-out menu and check its visual states."
     expected: "No visible flash between 'Sign in' and the signed-in name/avatar on any reload. Real Google profile photo renders (or a legible initials-circle fallback if it 403s). Disclosure menu opens/closes on click, Escape, outside-click, and route change; 'Sign out' visibly dims while in flight."
     why_human: "Visual layout, animation smoothness, and flash-of-wrong-state are not verifiable by grep or a scripted fetch (02-02-PLAN Task 2)."
+
   - test: "Visit /account while signed in (real content should show). At Google's consent screen during a fresh sign-in attempt, click 'Cancel' instead of approving. Reload afterward."
     expected: "/account briefly shows 'Checking your session…' before real content appears (never a stale flash). Canceling at Google returns to the originating page with a brief 'Sign-in failed — try again.' notice; reloading does not re-show it."
     why_human: "Denied-consent handling and the loading-to-content transition timing can only be judged by watching a real browser session (02-03-PLAN Task 1)."
