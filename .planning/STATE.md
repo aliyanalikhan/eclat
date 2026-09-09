@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-09-09)
 Phase: 4 — Content Gating — Real Server-Side Entitlement Enforcement
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-09-09 — Completed quick task 260909-kco: fixed checkout.js hard-failing on a stale/invalid stripe_customer_id (retry without stale customer, added Stripe error logging)
+Last activity: 2026-09-09 — Completed quick task 260909-l31: fixed /subscribe grid layout (stable 2x2 grid, equal-height cards, bottom-anchored buttons); browser-verified locally
 
 Progress: [████████████░░░░░░░░] 60% (3/5 phases)
 
@@ -86,6 +86,7 @@ None yet.
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260909-kco | Fix checkout.js hard-failing on a stale/invalid stored stripe_customer_id | 2026-09-09 | 5916f7f | [260909-kco-fix-checkout-js-hard-failing-on-a-stale-](./quick/260909-kco-fix-checkout-js-hard-failing-on-a-stale-/) |
+| 260909-l31 | Fix /subscribe page card grid layout: equal-height cards, no orphaned card, aligned buttons | 2026-09-09 | 7b337a2 | [260909-l31-fix-subscribe-page-card-grid-layout-equa](./quick/260909-l31-fix-subscribe-page-card-grid-layout-equa/) |
 
 ## Deferred Items
 
