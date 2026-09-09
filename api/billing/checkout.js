@@ -126,8 +126,9 @@ export default {
     const successUrl = `${PUBLIC_ORIGIN}/subscribe/success?product=${key}`
     const cancelUrl = `${PUBLIC_ORIGIN}/subscribe`
 
+    let session
     try {
-      const session = await stripe.checkout.sessions.create(
+      session = await stripe.checkout.sessions.create(
         {
           mode: 'subscription',
           line_items: [{ price: priceId, quantity: 1 }],
@@ -145,14 +146,60 @@ export default {
         // that window once the first session's webhook has landed).
         { idempotencyKey: `checkout:${user.id}:${key}:${interval}` },
       )
+    } catch (err) {
+      // WR-11: a stored `stripe_customer_id` can be stale for the currently
+      // configured Stripe key's mode (e.g. a test-mode customer under a
+      // live-mode key) — Stripe throws resource_missing on the `customer`
+      // param for that exact case. That must not block checkout: retry once
+      // without `customer` so Stripe creates a fresh Customer for this
+      // session (api/billing/webhook.js's checkout.session.completed handler
+      // already backfills users.stripe_customer_id from session.customer on
+      // the next successful webhook delivery, so no DB write happens here).
+      // Every other Stripe failure (bad price, network error, account issue,
+      // etc.) must still fail closed exactly as before — this is not a
+      // generic retry-on-any-error, only this one narrow, known-safe case.
+      const isStaleCustomer =
+        user.stripe_customer_id &&
+        err?.type === 'StripeInvalidRequestError' &&
+        err?.code === 'resource_missing' &&
+        err?.param === 'customer'
 
-      const headers = new Headers()
-      headers.set('Location', session.url)
-      return new Response(null, { status: 302, headers })
-    } catch {
-      // Never leak the Stripe error to the client — fail closed back to the
-      // picker, flagged so it can surface the prescribed error banner.
-      return redirectTo('/subscribe?checkout_error=1', request)
+      if (isStaleCustomer) {
+        try {
+          session = await stripe.checkout.sessions.create(
+            {
+              mode: 'subscription',
+              line_items: [{ price: priceId, quantity: 1 }],
+              customer: undefined,
+              client_reference_id: String(user.id),
+              subscription_data: { metadata: { userId: String(user.id) } },
+              success_url: successUrl,
+              cancel_url: cancelUrl,
+            },
+            // Distinct idempotency key: Stripe's idempotency guarantee only
+            // replays the same response for the exact same request params —
+            // reusing the original key (whose stored request included
+            // `customer`) against a request that omits it would make Stripe
+            // reject this retry as a parameter mismatch instead of creating
+            // a session.
+            { idempotencyKey: `checkout:${user.id}:${key}:${interval}:retry` },
+          )
+        } catch (retryErr) {
+          console.error(
+            `checkout: retry after stale customer id failed (type=${retryErr?.type}, code=${retryErr?.code}): ${retryErr?.message}`,
+          )
+          return redirectTo('/subscribe?checkout_error=1', request)
+        }
+      } else {
+        console.error(
+          `checkout: session creation failed (type=${err?.type}, code=${err?.code}): ${err?.message}`,
+        )
+        return redirectTo('/subscribe?checkout_error=1', request)
+      }
     }
+
+    const headers = new Headers()
+    headers.set('Location', session.url)
+    return new Response(null, { status: 302, headers })
   },
 }
