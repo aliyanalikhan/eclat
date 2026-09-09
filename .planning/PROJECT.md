@@ -26,16 +26,16 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 - ✓ Server-side secrets boundary and database schema (users, sessions, subscriptions, webhook_events, addresses) — provisioned on Vercel Postgres, enforced by a build-time secret-leak scanner in `npm run build` — Phase 1
 - ✓ User can sign in with Google (no email/password option — Google is the only sign-in method) — Phase 2
 - ✓ User's session is verified server-side (jose-verified ID token, opaque hashed session cookie, DB-backed session lookup on every `/api/auth/session` call) — Phase 2
+- ✓ User can subscribe to any of the 4 existing Stripe products (ÉCLAT Online/Hard Copy, Children's Book Online/Hard Copy) via Stripe Checkout — Phase 3
+- ✓ User's subscription status is kept in sync via verified Stripe webhooks (signature-checked), not by trusting the client — Phase 3
+- ✓ No Stripe secret key, webhook secret, or Google OAuth client secret is ever exposed to client-side code — enforced by `scripts/check-secrets.js` gating every `npm run build`; verified Phase 3
+- ✓ All money-related actions (checkout session creation, webhook handling, entitlement checks) happen server-side only — Phase 3
 
 ### Active
 
-- [ ] User can subscribe to any of the 4 existing Stripe products (ÉCLAT Online/Hard Copy, Children's Book Online/Hard Copy) via Stripe Checkout
-- [ ] User's subscription status is kept in sync via verified Stripe webhooks (signature-checked), not by trusting the client
 - [ ] Gated content (edition full issues, book full spreads, paywalled writings) is served/rendered based on the user's real, server-verified entitlement — replacing the current `subscribed` localStorage flag entirely
 - [ ] User can manage their subscription (view status, cancel) from the Account page, backed by real Stripe data instead of the current mocked invoices/plan
 - [ ] Losing/cancelling a subscription immediately revokes access to gated content on the next request
-- [ ] No Stripe secret key, webhook secret, or Google OAuth client secret is ever exposed to client-side code
-- [ ] All money-related actions (checkout session creation, webhook handling, entitlement checks) happen server-side only
 
 ### Out of Scope
 
@@ -61,6 +61,7 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 - Existing pricing shown on `/subscribe` ($9/mo, $84/year) is currently just UI copy tied to no real billing — it should be reconciled with whatever the actual prices are on the 4 Stripe products above during implementation.
 - **Phase 1 complete (2026-09-08):** Server-side secrets boundary, Postgres schema, and a build-time secret-leak scanner are live and verified against the real, already-provisioned Vercel Postgres database. Discovered mid-phase that this Vercel project already had prior out-of-band work done on it (a `users`/`addresses` schema with 2 real rows, plus `GOOGLE_CLIENT_ID`/`STRIPE_SECRET_KEY`/`SESSION_SECRET` env vars already set, ~7 days old) — confirmed intentional by the user. **Phase 2/3 planning should explicitly check for other pre-existing artifacts (partial auth/billing code, other tables/routes) rather than assuming a blank slate**, since this milestone's actual starting point is not as clean as the original codebase map assumed.
 - **Phase 2 complete (2026-09-09):** Google OAuth sign-in and server-side sessions are live: `api/auth/google.js` + `api/auth/google/callback.js` handle the full authorization-code flow (jose-verified ID token, constant-time state check, `isSafeReturnTo` open-redirect guard), sessions are opaque tokens hashed before storage (`lib/session.js`, `sessions.token_hash`), `middleware.js` does a cheap cookie-presence pre-filter for `/account` while `api/auth/session.js` is the real DB-backed entitlement check, and the header/`Account.jsx`/`App.jsx` are fully auth-aware with no more mocked sign-in state. 24/24 automated must-have truths verified plus 5/5 human UAT checks passed. Security review (`02-SECURITY.md`) closed 14 STRIDE threats (9 mitigated, 5 accepted) with `threats_open: 0`. One cosmetic carry-forward: `.env.example` still documents an unused `SESSION_SECRET=` line (WR-07, blocked by a sandbox permission restriction during the fix pass — not a functional issue, `hashToken()` uses plain SHA-256 by design).
+- **Phase 3 complete (2026-09-09):** Real Stripe Checkout + signature-verified webhook sync are live: `lib/stripe.js` (server-only client) and `lib/products.js` (4-slug price allowlist) back `api/billing/checkout.js` (server-initiated redirect, re-verifies session + existing subscription before ever calling Stripe), `api/billing/status.js`, `api/billing/prices.js` (public price facts, zero price-ID leakage), and `api/billing/webhook.js` (raw-body signature verification, `webhook_events`-PK idempotency inside a real DB transaction, dispatches `checkout.session.completed`/subscription lifecycle/`invoice.payment_failed`→`past_due`). `/subscribe` is a real 4-tile picker with live prices and independent per-product ownership state (D-05); `/subscribe/success` only flips to success on an observed webhook-synced row (D-07), never on the redirect alone. D-02 resolved live against the real Stripe account: all 4 products carry monthly + annual prices (branch B), embedded in `migrations/0004_billing_stripe_price_id.sql` + `lib/products.js`. 16/17 automated must-have truths verified plus all 4 human UAT checks passed, including a real Stripe Checkout completion. Security review (`03-SECURITY.md`) closed 19 STRIDE threats (16 mitigated, 3 accepted) with `threats_open: 0`. Code review (`03-REVIEW.md`) found 0 critical/10 warnings/4 info — none blocking; notable open items for Phase 4/5 to be aware of: no idempotency key on Checkout Session creation (double-click risk), no event-ordering guard on subscription webhooks, and a `past_due` picker UX dead-end. **This phase ran against the LIVE production Stripe account (not test mode)** — an explicit, informed decision made by the user after being warned of the risk (real charges, real webhook effects); see Key Decisions.
 
 ## Constraints
 
@@ -77,10 +78,12 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 | Google-only sign-in (no email/password) | Avoids password storage, reset flows, and credential-leak surface entirely; user explicitly chose this over adding password auth | ✓ Applied — Phase 2 |
 | Session token stored as SHA-256 hash, raw value only ever in an httpOnly/Secure cookie | A DB read/dump alone can never be replayed as a live session; matches D-12 from Phase 2 planning | ✓ Applied — Phase 2 |
 | Full rebuild rather than bolt-on accounts layer | User wants the real site's gated content (editions/books/writings) to actually be protected, not just an added account page on top of a still-fake paywall | — Pending |
-| Backend on Vercel serverless/Edge + managed DB | Fits the existing Vercel deployment with minimal new infra to operate; specific DB provider to be decided during research | — Pending |
-| Reuse existing Stripe products instead of new pricing | 4 real recurring subscription products already exist in the live Stripe account (magazine + children's book, each online/hard-copy) | — Pending |
+| Backend on Vercel serverless/Edge + managed DB | Fits the existing Vercel deployment with minimal new infra to operate; specific DB provider to be decided during research | ✓ Applied — Phase 1 |
+| Reuse existing Stripe products instead of new pricing | 4 real recurring subscription products already exist in the live Stripe account (magazine + children's book, each online/hard-copy) | ✓ Applied — Phase 3 |
 | "Multi-tenant" clarified to mean multi-user, single brand | Initial request used "multi-tenant" loosely; user confirmed it means many individual reader accounts on one Éclat product, not a white-label platform for other businesses | ✓ Good |
 | `users.id` is `BIGINT`, not `UUID` | Phase 1 execution discovered a live Vercel Postgres database (~7 days old, prior out-of-band work on this same project) already had a `users` table with a `BIGINT` identity PK and 2 real rows, plus an `addresses` table. User confirmed this was intentional prior work and chose to adopt it as canonical rather than drop the data. Reverses the original UUID-PK decision (Phase 1 CONTEXT.md D-08). | ✓ Applied — Phase 1 |
+| D-02: each of the 4 Stripe products has monthly + annual prices, not one fixed price (branch B) | Resolved live against the real Stripe account in Phase 3 Task 1 (`stripe.prices.list`), before any billing code was written — RESEARCH.md could not resolve this in advance (sandbox blocked `.env.local` access) | ✓ Applied — Phase 3 |
+| Phase 3 executed against the LIVE production Stripe account, not test mode | User explicitly chose this after being warned it means real charges/real webhook effects against production data (no test-mode key was available at the time); the user separately confirmed the Checkout round-trip with a real purchase during Phase 3 UAT | ✓ Applied — Phase 3 |
 
 ## Evolution
 
@@ -100,4 +103,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-09 after Phase 2 completion*
+*Last updated: 2026-09-09 after Phase 3 completion*
