@@ -65,6 +65,10 @@ const SERVER_ONLY_IMPORT_MARKERS = [
   // lib/products.js — a real Stripe product ID from the allowlist would
   // only reach the client bundle if lib/products.js itself leaked.
   'prod_VAyHWfX8XdHh2z',
+  // lib/gated-content.js — a gated edition paragraph, unique to that
+  // server-only module, would only reach the client bundle if the D-02
+  // bundling leak this phase fixes were ever reintroduced (D-11).
+  'the work of decades, not quarters',
 ]
 const CLIENT_BUNDLE_DIR = join(dist, 'assets')
 
