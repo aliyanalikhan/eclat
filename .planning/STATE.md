@@ -2,13 +2,14 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planning
-last_updated: "2026-09-09T21:06:12.000Z"
-last_activity: 2026-09-09 — Phase 4 research refreshed via /gsd-research (decisions D-01..D-17 from /gsd-discuss folded into 04-RESEARCH.md, commit 92341e5); ready to plan
+status: executing
+stopped_at: "Phase 4 research refreshed (04-RESEARCH.md rewritten with D-01..D-17, commit 92341e5) — next step is /gsd:plan-phase 4 (or /gsd:plan-phase 4 --research to refresh research and plan)"
+last_updated: "2026-09-09T22:12:45.764Z"
+last_activity: 2026-09-09 -- Phase 4 planning complete
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 9
+  total_plans: 11
   completed_plans: 9
   percent: 60
 ---
@@ -26,8 +27,8 @@ See: .planning/PROJECT.md (updated 2026-09-09)
 
 Phase: 4 — Content Gating — Real Server-Side Entitlement Enforcement
 Plan: Not started
-Status: Ready to plan (research refreshed — D-01..D-17 locked, prescriptive)
-Last activity: 2026-09-09 — /gsd-research Phase 4 complete: 04-RESEARCH.md rewritten (commit 92341e5) folding /gsd-discuss decisions D-01..D-17; doc verified against researcher contract
+Status: Ready to execute
+Last activity: 2026-09-09 -- Phase 4 planning complete
 
 Progress: [████████████░░░░░░░░] 60% (3/5 phases)
 
