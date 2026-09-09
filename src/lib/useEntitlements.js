@@ -1,8 +1,14 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
+import { useSafeFetch } from './useSafeFetch.js'
 
 /**
- * Client hook wrapping GET /api/billing/status. Sibling to useSession.js,
- * copying its exact cancel-flag + .then/.catch shape.
+ * Client hook wrapping GET /api/billing/status. Backported onto the shared
+ * useSafeFetch primitive (D-07..D-09) — fixes the Phase 3 IN-03 hazard
+ * where `refetch()` returned an orphaned abort-guard flag that a manual
+ * caller (SubscribeSuccess.jsx's polling loop) had to remember to honor.
+ * `refetch()` is now a safe key bump: useSafeFetch's effect owns the
+ * abort-previous + latest-request-wins guarantee, so a refetch can never
+ * resolve out of order or leak into an unmounted component.
  *
  * Fails closed to an empty subscriptions map on any fetch/parse error or a
  * 401 (no session) response — callers (the /subscribe picker and
@@ -14,33 +20,10 @@ import { useCallback, useEffect, useState } from 'react'
  * @returns {{ subs: Record<string, { status: string, current_period_end: string }>, loading: boolean, error: boolean, refetch: () => void }}
  */
 export function useEntitlements() {
-  const [subs, setSubs] = useState({})
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-
-  const refetch = useCallback(() => {
-    let cancelled = false
-    setLoading(true)
-    fetch('/api/billing/status')
-      .then((res) => res.json())
-      .then((body) => {
-        if (cancelled) return
-        setSubs(body.subscriptions || {})
-        setError(false)
-        setLoading(false)
-      })
-      .catch(() => {
-        if (cancelled) return
-        setSubs({})
-        setError(true)
-        setLoading(false)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  useEffect(() => refetch(), [refetch])
+  const [key, setKey] = useState(0)
+  const { loading, data, error } = useSafeFetch('/api/billing/status', { enabled: true, key })
+  const subs = (data && data.subscriptions) || {}
+  const refetch = useCallback(() => setKey((k) => k + 1), [])
 
   return { subs, loading, error, refetch }
 }
