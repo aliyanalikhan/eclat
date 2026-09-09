@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 1: Foundation — Environment, Secrets & Data Layer** - Server-only secrets boundary and database schema in place before any auth or billing code exists (completed 2026-09-08)
 - [x] **Phase 2: Authentication — Google Sign-In & Server-Side Sessions** - Users sign in with Google only, verified server-side, with persistent sessions (completed 2026-09-09)
 - [x] **Phase 3: Billing & Webhooks — Stripe Checkout and Subscription Sync** - Users subscribe via Stripe Checkout; webhook-verified events are the single source of truth for subscription state (completed 2026-09-09)
-- [ ] **Phase 4: Content Gating — Real Server-Side Entitlement Enforcement** - Every gated page checks real per-user entitlement server-side; the fake `subscribed` flag is gone
+- [x] **Phase 4: Content Gating — Real Server-Side Entitlement Enforcement** - Every gated page checks real per-user entitlement server-side; the fake `subscribed` flag is gone (completed 2026-09-10)
 - [ ] **Phase 5: Account Management — Real Status, Cancellation & Billing Portal** - The Account page shows real subscription status, invoices, and payment-failure notices, backed by Stripe
 
 ## Phase Details
@@ -104,7 +104,16 @@ Plans:
   4. Canceling or lapsing a subscription revokes access to that product's gated content on the user's very next request, with no stale cached access
   5. Publicly-intended content (covers, previews, marketing pages) renders exactly as it does today, unaffected by the new gating
 
-**Plans**: TBD
+**Plans**: 2/2 plans executed
+Plans:
+**Wave 1**
+
+- [x] 04-01-PLAN.md — Server-only session helper, gated-content module, GET /api/content/editions/:no entitlement endpoint, no-store defense-in-depth, check-secrets guard
+
+**Wave 2**
+
+- [x] 04-02-PLAN.md — useSafeFetch/useGatedContent client hooks, useEntitlements IN-03 backport, free-only excerpt restore, Edition.jsx gated-block rewrite, GATE-02 demo-state removal
+
 **UI hint**: yes
 
 ### Phase 5: Account Management — Real Status, Cancellation & Billing Portal
@@ -132,5 +141,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Foundation — Environment, Secrets & Data Layer | 3/3 | Complete    | 2026-09-08 |
 | 2. Authentication — Google Sign-In & Server-Side Sessions | 3/3 | Complete    | 2026-09-09 |
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | 3/3 | Complete    | 2026-09-09 |
-| 4. Content Gating — Real Server-Side Entitlement Enforcement | 1/2 | In Progress|  |
+| 4. Content Gating — Real Server-Side Entitlement Enforcement | 2/2 | Complete    | 2026-09-10 |
 | 5. Account Management — Real Status, Cancellation & Billing Portal | TBD | Not started | - |
