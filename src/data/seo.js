@@ -34,6 +34,12 @@ export const staticSeo = {
     og: DEFAULT_OG,
     robots: 'noindex,follow',
   },
+  '/subscribe/success': {
+    title: 'Subscription confirmed — Éclat',
+    description: 'Your Éclat subscription is being confirmed.',
+    og: DEFAULT_OG,
+    robots: 'noindex,follow',
+  },
   '/account': {
     title: 'Your Account — Éclat',
     description: 'Manage your Éclat subscription, plan and billing history.',

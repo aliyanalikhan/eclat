@@ -9,6 +9,7 @@ import Edition from './routes/Edition.jsx'
 import Books from './routes/Books.jsx'
 import Writings from './routes/Writings.jsx'
 import Subscribe from './routes/Subscribe.jsx'
+import SubscribeSuccess from './routes/SubscribeSuccess.jsx'
 import Account from './routes/Account.jsx'
 import NotFound from './routes/NotFound.jsx'
 import './styles/eclat.css'
@@ -67,6 +68,7 @@ export default function App() {
         <Route path="/books" element={<Books />} />
         <Route path="/writings" element={<Writings />} />
         <Route path="/subscribe" element={<Subscribe />} />
+        <Route path="/subscribe/success" element={<SubscribeSuccess />} />
         <Route path="/account" element={<Account />} />
         <Route path="*" element={<NotFound />} />
       </Routes>

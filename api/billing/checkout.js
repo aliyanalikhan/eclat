@@ -102,8 +102,8 @@ export default {
       return new Response(null, { status: 302, headers })
     } catch {
       // Never leak the Stripe error to the client — fail closed back to the
-      // picker.
-      return redirectTo('/subscribe', request)
+      // picker, flagged so it can surface the prescribed error banner.
+      return redirectTo('/subscribe?checkout_error=1', request)
     }
   },
 }
