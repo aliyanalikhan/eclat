@@ -46,7 +46,7 @@ current_period_end:     2026-10-09T04:40:06.000Z   (matches the items.data[0].cu
 
 ---
 
-## Idempotency Replay (BILL-04)
+## Idempotency replay (BILL-04)
 
 **Captured event id replayed:** `evt_test_capture_sub_updated_A1` (the `customer.subscription.updated` event above).
 
@@ -67,7 +67,7 @@ current_period_end:     2026-10-09T04:40:06.000Z   (matches the items.data[0].cu
 
 ---
 
-## Past-Due Surfacing (BILL-06)
+## Past-due surfacing (BILL-06)
 
 **Event:** `evt_test_capture_invoice_failed_A1` (`invoice.payment_failed`, above) landed the `subscriptions` row for `sub_test_capture_A1` at `status = past_due` (Stripe's own verbatim status string, no translation layer).
 
