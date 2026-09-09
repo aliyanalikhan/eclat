@@ -21,6 +21,7 @@ Phase 4 replaces every remaining client-trusted content gate with a real server-
 - **D-03:** Of the 4 real Stripe products (`eclat-online`, `eclat-hardcopy`, `book-online`, `book-hardcopy`), Writings/essays are gated by `eclat-online` — same digital-magazine subscription that unlocks edition full issues, not a separate product and not "any active subscription."
 - **D-04 (GATE-03):** A user holding only `eclat-hardcopy` (or only `book-hardcopy`) with no corresponding Online product gets **zero** digital/web access to that product's gated content — the paywall behaves exactly as if they weren't subscribed at all. Hard Copy is purely a physical-mail subscription with no bundled digital perk.
 - **D-05:** An active Online subscription (`eclat-online` or `book-online`) unlocks the **entire back-archive** under that product — entitlement is a simple "does this user have a currently-active subscription row for product X" boolean, independent of specific edition/item or publish date. No per-item date comparison is needed.
+- **D-06 (surfaced by RESEARCH.md, Open Question 2):** A `past_due` subscription (Stripe renewal payment failed, not yet canceled) does **not** count as entitled — it loses gated-content access immediately, same as `canceled`. Only `status = 'active'` grants entitlement; every other Stripe status value mirrored into `subscriptions.status` (`past_due`, `canceled`, `unpaid`, `incomplete`, etc.) is treated as not-entitled. Matches the milestone's core value literally ("hasn't actually paid for it"); Phase 5's ACCT-04 "update your card" notice is the user-facing explanation for why access dropped, not a grace-period mechanism.
 
 ### Claude's Discretion
 - Exact API route naming/shape for the authenticated per-request gated-content fetch (e.g. `/api/content/editions/:no`) — follows the `/api/billing/*` and `/api/auth/*` Node-route conventions established in Phases 2/3.
@@ -39,6 +40,9 @@ Phase 4 replaces every remaining client-trusted content gate with a real server-
 - `.planning/ROADMAP.md` — Phase 4 section (Goal, Success Criteria, Requirements GATE-01 through GATE-05; `UI hint: yes`)
 - `.planning/REQUIREMENTS.md` — GATE-01 through GATE-05 (full requirement text, GATE-03 locked 2026-09-08); v2 GATE-06 (deferred content-model change — explicitly NOT this phase); Out of Scope table
 - `.planning/PROJECT.md` — Core Value, Constraints, Key Decisions table
+
+### This Phase's Research
+- `.planning/phases/04-content-gating-real-server-side-entitlement-enforcement/04-RESEARCH.md` — confirms the bundling-leak diagnosis (D-02), the books/writings scope finding (D-01), recommends extracting a shared `lib/auth.js` session-lookup helper (3x duplicated already across `api/auth/session.js`, `api/billing/status.js`, `api/billing/checkout.js`), and surfaced the `past_due` entitlement question resolved as D-06 above
 
 ### Prior Phase Context
 - `.planning/phases/01-foundation-environment-secrets-data-layer/01-CONTEXT.md` — DB schema decisions (`subscriptions` table shape, `status` enum, `users.id` as `BIGINT`)

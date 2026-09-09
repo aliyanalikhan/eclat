@@ -5,7 +5,7 @@
 
 **Date:** 2026-09-09
 **Phase:** 4-Content Gating — Real Server-Side Entitlement Enforcement
-**Areas discussed:** Books/writings gating scope, Writings entitlement mapping, Hard Copy web access, Archive access scope
+**Areas discussed:** Books/writings gating scope, Writings entitlement mapping, Hard Copy web access, Archive access scope, Past-due access (surfaced post-hoc by RESEARCH.md)
 
 ---
 
@@ -55,6 +55,20 @@
 
 **User's choice:** Full back-archive (Recommended)
 **Notes:** Simplifies the entitlement query to a boolean check, no per-item date logic needed.
+
+---
+
+## Past-due access
+
+> Not part of the original discussion — 04-RESEARCH.md (run in parallel) flagged this as an undecided policy question before planning could lock the entitlement query's `status IN (...)` filter. Resolved directly via follow-up AskUserQuestion rather than a full discuss-phase re-run.
+
+| Option | Description | Selected |
+|--------|-------------|----------|
+| Lose access immediately (Recommended) | Matches the core value literally ("hasn't actually paid for it"). Phase 5's ACCT-04 notice explains why. | ✓ |
+| Grace period — keep access | Common SaaS pattern: past_due still counts as entitled for a window. | |
+
+**User's choice:** Lose access immediately (Recommended)
+**Notes:** Only `status = 'active'` grants entitlement; `past_due`, `canceled`, and any other Stripe status are all treated as not-entitled.
 
 ---
 
