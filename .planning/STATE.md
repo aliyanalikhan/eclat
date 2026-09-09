@@ -27,7 +27,7 @@ See: .planning/PROJECT.md (updated 2026-09-09)
 Phase: 4 — Content Gating — Real Server-Side Entitlement Enforcement
 Plan: Not started
 Status: Ready to plan
-Last activity: 2026-09-09 — Phase 03 code-review fix pass complete (all WR-01..WR-10 + IN-01/IN-02, build verified); transitioned to Phase 4
+Last activity: 2026-09-09 — Completed quick task 260909-kco: fixed checkout.js hard-failing on a stale/invalid stripe_customer_id (retry without stale customer, added Stripe error logging)
 
 Progress: [████████████░░░░░░░░] 60% (3/5 phases)
 
@@ -80,6 +80,12 @@ None yet.
 - **NEW (fix-pass):** `PUBLIC_ORIGIN` env var must be set (`.env.local` + Vercel) to the canonical `https` origin before `api/billing/checkout.js` can run — it now fails fast at module load without it (WR-07). `src/data/seo-site.js`'s `SITE.url` is still the `https://eclat.example` placeholder and is NOT used for this.
 - Phase 3 code review fix pass: **complete** (2026-09-09) — all 10 warnings (WR-01..WR-10) and IN-01/IN-02 fixed and verified by a green `npm run build` (see `03-REVIEW.md` Fix-Pass Results). Remaining review items are non-blocking: IN-03 (`useEntitlements().refetch()` unmount-safety docs) and IN-04 (checkout sign-in redirect dropping product/interval selection) — deferred to Phase 4/5.
 - [Phase 2] Cosmetic: `.env.example` documents an unused `SESSION_SECRET=` line (WR-07) — no code reads it, `hashToken()` uses plain SHA-256 by design. Fix was blocked by a sandbox permission restriction on that filename during the review-fix pass; low priority, safe to clean up whenever that file is next touched.
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260909-kco | Fix checkout.js hard-failing on a stale/invalid stored stripe_customer_id | 2026-09-09 | 5916f7f | [260909-kco-fix-checkout-js-hard-failing-on-a-stale-](./quick/260909-kco-fix-checkout-js-hard-failing-on-a-stale-/) |
 
 ## Deferred Items
 
