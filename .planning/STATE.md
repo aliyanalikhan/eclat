@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 3 UI-SPEC approved
-last_updated: "2026-09-09T03:52:06.396Z"
-last_activity: 2026-09-09 — Phase 03 execution started
+stopped_at: Completed 03-01-PLAN.md
+last_updated: "2026-09-09T04:22:05.336Z"
+last_activity: 2026-09-09
 progress:
   total_phases: 5
   completed_phases: 2
   total_plans: 9
-  completed_plans: 6
+  completed_plans: 7
   percent: 40
 ---
 
@@ -26,17 +26,17 @@ See: .planning/PROJECT.md (updated 2026-09-09)
 ## Current Position
 
 Phase: 03 (Billing & Webhooks — Stripe Checkout and Subscription Sync) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 03
-Last activity: 2026-09-09 — Phase 03 execution started
+Plan: 2 of 3
+Status: Executing Phase 03 (Plan 03-01 complete)
+Last activity: 2026-09-09 — Plan 03-01 (Billing Foundation: Stripe client, checkout, status, webhook) complete
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [████████░░] 78%
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 6
+- Total plans completed: 7
 - Average duration: - min
 - Total execution time: 0 hours
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 03 P01 | 48min | 3 tasks | 9 files |
 
 ## Accumulated Context
 
@@ -66,6 +67,8 @@ Recent decisions affecting current work:
 - Research: Session (identity) and entitlement (access) are kept structurally separate — entitlement is always a live DB read per gated request, never baked into a session cookie/JWT
 - Phase 2: Session tokens are opaque random values, only the SHA-256 hash is ever persisted (`sessions.token_hash`) — a DB compromise alone cannot yield a replayable session
 - Phase 2: `middleware.js` is a cheap cookie-presence UX pre-filter only; `api/auth/session.js` (DB-backed) is the sole authoritative entitlement check — this same identity/entitlement split now has a concrete precedent for Phase 3's billing entitlement checks
+- [Phase 3]: D-02 resolved to branch B: all 4 Stripe products have 2 active recurring prices each (monthly + annual), verified live against the real Stripe account
+- [Phase 3]: lib/db.js extended to export db (pooled client) alongside sql, since the HTTP-based sql tagged template has no multi-statement transaction support but the webhook handler needs one
 
 ### Pending Todos
 
@@ -77,7 +80,7 @@ None yet.
 - Phase 3 (Billing & Webhooks): exact current Stripe API shapes/field names, `apiVersion` pinning, and real product prices should be verified against docs.stripe.com and the live Stripe account at planning time, not assumed from research
 - Phase 4 (Content Gating): the prerender split (what stays static vs. becomes dynamic) needs verification against the actual current route list in the codebase, not assumed from research alone
 - [Phase 2] Cosmetic: `.env.example` documents an unused `SESSION_SECRET=` line (WR-07) — no code reads it, `hashToken()` uses plain SHA-256 by design. Fix was blocked by a sandbox permission restriction on that filename during the review-fix pass; low priority, safe to clean up whenever that file is next touched.
-- [Phase 3, 03-01 Task 1] BLOCKED: `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET` are not present in `.env.local` (confirmed via direct file read — both env vars absent from the file's 25 lines, which otherwise has Postgres/Google/session vars). `vercel` CLI is not installed or authenticated on this machine (`command not found`, no `~/.vercel` cache), so `vercel env pull .env.local` cannot be run non-interactively by the executor. D-02 price-shape verification (the mandatory first task of Plan 03-01, gating the rest of Phase 3) cannot proceed without live Stripe API access. Needs a human to run `vercel env pull .env.local` (after confirming both vars are set in the Vercel dashboard per Plan 03-01's `user_setup`) or manually populate both vars in `.env.local`, then resume Plan 03-01 Task 1.
+- [Phase 3, 03-01 Task 1] RESOLVED (2026-09-09): The user manually populated `STRIPE_SECRET_KEY`/`STRIPE_WEBHOOK_SECRET` in `.env.local` directly (outside this agent's session). Re-verified independently before proceeding (var names/lengths only, values never printed): both present. Note: the supplied `STRIPE_SECRET_KEY` is a **live** (`sk_live_...`) key, not test-mode — the user was explicitly warned Plan 03-01's D-02 price lookup and all Wave 1 Stripe API calls would hit the real production Stripe account, and chose to proceed. D-02 resolved to branch B (2 prices per product, monthly + annual) against the live account; see 03-01-SUMMARY.md for full verification detail, including how live-mode side effects were avoided (read-only price listing + locally-generated signed test payloads for webhook verification, no real Checkout Sessions or live webhook traffic created).
 
 ## Deferred Items
 
@@ -89,6 +92,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-09T01:20:47.230Z
-Stopped at: Phase 3 UI-SPEC approved
-Resume file: .planning/phases/03-billing-webhooks-stripe-checkout-and-subscription-sync/03-UI-SPEC.md
+Last session: 2026-09-09T04:22:05.326Z
+Stopped at: Completed 03-01-PLAN.md
+Resume file: None
