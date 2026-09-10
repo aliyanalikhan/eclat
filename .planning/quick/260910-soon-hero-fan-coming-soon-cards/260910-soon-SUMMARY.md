@@ -98,6 +98,16 @@ tint) was invisible after blur+compression — fixed with a distinct lighter car
 (#d8d2c4) and dark text/lines, verified visible in-browser. Zero external assets now. Commit:
 `34a1e02`.
 
+## Extension 3 (same session): per-slot variety + real glassmorphism
+
+User asked for each Coming Soon card to look different ("random design") and for the overlay to
+be a proper "glass effect". Added 4 fixed sample-cover looks (`.fan-card__sample--0..3`, distinct
+palette + layout order each), picked deterministically by slot index via `buildFan`'s new
+`variant` field (not `Math.random()` — would hydration-mismatch server vs. client). Redid
+`.fan-card__soon` as actual frosted glass: translucent white gradient, `backdrop-filter: blur
+saturate`, bright rim border, soft shadow — replacing the flat dark scrim. Verified in-browser:
+3 visibly distinct card colors, legible glass label on all of them. Commit: `cde2156`.
+
 ## Self-Check: PASSED
 
 - FOUND: `src/routes/Home.jsx` (buildFan + render map changes)
