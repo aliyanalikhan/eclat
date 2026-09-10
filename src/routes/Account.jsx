@@ -1,35 +1,51 @@
 import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { invoices } from '../data/content.js'
 import { staticSeo } from '../data/seo.js'
 import { useSeo } from '../lib/useSeo.js'
 import { useSession } from '../lib/useSession.js'
 import { useEntitlements } from '../lib/useEntitlements.js'
+import { useAccount } from '../lib/useAccount.js'
+import { PRODUCTS, productName } from '../data/products.js'
+
+// 3-state status map (D-02/D-16, 05-UI-SPEC §1). Wave 1 only ever emits
+// these three statuses; an unknown value fails closed to '—' with no dot.
+const STATUS = {
+  active: { dot: 'var(--ok)', label: 'Active' },
+  past_due: { dot: 'var(--bad)', label: 'Past due' },
+  canceled: { dot: 'var(--accent)', label: 'Canceled' },
+}
+
+// Shared formatter — 'D MMM YYYY', e.g. '12 Aug 2026', no comma, day before
+// month (matches the mock invoice format exactly, 05-UI-SPEC §1).
+const DATE_FMT = new Intl.DateTimeFormat('en-GB', {
+  day: 'numeric',
+  month: 'short',
+  year: 'numeric',
+})
 
 export default function Account() {
   const { user, loading } = useSession()
-  const { subs, loading: entitlementsLoading, error } = useEntitlements()
+  // Entitlements contribute ONLY its loading flag to the page gate
+  // (05-UI-SPEC §6) — account data comes exclusively from useAccount().
+  const { loading: entitlementsLoading } = useEntitlements()
+  const { loading: accountLoading, data, error: accountError } = useAccount()
 
   useSeo({ ...staticSeo['/account'], path: '/account' })
 
   // Signed out, or the session-check request itself failed — fail closed
-  // in both cases (D-09): never render the mocked page content, always
-  // send the visitor back into sign-in via a plain navigation. Performed
-  // in an effect, not during render (WR-04) — render must stay pure, and
-  // window.location.assign is a side effect that could otherwise fire
-  // twice under Strict Mode's dev-time double-invocation or be started
-  // and discarded under concurrent rendering.
+  // in both cases (D-09): never render account content, always send the
+  // visitor back into sign-in via a plain navigation. Performed in an
+  // effect, not during render (WR-04).
   useEffect(() => {
     if (!loading && !user) {
       window.location.assign('/api/auth/google?return_to=/account')
     }
   }, [loading, user])
 
-  // Extended to also cover entitlement loading (04-UI-SPEC) — the panel
-  // never renders until BOTH session and entitlement are resolved, so
-  // there is no intermediate flash of "Free tier" before "Active" (or the
-  // reverse) once the real subscription state arrives.
-  if (loading || entitlementsLoading) {
+  // Extended gate (05-UI-SPEC §6): no panel/CTA/invoice content renders
+  // until session, entitlements, AND the account fetch have all resolved —
+  // no intermediate flash of stale state.
+  if (loading || entitlementsLoading || accountLoading) {
     return (
       <main className="page--narrow" id="main">
         <div
@@ -50,16 +66,37 @@ export default function Account() {
     return null
   }
 
-  // Real server-side entitlement (D-06/GATE-02): only a live 'active'
-  // eclat-online subscriptions row counts. Fails closed to Free-tier
-  // presentation on any fetch error, exactly like the not-entitled case —
-  // never assumes ownership on an uncertain outcome.
-  const sub = subs['eclat-online']
-  const active = Boolean(!error && sub && sub.status === 'active')
-  // Real plan metadata (monthly vs. annual, renewal date, card on file) is
-  // Phase 5's ACCT-01/ACCT-04 concern — this fails closed to '—' for now.
-  const planLabel = '—'
-  const rows = active ? invoices : []
+  // Portal CTA (WR-06): never an anchor or popup. POST the fixed
+  // { action } enum, then assign the server-returned URL. A non-ok response
+  // is a no-op — the DB-driven page state stays on screen (D-04). Returning
+  // to /account remounts the route → fresh useAccount fetch (D-06 §7).
+  async function openPortal(action) {
+    const res = await fetch('/api/billing/portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action }),
+    })
+    if (!res.ok) return
+    const { url } = await res.json()
+    window.location.assign(url)
+  }
+
+  const subs = data.subscriptions
+  // Fixed D-16 order: PRODUCTS array order IS the display order (eclat-online
+  // first). Unknown slugs in the payload are ignored (Wave 1 skips them too).
+  const heldKeys = PRODUCTS.map((p) => p.key).filter((key) => subs[key])
+
+  // Invoices: one table across ALL held products (D-12). Best-effort section:
+  // if ANY held product reports invoices unavailable, degrade the table to the
+  // contract message while panels still render (D-04).
+  const invoicesUnavailable = heldKeys.some(
+    (key) => subs[key].invoices && subs[key].invoices.available === false
+  )
+  const invoiceItems = Object.values(subs)
+    .map((s) => (s.invoices && s.invoices.items) || [])
+    .flat()
+    .sort((a, b) => b.created - a.created) // most-recent-first (D-10)
+    .slice(0, 12) // cap at 12 rows (D-09)
 
   return (
     <main className="page--narrow" id="main">
@@ -74,64 +111,162 @@ export default function Account() {
           Reader since 2021
         </h1>
 
-        <div className="panel">
-          <div>
-            <p className="panel__key">Status</p>
-            <p className="panel__val">
-              <span
-                className="status-dot"
-                style={{ background: active ? 'var(--ok)' : 'var(--accent)' }}
-              />
-              {active ? 'Active' : 'Free tier'}
-            </p>
-          </div>
-          <div>
-            <p className="panel__key">Plan</p>
-            <p className="panel__val">{planLabel}</p>
-          </div>
-          <div>
-            <p className="panel__key">Renews</p>
-            <p className="panel__val">—</p>
-          </div>
-          <div>
-            <p className="panel__key">Card</p>
-            <p className="panel__val">{active ? '•••• 4242' : '—'}</p>
-          </div>
-        </div>
-
-        {!active && (
-          <div className="upsell">
-            <p className="upsell__text">
-              You&rsquo;re on the free tier — covers and previews only. Subscribe to open the
-              full issue.
-            </p>
-            <Link to="/subscribe" className="btn btn--sm btn--accent">
-              Subscribe
-            </Link>
-          </div>
-        )}
-
-        <h2 className="h2" style={{ fontSize: 30, margin: '66px 0 0' }}>
-          Billing history
-        </h2>
-
-        {rows.length === 0 ? (
-          <p className="empty" style={{ paddingBottom: 0 }}>
-            No invoices yet.
+        {accountError ? (
+          // Whole-page fail-closed (Copywriting Contract, mirrors Edition.jsx
+          // D-13): an unknown outcome NEVER renders the no-subscription notice.
+          <p className="fine" style={{ color: 'var(--bad)' }}>
+            Couldn't confirm your account — reload to try again.
           </p>
         ) : (
-          <div className="invoices">
-            {rows.map((v) => (
-              <div className="invoice" key={v.date}>
-                <span className="invoice__date">{v.date}</span>
-                <span className="invoice__desc">{v.desc}</span>
-                <span>{v.amount}</span>
-                <Link to="/account" className="invoice__link">
-                  Receipt →
+          <>
+            {heldKeys.length === 0 ? (
+              // Zero-held case (05-UI-SPEC §5): generalized notice + CTA; the
+              // Billing history section still renders below.
+              <div className="upsell">
+                <p className="upsell__text">
+                  You don't have an active subscription yet. Subscribe to unlock full issues,
+                  books, and more.
+                </p>
+                <Link to="/subscribe" className="btn btn--sm btn--accent">
+                  Subscribe
                 </Link>
               </div>
-            ))}
-          </div>
+            ) : (
+              // Per-product panels in fixed D-16 order, held products only (§1).
+              heldKeys.map((key, i) => {
+                const sub = subs[key]
+                const product = PRODUCTS.find((p) => p.key === key)
+                const state = STATUS[sub.status]
+                const renewsKey = sub.status === 'canceled' ? 'Access until' : 'Renews'
+                const brand = sub.card && sub.card.brand
+                const card =
+                  sub.card && sub.card.available && sub.card.brand && sub.card.last4
+                    ? `${brand[0].toUpperCase()}${brand.slice(1)} •••• ${sub.card.last4}`
+                    : '—' // silent degradation (D-15) — no error copy
+
+                return (
+                  <div key={key}>
+                    <p
+                      className="eyebrow"
+                      style={{ marginBottom: 20, ...(i > 0 ? { marginTop: 40 } : {}) }}
+                    >
+                      {productName(key)}
+                    </p>
+                    <div className="panel">
+                      <div>
+                        <p className="panel__key">Status</p>
+                        <p className="panel__val">
+                          {state ? (
+                            <>
+                              <span className="status-dot" style={{ background: state.dot }} />
+                              {state.label}
+                            </>
+                          ) : (
+                            '—'
+                          )}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="panel__key">Plan</p>
+                        <p className="panel__val">{sub.planLabel || '—'}</p>
+                      </div>
+                      <div>
+                        <p className="panel__key">{renewsKey}</p>
+                        <p className="panel__val">{sub.renews || '—'}</p>
+                      </div>
+                      <div>
+                        <p className="panel__key">Card</p>
+                        <p className="panel__val">{card}</p>
+                      </div>
+                    </div>
+
+                    {/* State-aware CTA row (§2, D-08): active/past_due → Manage;
+                        canceled → no CTA; never a dead-end upsell CTA (WR-01). */}
+                    {sub.status !== 'canceled' && (
+                      <div style={{ marginTop: 24 }}>
+                        <button
+                          type="button"
+                          className="btn btn--sm"
+                          onClick={() => openPortal('manage')}
+                        >
+                          Manage
+                        </button>
+                      </div>
+                    )}
+
+                    {/* ACCT-04 notice (§3, D-08): past_due only; .demo-notice
+                        classes verbatim with --bad inline overrides (zero new
+                        CSS, Phase 4 precedent). */}
+                    {sub.status === 'past_due' && (
+                      <div
+                        className="demo-notice"
+                        role="note"
+                        style={{
+                          borderColor: 'var(--bad)',
+                          background: 'color-mix(in srgb, var(--bad) 7%, transparent)',
+                          margin: '24px 0 0',
+                        }}
+                      >
+                        <span className="demo-notice__tag" style={{ background: 'var(--bad)' }}>
+                          Payment failed
+                        </span>
+                        <p className="demo-notice__text">
+                          We couldn't process your last payment. Update your card to keep your
+                          subscription active.
+                        </p>
+                        <button
+                          type="button"
+                          className="btn btn--sm"
+                          style={{ marginLeft: 'auto', flex: '0 0 auto' }}
+                          onClick={() => openPortal('payment_method_update')}
+                        >
+                          Update payment method
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                )
+              })
+            )}
+
+            <h2 className="h2" style={{ fontSize: 30, margin: '66px 0 0' }}>
+              Billing history
+            </h2>
+
+            {invoicesUnavailable ? (
+              // Invoices-only degradation (D-04): panels above still render.
+              <p className="fine" style={{ color: 'var(--bad)' }}>
+                Invoice history is temporarily unavailable.
+              </p>
+            ) : invoiceItems.length === 0 ? (
+              <p className="empty" style={{ paddingBottom: 0 }}>
+                No invoices yet.
+              </p>
+            ) : (
+              <div className="invoices">
+                {invoiceItems.map((item) => {
+                  const { number, created, amount_paid, hosted_invoice_url } = item
+                  return (
+                    <div className="invoice" key={number}>
+                      <span className="invoice__date">
+                        {DATE_FMT.format(new Date(created * 1000))}
+                      </span>
+                      <span>{number}</span>
+                      <span>{'$' + (amount_paid / 100).toFixed(2)}</span>
+                      <a
+                        href={hosted_invoice_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="invoice__link"
+                      >
+                        Receipt →
+                      </a>
+                    </div>
+                  )
+                })}
+              </div>
+            )}
+          </>
         )}
       </div>
     </main>
