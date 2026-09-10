@@ -548,6 +548,29 @@ a:hover {
   opacity: 0;
 }
 
+/* "Coming soon" hero placeholder — backdrop-filter blurs the tint+stripe
+   texture painted behind this overlay (Cover's own background), not this
+   element's own content, so the label stays crisp against a blurred card. */
+.fan-card__soon {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(9px);
+  -webkit-backdrop-filter: blur(9px);
+  background: rgba(20, 18, 15, 0.22);
+}
+
+.fan-card__soon-label {
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--cream);
+  opacity: 0.85;
+}
+
 .hero__copy {
   position: absolute;
   left: 0;

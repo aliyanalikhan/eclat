@@ -21,12 +21,28 @@ const FAN_SLOTS = [
 ]
 const FAN_FILL_ORDER = [2, 3, 1, 4, 0] // centre, then outward alternating right/left
 
+// Muted, deliberately un-editorial tint so a "coming soon" placeholder never
+// reads as a real, uncovered edition (those use rich per-issue oklch tints)
+// — it's the same tint+stripe-texture fallback Cover already renders for a
+// missing img, just visually flagged as "not yet real" via the blur overlay.
+const COMING_SOON_TINT = 'oklch(0.4 0.01 80)'
+
 function buildFan(eds) {
   const slots = new Array(FAN_SLOTS.length).fill(null)
   eds.slice(0, FAN_SLOTS.length).forEach((ed, i) => {
-    slots[FAN_FILL_ORDER[i]] = ed
+    slots[FAN_FILL_ORDER[i]] = { ed, comingSoon: false }
   })
-  return slots.flatMap((ed, i) => (ed ? [{ ...FAN_SLOTS[i], ed }] : []))
+  // The fan is always 5 slots wide by design (see comment above), but only
+  // ever has as many real editions as exist so far. Rather than leave the
+  // remaining slots empty — sparse and asymmetric with just 1-2 editions —
+  // fill them with blurred "Coming Soon" placeholders so the spread stays
+  // visually balanced while there are still only a couple of real issues.
+  slots.forEach((slot, i) => {
+    if (!slot) {
+      slots[i] = { ed: { no: `soon-${i}`, tint: COMING_SOON_TINT }, comingSoon: true }
+    }
+  })
+  return slots.map((slot, i) => ({ ...FAN_SLOTS[i], ...slot }))
 }
 
 export default function Home() {
@@ -58,6 +74,33 @@ export default function Home() {
         <div className="fan-origin" data-fan-origin="1" aria-hidden="true">
           {fan.map((f) => {
             const ed = f.ed
+            if (f.comingSoon) {
+              return (
+                <Cover
+                  key={ed.no}
+                  tint={ed.tint}
+                  alt=""
+                  ratio={null}
+                  className={`fan-card ${f.cls}`}
+                  data-fan="1"
+                  data-fx={f.fx}
+                  data-fy={f.fy}
+                  data-fr={f.fr}
+                  style={{
+                    transform: `translate(${f.fx}px,${f.fy}px) rotate(${f.fr}deg)`,
+                    aspectRatio: 'auto',
+                  }}
+                >
+                  {/* backdrop-filter blurs the tint+stripe-texture sitting
+                      behind this overlay without blurring the label itself
+                      — a real filter:blur() on the whole card would blur its
+                      own children too. */}
+                  <div className="fan-card__soon">
+                    <span className="fan-card__soon-label">Coming Soon</span>
+                  </div>
+                </Cover>
+              )
+            }
             return (
               <Cover
                 key={ed.no ?? ed.slug}
