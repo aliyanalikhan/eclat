@@ -39,7 +39,15 @@ function buildFan(eds) {
   // visually balanced while there are still only a couple of real issues.
   slots.forEach((slot, i) => {
     if (!slot) {
-      slots[i] = { ed: { no: `soon-${i}`, tint: COMING_SOON_TINT }, comingSoon: true }
+      // `variant` picks one of 4 drawn sample-cover looks (see
+      // .fan-card__sample--0..3 in eclat.css) — fixed by slot position, not
+      // Math.random(), so server and client render identically (a real
+      // random pick per render would hydration-mismatch).
+      slots[i] = {
+        ed: { no: `soon-${i}`, tint: COMING_SOON_TINT },
+        comingSoon: true,
+        variant: i % 4,
+      }
     }
   })
   return slots.map((slot, i) => ({ ...FAN_SLOTS[i], ...slot }))
@@ -94,18 +102,24 @@ export default function Home() {
                   {/* A drawn (not photographed) sample cover layout — no
                       real photo, no real publication, just generic
                       placeholder blocks standing in for a masthead/cover
-                      line/image well. backdrop-filter blurs this whole
-                      layout without blurring the "Coming Soon" label
-                      sitting on top of it in the same stacking order the
-                      real photo used previously. */}
-                  <div className="fan-card__sample" aria-hidden="true">
+                      line/image well. `--{variant}` (0-3, fixed per slot
+                      position) gives each placeholder a different color and
+                      layout order so the 3 empty slots don't look like
+                      identical clones. A frosted-glass overlay (light,
+                      translucent, blurred, bordered) sits on top, blurring
+                      this layout without blurring the "Coming Soon" label
+                      itself. */}
+                  <div
+                    className={`fan-card__sample fan-card__sample--${f.variant}`}
+                    aria-hidden="true"
+                  >
                     <span className="fan-card__sample-mast">MAGAZINE</span>
                     <div className="fan-card__sample-well" />
                     <span className="fan-card__sample-line" />
                     <span className="fan-card__sample-line" style={{ width: '70%' }} />
                     <span className="fan-card__sample-line" style={{ width: '45%' }} />
                   </div>
-                  <div className="fan-card__soon">
+                  <div className="fan-card__soon fan-card__soon--glass">
                     <span className="fan-card__soon-label">Coming Soon</span>
                   </div>
                 </Cover>
