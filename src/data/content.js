@@ -229,6 +229,79 @@ export const articles = [
   },
 ].map((a) => ({ ...a, img: `/assets/images/features/${a.slug}.jpg` }))
 
+// American culture, told through speeches and moments people actually lived
+// through — not a stock library. Each `youtubeId` is played inline via
+// youtube-nocookie.com on click (CSP: frame-src); the thumbnail comes
+// straight from YouTube's own CDN (CSP: img-src https://i.ytimg.com), so no
+// local asset is needed. `source` credits the original uploader for the
+// title shown in the modal.
+export const videos = [
+  {
+    slug: 'obama-election-night-2008',
+    youtubeId: 'HfHbw3n0EIM',
+    kicker: 'Election Night · 2008',
+    title: 'President-Elect Barack Obama',
+    dek: 'The address that opened a new chapter — delivered to Grant Park, Chicago, the night America elected its first Black president.',
+    source: 'Barack Obama',
+  },
+  {
+    slug: 'mandela-childrens-rights',
+    youtubeId: 'eF8IKcZuyoQ',
+    kicker: "World Voices · Children's Rights",
+    title: 'Nelson Mandela on Children',
+    dek: 'Not an American voice, but a friend to the American civil-rights story — Mandela on why a nation is judged by how it treats its children.',
+    source: 'Keepin It Kaashual',
+  },
+  {
+    slug: 'jfk-ask-not',
+    youtubeId: 'L8l11q_MNRY',
+    kicker: 'Inaugural Address · 1961',
+    title: '"Ask Not What Your Country Can Do for You"',
+    dek: 'John F. Kennedy’s inaugural line became a generation’s call to public service — still the most-quoted sentence in American political oratory.',
+    source: 'John F. Kennedy Library Foundation',
+  },
+  {
+    slug: 'breakdance-80s',
+    youtubeId: 'PN_o0cB5iKs',
+    kicker: 'Street Culture · The 1980s',
+    title: 'Breakdance in the 80s',
+    dek: 'Before it was an Olympic sport, breaking was a Bronx block-party invention — cardboard mats, boomboxes, and a whole new American art form.',
+    source: 'JOAN NSX',
+  },
+  {
+    slug: 'obama-yes-we-can',
+    youtubeId: 'FPBSilfiRY0',
+    kicker: 'Campaign Trail · 2008',
+    title: '"Yes We Can"',
+    dek: 'A New Hampshire primary-night concession speech that became one of the most studied pieces of American political rhetoric of the century.',
+    source: 'John Zimmer',
+  },
+  {
+    slug: 'maya-angelou-phenomenal-woman',
+    youtubeId: 'x2Mh-4P6OQU',
+    kicker: 'Poetry · American Letters',
+    title: 'Maya Angelou — "Phenomenal Woman"',
+    dek: 'Maya Angelou reads her own poem — a defiant, joyful anthem that became one of the best-loved works in American poetry.',
+    source: 'UPSURGE! The Global Women of Choice Podcast',
+  },
+  {
+    slug: 'reagan-farewell-address',
+    youtubeId: 'J5upAEZOchM',
+    kicker: 'Farewell Address · 1989',
+    title: 'Ronald Reagan on What Made America Great',
+    dek: 'Reagan’s closing message from the Oval Office — his own account of the country he believed America to be.',
+    source: '1990 Institute',
+  },
+  {
+    slug: 'mlk-i-have-a-dream',
+    youtubeId: 'vP4iY1TtS3s',
+    kicker: 'March on Washington · 1963',
+    title: '"I Have a Dream"',
+    dek: 'From the steps of the Lincoln Memorial — Martin Luther King Jr.’s address to the March on Washington for Jobs and Freedom, and the defining speech of the civil-rights era.',
+    source: 'RARE FACTS',
+  },
+]
+
 export const invoices = [
   { date: '12 Aug 2026', desc: 'Annual subscription — Éclat', amount: '$84.00' },
   { date: '12 Aug 2025', desc: 'Annual subscription — Éclat', amount: '$84.00' },

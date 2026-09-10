@@ -27,6 +27,12 @@ export const staticSeo = {
     description: 'Essays, reportage and two collections from the Éclat archive, oldest to newest.',
     og: DEFAULT_OG,
   },
+  '/videos': {
+    title: 'Videos — Éclat',
+    description:
+      'Speeches, moments and street culture — a short reel of American history, told in its own voice.',
+    og: DEFAULT_OG,
+  },
   '/subscribe': {
     title: 'Subscribe — Éclat',
     description:

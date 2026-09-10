@@ -1729,6 +1729,49 @@ a:hover .cover--book {
   color: rgba(247, 243, 236, 0.5);
 }
 
+/* --- video section ------------------------------------------------------ */
+.video-card__thumb {
+  position: relative;
+}
+
+.video-card__play {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+/* The image lightbox's close button relies on photo content behind it for
+   contrast; this modal's frame is flat black, so the same translucent
+   dark-on-dark styling nearly disappears — scoped override, not a change to
+   the shared .lightbox__close rule other lightbox instances still use. */
+.video-modal .lightbox__close {
+  background: rgba(247, 243, 236, 0.12);
+  border-color: rgba(247, 243, 236, 0.7);
+}
+
+.video-modal .lightbox__close:hover {
+  background: rgba(247, 243, 236, 0.24);
+}
+
+.video-modal__frame {
+  position: relative;
+  width: min(960px, 100%);
+  aspect-ratio: 16/9;
+  background: var(--ink);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+}
+
+.video-modal__frame iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
 /* --- reveal / motion ---------------------------------------------------- */
 .reveal {
   opacity: 0;

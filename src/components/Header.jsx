@@ -7,6 +7,7 @@ const LINKS = [
   { to: '/archive', label: 'Archive' },
   { to: '/books', label: "Children's Books" },
   { to: '/writings', label: 'Writings' },
+  { to: '/videos', label: 'Videos' },
 ]
 
 /** Truncates a display name to 18 characters with an ellipsis, falling back
