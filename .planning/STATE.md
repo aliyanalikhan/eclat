@@ -116,6 +116,7 @@ None yet.
 | 260910-soon | Fill empty hero fan slots with blurred "Coming Soon" cards; iterated flat tint -> stock photo -> drawn CSS covers -> 4 varied looks + real glassmorphism | 2026-09-10 | e051aa3, 21f9da5, 34a1e02, cde2156 | [260910-soon-hero-fan-coming-soon-cards](./quick/260910-soon-hero-fan-coming-soon-cards/) |
 | 260910-icon | Add "Cultural Icons" decorative section to Home page (8 user-supplied tribute images + bios, uniform sizing; renamed from "American Icons") | 2026-09-10 | 2af6218, 67952bd, cc7386a | [260910-icon-american-icons-home-section](./quick/260910-icon-american-icons-home-section/) |
 | 260910-fr3 | Make Edition page's "Inside this edition" free-preview strip edition-specific: swap dead generic `samples` placeholder for real per-edition `articles` filtered by `editionNo` | 2026-09-10 | 71b37cf | [260910-fr3-in-magazine-free-preview-fill-in-some-da](./quick/260910-fr3-in-magazine-free-preview-fill-in-some-da/) |
+| 260910-g36 | Replace Marilyn Monroe + Muhammad Ali Cultural Icons portraits with user-supplied images (JPEG-to-PNG re-encode + corrected aspect-ratio metadata for Ali); add `useOnlinePrice` hook wiring Home/Edition Subscribe CTAs to the real live Stripe price instead of a hardcoded `$9/mo` | 2026-09-10 | c9e9eff, 8a5766d, ae40a01 | [260910-g36-swap-two-cultural-icons-section-images-w](./quick/260910-g36-swap-two-cultural-icons-section-images-w/) |
 
 ## Deferred Items
 
