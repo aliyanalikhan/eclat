@@ -5,6 +5,7 @@ import { siteJsonLd, staticSeo } from '../data/seo.js'
 import { useSeo } from '../lib/useSeo.js'
 import { useReveal, useScrollFx, runFlip } from '../lib/motion.js'
 import { useApp } from '../store.jsx'
+import { useOnlinePrice } from '../lib/useOnlinePrice.js'
 
 // Hero fan geometry, preserved from the prototype: five fixed slots the fan
 // opens into on scroll. Real editions and books fill them outward from the
@@ -56,6 +57,7 @@ function buildFan(eds) {
 export default function Home() {
   const navigate = useNavigate()
   const { setFlipFrom } = useApp()
+  const { label: onlinePriceLabel } = useOnlinePrice()
   const newest = editions[0]
   const homeBooks = books.slice(0, 5)
   // Hero fan is strictly magazine covers — children's books get their own
@@ -270,7 +272,7 @@ export default function Home() {
                 See inside this edition
               </Link>
               <Link to="/subscribe" className="btn btn--ghost">
-                Subscribe — $9/mo
+                {onlinePriceLabel ? `Subscribe — ${onlinePriceLabel}/mo` : 'Subscribe'}
               </Link>
             </div>
           </div>

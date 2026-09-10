@@ -9,6 +9,7 @@ import { runFlip, useDragScroll } from '../lib/motion.js'
 import { useApp } from '../store.jsx'
 import { useSession } from '../lib/useSession.js'
 import { useGatedContent } from '../lib/useGatedContent.js'
+import { useOnlinePrice } from '../lib/useOnlinePrice.js'
 
 export default function Edition() {
   const { no } = useParams()
@@ -17,6 +18,7 @@ export default function Edition() {
   const { user, loading: sessionLoading } = useSession()
   const sessionOk = !sessionLoading && Boolean(user)
   const { kind, paragraphs } = useGatedContent(ed?.no, { ok: sessionOk })
+  const { label: onlinePriceLabel } = useOnlinePrice()
   const stripRef = useRef(null)
 
   useDragScroll(stripRef)
@@ -192,7 +194,7 @@ export default function Edition() {
                 Read the full issue
               </h3>
               <Link to="/subscribe" className="btn">
-                Subscribe — $9/mo
+                {onlinePriceLabel ? `Subscribe — ${onlinePriceLabel}/mo` : 'Subscribe'}
               </Link>
               {kind === 'unknown' && sessionOk ? (
                 <p className="fine" style={{ marginTop: 16, color: 'var(--bad)' }}>
