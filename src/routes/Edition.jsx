@@ -1,6 +1,7 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Cover from '../components/Cover.jsx'
+import MagazinePreview from '../components/MagazinePreview.jsx'
 import NotFound from './NotFound.jsx'
 import { articles, editionByNo, editions } from '../data/content.js'
 import { editionJsonLd, editionSeo } from '../data/seo.js'
@@ -20,6 +21,7 @@ export default function Edition() {
   const { kind, paragraphs } = useGatedContent(ed?.no, { ok: sessionOk })
   const { label: onlinePriceLabel } = useOnlinePrice()
   const stripRef = useRef(null)
+  const [previewOpen, setPreviewOpen] = useState(false)
 
   useDragScroll(stripRef)
 
@@ -43,6 +45,13 @@ export default function Edition() {
   const newer = editions[idx - 1]
   const older = editions[idx + 1]
   const editionArticles = articles.filter((a) => a.editionNo === ed.no)
+  const previewPages =
+    ed.previewPageCount > 0
+      ? Array.from(
+          { length: ed.previewPageCount },
+          (_, i) => `/assets/images/magazine-preview/${ed.no}/page-${String(i + 1).padStart(2, '0')}.jpg`,
+        )
+      : []
 
   return (
     <main id="main">
@@ -138,12 +147,29 @@ export default function Edition() {
             <p className="eyebrow eyebrow--accent" style={{ marginBottom: 22 }}>
               Full issue unlocked
             </p>
-            {paragraphs.map((p, i) => (
-              <p key={i} className={i === 0 ? 'prose__open' : undefined}>
-                {p}
-              </p>
-            ))}
-            {ed.excerptBy && <p>— {ed.excerptBy}</p>}
+            {ed.previewPageCount > 0 ? (
+              <>
+                {ed.excerptBy && <p style={{ marginBottom: 22 }}>— {ed.excerptBy}</p>}
+                <button type="button" className="btn" onClick={() => setPreviewOpen(true)}>
+                  Preview the Full Issue
+                </button>
+                <MagazinePreview
+                  open={previewOpen}
+                  onClose={() => setPreviewOpen(false)}
+                  title={ed.title}
+                  pages={previewPages}
+                />
+              </>
+            ) : (
+              <>
+                {paragraphs.map((p, i) => (
+                  <p key={i} className={i === 0 ? 'prose__open' : undefined}>
+                    {p}
+                  </p>
+                ))}
+                {ed.excerptBy && <p>— {ed.excerptBy}</p>}
+              </>
+            )}
           </div>
         ) : kind === 'loading' ? (
           <div className="paywall">

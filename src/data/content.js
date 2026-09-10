@@ -23,6 +23,7 @@ export const editions = [
     date: 'September 2026',
     year: '2026',
     pages: 62,
+    previewPageCount: 62,
     tint: 'oklch(0.24 0.03 255)',
     isNew: true,
     plateSuppressed: true, // real cover art — wordmark and coverlines are already printed in
@@ -46,6 +47,7 @@ export const editions = [
     date: '2026',
     year: '2026',
     pages: 60,
+    previewPageCount: 60,
     tint: 'oklch(0.32 0.02 60)',
     plateSuppressed: true, // real cover art — wordmark and coverlines are already printed in
     ratio: '3/4',
