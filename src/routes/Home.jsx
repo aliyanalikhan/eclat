@@ -337,13 +337,16 @@ export default function Home() {
         </div>
       </section>
 
-      {/* --- American icons (decoration only — supplied tribute images, not
+      {/* --- Cultural icons (decoration only — supplied tribute images, not
           editorial content, not a claim any of these appeared in a real
-          Éclat issue) --- */}
+          Éclat issue. Titled "Cultural" rather than "American" since two of
+          the seven — Soyinka, Kuti — aren't American. Bios are short,
+          widely-documented public facts, not sourced from any particular
+          reference. */}
       <section className="section" aria-labelledby="icons-h">
         <div className="section-head reveal" data-rev="0" style={{ marginBottom: 52 }}>
           <h2 className="h2" id="icons-h">
-            American Icons
+            Cultural Icons
           </h2>
         </div>
 
@@ -359,6 +362,9 @@ export default function Home() {
                 height={icon.h}
                 className="cover--lift"
               />
+              <p className="label" style={{ marginTop: 12 }}>
+                <strong>{icon.name}</strong> — {icon.bio}
+              </p>
             </div>
           ))}
         </div>
