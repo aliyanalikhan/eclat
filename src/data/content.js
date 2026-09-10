@@ -293,6 +293,14 @@ export const icons = [
     w: 1145,
     h: 1374,
   },
+  {
+    slug: 'things-fall-apart',
+    name: 'Chinua Achebe',
+    bio: 'Nigerian novelist (1930–2013) whose 1958 debut, "Things Fall Apart," is the most widely read work in modern African literature.',
+    ratio: '1024/1536',
+    w: 1024,
+    h: 1536,
+  },
 ].map((i) => ({ ...i, img: `/assets/images/icons/${i.slug}.png` }))
 
 // American culture, told through speeches and moments people actually lived

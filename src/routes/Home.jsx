@@ -381,9 +381,9 @@ export default function Home() {
                 tint="oklch(0.2 0.02 260)"
                 img={icon.img}
                 alt={`Tribute image of ${icon.name}`}
-                ratio={icon.ratio}
-                width={icon.w}
-                height={icon.h}
+                ratio="2/3"
+                width={800}
+                height={1200}
                 className="cover--lift"
               />
               <p className="label" style={{ marginTop: 12 }}>
