@@ -3,15 +3,15 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 current_phase: 05
-current_phase_name: GAPS FOUND
+current_phase_name: account-management-real-status-cancellation-billing-portal
 status: executing
-stopped_at: "Completed 05-03-PLAN.md (gap closure: CR-01/CR-02/CR-03 all closed) — human verification matrix still pending before phase re-verification"
-last_updated: "2026-09-10T03:25:59.506Z"
+stopped_at: "Completed 05-03-PLAN.md (gap closure: CR-01/CR-02/CR-03 closed, plus an emergent critical bug in account.js fixed) — re-verified 5/5 must-haves, status human_needed, 05-UAT.md pending"
+last_updated: "2026-09-10T20:15:00.000Z"
 last_activity: 2026-09-10
-last_activity_desc: Phase 05 goal-verified (05-VERIFICATION.md); status gaps_found — run /gsd-plan-phase 5 --gaps to create gap-closure plans
+last_activity_desc: Phase 05 re-verified after gap closure (05-VERIFICATION.md) — 5/5 must-haves pass, status human_needed — run /gsd-verify-work 05 to work through 05-UAT.md
 progress:
   total_phases: 5
-  completed_phases: 5
+  completed_phases: 3
   total_plans: 14
   completed_plans: 14
 ---
@@ -23,16 +23,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-09)
 
 **Core value:** A signed-in subscriber's paid access is real and enforced server-side — no page, download, or API response leaks paid content to someone who hasn't actually paid for it.
-**Current focus:** Phase 05 gap closure — fix CR-01/CR-02/CR-03 from 05-VERIFICATION.md before Phase 5 can be marked complete; Phase 04 UAT (04-UAT.md) also still outstanding
+**Current focus:** Human UAT for both Phase 4 (04-UAT.md) and Phase 5 (05-UAT.md) — both phases are code-complete and goal-verified (5/5 and 5/5 must-haves respectively) but held open pending live-environment sign-off before either can be marked Complete
 
 ## Current Position
 
-Phase: 05 (Account Management — Real Status, Cancellation & Billing Portal) — GAPS FOUND (2/5 must-haves verified)
-Plan: 2 of 2 executed; both plans' code committed, but code review (3 critical) and phase-goal verification found real defects
-Status: Automated build/secret-scan/grep gates pass, but 3 confirmed critical bugs block phase completion — see 05-VERIFICATION.md and 05-REVIEW.md
-Last activity: 2026-09-10 -- Phase 05 goal-verified (05-VERIFICATION.md); status gaps_found — run /gsd-plan-phase 5 --gaps to create gap-closure plans
+Phase: 05 (Account Management — Real Status, Cancellation & Billing Portal) — GAPS CLOSED, PENDING HUMAN VERIFICATION (5/5 must-haves verified)
+Plan: 3 of 3 executed. 05-03 closed all 3 confirmed gaps (CR-01/CR-02/CR-03) plus an emergent critical bug (account.js `rows` destructuring) its own code review caught
+Status: Code review clean (0 findings after fix), phase-goal re-verification passed 5/5 — 5 items in 05-UAT.md need a live vercel dev + seeded DB + real Google/Stripe session before the phase is fully closed
+Last activity: 2026-09-10 -- Phase 05 re-verified after gap closure; status human_needed — run /gsd-verify-work 05 to work through 05-UAT.md
 
-Progress: [██████████] 100% (3/5 phases complete; Phase 4 executed+verified pending human UAT sign-off, Phase 5 executed but verification found 3 unresolved critical gaps)
+Progress: [████████████░░░░░░░░] 60% (3/5 phases complete; Phase 4 and Phase 5 both code-complete and goal-verified, both pending human UAT sign-off)
 
 ## Performance Metrics
 
@@ -97,7 +97,7 @@ None yet.
 
 ### Blockers/Concerns
 
-- **NEW: Phase 5 (Account Management) has 3 unresolved CRITICAL defects, confirmed independently by both 05-REVIEW.md and 05-VERIFICATION.md.** (1) CR-01: `src/lib/useSafeFetch.js` never checks `response.ok`/status before parsing JSON, so `api/billing/account.js`'s deliberate fail-closed `401 { subscriptions: {} }` (on auth OR DB failure) is read as a *successful* zero-subscriptions result — a real paying subscriber hitting a transient DB outage sees the "Subscribe" upsell, not a fail-closed error. This primitive is shared by Phase 4's `useEntitlements`/`useGatedContent`, so the blast radius may extend there too — worth re-checking during Phase 4 UAT. (2) CR-02: `Account.jsx` flattens `Object.values(subs)` without dedup while the server assigns the same shared invoice array to every held product key — a customer holding 2+ products sees every invoice duplicated. (3) CR-03: `cancelAtPeriodEnd` is fetched live from Stripe but never rendered — a subscriber who cancelled but is still in their paid period sees "Active"/"Renews" with no cancellation indication (violates locked decision D-14). Run `/gsd-plan-phase 5 --gaps` to create gap-closure plans before this phase can be marked complete.
+- **RESOLVED (2026-09-10, plan 05-03): all 3 of Phase 5's confirmed critical defects are closed**, plus a 4th emergent critical bug found during 05-03's own code review. (1) CR-01 fixed: `src/lib/useSafeFetch.js` now throws before parsing the body for any non-2xx/non-401 response, and `api/billing/account.js`'s DB-failure branch returns a distinct 500 instead of reusing the "no session" 401 shape — verified not to regress Phase 3/4's `useEntitlements`/`useGatedContent` (both untouched by the fix, 401 stays exempt). (2) CR-02 fixed: invoices now read from a single held product key instead of being flattened across all held products. (3) CR-03 fixed: `cancelAtPeriodEnd` now drives the "Access until" label plus a new confirmation notice, with the "Manage" CTA deliberately left reachable. (4) **Emergent bug found+fixed during 05-03's code review**: `api/billing/account.js` was assigning the raw `@vercel/postgres` `QueryResult` object to `rows` instead of destructuring `{ rows }` — every other query site in the codebase does this correctly — which threw an unhandled `TypeError` on every authenticated request to `/api/billing/account`, meaning the endpoint had never returned real data for any user since Plan 05-01 first shipped it. Fixed in commit `a01e33c`. Phase re-verified 5/5 must-haves after these fixes; 5 items remain in `05-UAT.md` requiring a live environment.
 - Phase 4 (Content Gating): **prerender-split blocker resolved** — D-10 locks `/editions/:no` as static shell + client-fetched gated block with the route-list trio (`src/App.jsx`, `src/data/seo.js`, `prerender.js`) untouched. Remaining Phase 4 risk is the physical content split: gated text must leave `src/` entirely (D-11) with zero residual import paths (see RESEARCH.md Common Pitfalls 1–2).
 - **NEW (fix-pass):** `PUBLIC_ORIGIN` env var must be set (`.env.local` + Vercel) to the canonical `https` origin before `api/billing/checkout.js` can run — it now fails fast at module load without it (WR-07). `src/data/seo-site.js`'s `SITE.url` is still the `https://eclat.example` placeholder and is NOT used for this.
 - Phase 3 code review fix pass: **complete** (2026-09-09) — all 10 warnings (WR-01..WR-10) and IN-01/IN-02 fixed and verified by a green `npm run build` (see `03-REVIEW.md` Fix-Pass Results). Remaining review items now folded into Phase 4 research/planning: IN-01 → D-16 (`no-store` on every gated branch + `vercel.json` rule), IN-03 → D-07..D-09 (`useEntitlements` backported onto shared `useSafeFetch`, delivered in Plan 04-02), IN-04 still deferred to Phase 5.

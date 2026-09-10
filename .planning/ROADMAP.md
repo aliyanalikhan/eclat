@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Authentication — Google Sign-In & Server-Side Sessions** - Users sign in with Google only, verified server-side, with persistent sessions (completed 2026-09-09)
 - [x] **Phase 3: Billing & Webhooks — Stripe Checkout and Subscription Sync** - Users subscribe via Stripe Checkout; webhook-verified events are the single source of truth for subscription state (completed 2026-09-09)
 - [ ] **Phase 4: Content Gating — Real Server-Side Entitlement Enforcement** - Every gated page checks real per-user entitlement server-side; the fake `subscribed` flag is gone (pending human verification — see 04-UAT.md)
-- [ ] **Phase 5: Account Management — Real Status, Cancellation & Billing Portal** - The Account page shows real subscription status, invoices, and payment-failure notices, backed by Stripe (gaps found — see 05-VERIFICATION.md: fail-closed bypass, invoice duplication, cancel_at_period_end never rendered)
+- [ ] **Phase 5: Account Management — Real Status, Cancellation & Billing Portal** - The Account page shows real subscription status, invoices, and payment-failure notices, backed by Stripe (all 3 confirmed gaps closed + 1 emergent critical bug fixed — 5/5 must-haves verified, pending human verification — see 05-UAT.md)
 
 ## Phase Details
 
@@ -128,10 +128,10 @@ Plans:
   3. User sees their real invoice history on the Account page, replacing today's mocked invoice table
   4. User sees a clear "payment failed, update your card" notice on the Account page when a subscription is past due
 
-**Plans**: 3/3 plans executed; 05-VERIFICATION.md found 3 unresolved critical gaps (score 2/5 must-haves) — success criteria 1, 2, and 3 are NOT yet correctly delivered
+**Plans**: 3/3 plans executed. 05-03 (gap closure) fixed CR-01/CR-02/CR-03 plus an emergent critical bug (account.js's `rows` destructuring) found during its own code review. Re-verification: 5/5 must-haves now pass; status human_needed — 5 items require a live environment (see 05-UAT.md)
 Plans:
 
-- [x] 05-03-PLAN.md
+- [x] 05-03-PLAN.md — gap closure: CR-01 fail-closed useSafeFetch check + distinct DB-failure status, CR-02 single-held-key invoice read, CR-03 cancelAtPeriodEnd → "Access until" label + confirmation notice, plus an emergent fix for account.js's `rows` destructuring bug — committed 3167d6f, 3f74ec0, 1e25363, a01e33c; summary 05-03-SUMMARY.md
 
 **Wave 1**
 
@@ -154,4 +154,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Authentication — Google Sign-In & Server-Side Sessions | 3/3 | Complete    | 2026-09-09 |
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | 3/3 | Complete    | 2026-09-09 |
 | 4. Content Gating — Real Server-Side Entitlement Enforcement | 2/2 | Pending human verification | - |
-| 5. Account Management — Real Status, Cancellation & Billing Portal | 3/3 | In Progress|  |
+| 5. Account Management — Real Status, Cancellation & Billing Portal | 3/3 | Pending human verification | - |
