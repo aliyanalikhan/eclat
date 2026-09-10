@@ -18,7 +18,7 @@
  * Contract (D-15, locked): 401 {entitled:false, has_session:false} for a
  * missing/invalid session; 200 {entitled:false, has_session:true} for a
  * confirmed signed-in non-subscriber; 200 {entitled:true, content:{paragraphs}}
- * for an entitled user; 404 {error:'Not found'} for an unknown/malformed
+ * for an entitled user; 404 {error:Not found} for an unknown/malformed
  * edition number. There is no forbidden-status path anywhere in this
  * contract.
  *
@@ -43,14 +43,49 @@ import { gatedParagraphsFor } from '../../../lib/gated-content.js'
 import { getProduct } from '../../../lib/products.js'
 import { getSessionUser } from '../../../lib/session-user.js'
 
+// ============================================================================
+// TEMPORARY PROMOTIONAL BYPASS — READ BEFORE EDITING THIS FILE
+// ============================================================================
+// This is a temporary, time-boxed promotional bypass requested by the site
+// owner for a marketing push — it is not a defect and not a weakening of the
+// endpoint's real contract. While TEMP_FREE_PREVIEW is true, every VALID
+// edition number's full gated content is returned to ANY caller: the session
+// check and the live subscription lookup below are both skipped entirely for
+// as long as this flag stays true.
+//
+// EXACT REVERT: set TEMP_FREE_PREVIEW back to false, or delete the
+// TEMP_FREE_PREVIEW conditional block in the handler below. The moment
+// that happens, the original entitlement logic beneath it — the session
+// check, the live subscription lookup, both not-entitled response branches,
+// and the 404 response for an unknown edition — resumes exactly as
+// documented in the header contract above, with zero other edits required
+// anywhere in this file.
+// ============================================================================
+const TEMP_FREE_PREVIEW = true
+
+function notFound() {
+  return Response.json(
+    { error: 'Not found' },
+    { status: 404, headers: { 'Cache-Control': 'no-store' } },
+  )
+}
+
 export default {
   async fetch(request) {
     const url = new URL(request.url)
     const editionNo = Number(url.pathname.split('/').pop())
     if (!Number.isInteger(editionNo) || editionNo < 1) {
+      return notFound()
+    }
+
+    if (TEMP_FREE_PREVIEW) {
+      const paragraphs = gatedParagraphsFor(editionNo)
+      if (paragraphs === null) {
+        return notFound()
+      }
       return Response.json(
-        { error: 'Not found' },
-        { status: 404, headers: { 'Cache-Control': 'no-store' } },
+        { entitled: true, content: { paragraphs } },
+        { status: 200, headers: { 'Cache-Control': 'no-store' } },
       )
     }
 
@@ -86,10 +121,7 @@ export default {
 
       const paragraphs = gatedParagraphsFor(editionNo)
       if (paragraphs === null) {
-        return Response.json(
-          { error: 'Not found' },
-          { status: 404, headers: { 'Cache-Control': 'no-store' } },
-        )
+        return notFound()
       }
 
       return Response.json(
