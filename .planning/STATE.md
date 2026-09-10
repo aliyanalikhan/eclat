@@ -114,6 +114,7 @@ None yet.
 | 260909-l31 | Fix /subscribe page card grid layout: equal-height cards, no orphaned card, aligned buttons | 2026-09-09 | 7b337a2 | [260909-l31-fix-subscribe-page-card-grid-layout-equa](./quick/260909-l31-fix-subscribe-page-card-grid-layout-equa/) |
 | 260910-vid | Separate hero fan to magazines-only; add /videos section (8 oEmbed-verified American culture/history clips, click-to-play modal, CSP update) | 2026-09-10 | 50dc6af, 378e1e6 | [260910-vid-add-videos-section-separate-hero-fan](./quick/260910-vid-add-videos-section-separate-hero-fan/) |
 | 260910-soon | Fill empty hero fan slots with blurred "Coming Soon" placeholder cards to balance the design | 2026-09-10 | e051aa3 | [260910-soon-hero-fan-coming-soon-cards](./quick/260910-soon-hero-fan-coming-soon-cards/) |
+| 260910-icon | Add "American Icons" decorative section to Home page (4 user-supplied tribute images) | 2026-09-10 | 2af6218 | [260910-icon-american-icons-home-section](./quick/260910-icon-american-icons-home-section/) |
 
 ## Deferred Items
 
