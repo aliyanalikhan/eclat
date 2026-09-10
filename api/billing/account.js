@@ -53,34 +53,36 @@ export default {
     // distinct (status + logging) from Step 1's 401 so the client-side
     // fail-closed check in useSafeFetch.js can tell the two apart (CR-01).
     let rows
+    let subscriptions
+    let rowForKey
     try {
-      rows = await sql`
+      ;({ rows } = await sql`
         SELECT stripe_product_id, status, current_period_end,
                stripe_customer_id, stripe_price_id, stripe_subscription_id
         FROM subscriptions WHERE user_id = ${session.user.id}
-      `
+      `)
+
+      // Step 3 — slug-keyed base map (D-02/D-16): unknown product ids are
+      // skipped exactly like status.js skips them. planLabel is derived
+      // server-side from the stored stripe_price_id (D-13).
+      subscriptions = {}
+      rowForKey = {}
+      for (const row of rows) {
+        const key = PRODUCT_ID_TO_KEY[row.stripe_product_id]
+        if (!key) continue
+        subscriptions[key] = {
+          status: row.status,
+          planLabel: planLabelFor(row.stripe_price_id),
+          renews: formatRenews(row.current_period_end),
+          cancelAtPeriodEnd: false,
+          card: { available: false },
+          invoices: { available: false },
+        }
+        rowForKey[key] = row
+      }
     } catch (err) {
       console.error('account: failed to load subscriptions', err)
       return Response.json({ error: 'unavailable' }, { status: 500, headers: noStore })
-    }
-
-    // Step 3 — slug-keyed base map (D-02/D-16): unknown product ids are
-    // skipped exactly like status.js skips them. planLabel is derived
-    // server-side from the stored stripe_price_id (D-13).
-    const subscriptions = {}
-    const rowForKey = {}
-    for (const row of rows) {
-      const key = PRODUCT_ID_TO_KEY[row.stripe_product_id]
-      if (!key) continue
-      subscriptions[key] = {
-        status: row.status,
-        planLabel: planLabelFor(row.stripe_price_id),
-        renews: formatRenews(row.current_period_end),
-        cancelAtPeriodEnd: false,
-        card: { available: false },
-        invoices: { available: false },
-      }
-      rowForKey[key] = row
     }
 
     // Step 4 — best-effort live Stripe enrichment (D-07 single customer).
