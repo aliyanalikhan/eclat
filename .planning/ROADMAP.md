@@ -128,8 +128,11 @@ Plans:
   3. User sees their real invoice history on the Account page, replacing today's mocked invoice table
   4. User sees a clear "payment failed, update your card" notice on the Account page when a subscription is past due
 
-**Plans**: 2/2 plans executed; 05-VERIFICATION.md found 3 unresolved critical gaps (score 2/5 must-haves) — success criteria 1, 2, and 3 are NOT yet correctly delivered
+**Plans**: 3/3 plans executed; 05-VERIFICATION.md found 3 unresolved critical gaps (score 2/5 must-haves) — success criteria 1, 2, and 3 are NOT yet correctly delivered
 Plans:
+
+- [x] 05-03-PLAN.md
+
 **Wave 1**
 
 - [x] 05-01-PLAN.md — lib/products.js reverse maps (PRODUCT_ID_TO_KEY/PRICE_ID_TO_PRODUCT_KEY/planLabelFor), GET /api/billing/account (DB-always + best-effort Stripe enrichment), POST /api/billing/portal (CSRF-first, own-customer scoped) — committed 362c693, 6166e60, b710795; summary c77371a
@@ -151,4 +154,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Authentication — Google Sign-In & Server-Side Sessions | 3/3 | Complete    | 2026-09-09 |
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | 3/3 | Complete    | 2026-09-09 |
 | 4. Content Gating — Real Server-Side Entitlement Enforcement | 2/2 | Pending human verification | - |
-| 5. Account Management — Real Status, Cancellation & Billing Portal | 2/2 | Gaps found (2/5 must-haves) | - |
+| 5. Account Management — Real Status, Cancellation & Billing Portal | 3/3 | In Progress|  |

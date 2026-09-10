@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 05
 current_phase_name: GAPS FOUND
 status: executing
-stopped_at: "Phase 5 both plans executed (Wave 1: server endpoints; Wave 2: useAccount + Account.jsx rebuild) — automated gates green; end-of-phase human verification pending (see 05-02-VERIFICATION.md manual matrix M1–M12 and 05-01 human_judgment items)"
-last_updated: "2026-09-10T03:15:30.257Z"
+stopped_at: "Completed 05-03-PLAN.md (gap closure: CR-01/CR-02/CR-03 all closed) — human verification matrix still pending before phase re-verification"
+last_updated: "2026-09-10T03:25:59.506Z"
 last_activity: 2026-09-10
 last_activity_desc: Phase 05 goal-verified (05-VERIFICATION.md); status gaps_found — run /gsd-plan-phase 5 --gaps to create gap-closure plans
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 5
   total_plans: 14
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State
@@ -32,7 +32,7 @@ Plan: 2 of 2 executed; both plans' code committed, but code review (3 critical) 
 Status: Automated build/secret-scan/grep gates pass, but 3 confirmed critical bugs block phase completion — see 05-VERIFICATION.md and 05-REVIEW.md
 Last activity: 2026-09-10 -- Phase 05 goal-verified (05-VERIFICATION.md); status gaps_found — run /gsd-plan-phase 5 --gaps to create gap-closure plans
 
-Progress: [████████████░░░░░░░░] 60% (3/5 phases complete; Phase 4 executed+verified pending human UAT sign-off, Phase 5 executed but verification found 3 unresolved critical gaps)
+Progress: [██████████] 100% (3/5 phases complete; Phase 4 executed+verified pending human UAT sign-off, Phase 5 executed but verification found 3 unresolved critical gaps)
 
 ## Performance Metrics
 
@@ -64,6 +64,11 @@ Progress: [████████████░░░░░░░░] 60% (3/
 | Phase 04 P02 | 11min | 6 tasks | 11 files |
 | Phase 05 P01 | 28min | 3 tasks | 3 files |
 | Phase 05 P02 | 22min | 4 tasks | 2 files |
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 05 P03 | 4min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -84,6 +89,7 @@ Recent decisions affecting current work:
 - Phase 4: Plan 04-02 left Account.jsx's Plan/Renews/Card fields and billing-history rows as explicitly-deferred placeholders (real plan cadence, renewal date, card-on-file, and per-user invoice history are Phase 5's ACCT-01/ACCT-04 scope) — see 04-02-SUMMARY.md Known Stubs
 - Phase 5 (via /gsd-plan-phase 5, locked D-01..D-16): two-wave plan — Wave 1 (05-01, server) adds lib/products.js reverse maps (PRODUCT_ID_TO_KEY / PRICE_ID_TO_PRODUCT_KEY / planLabelFor), the new sibling GET /api/billing/account (DB-always-200 + three independent best-effort live Stripe sections; no-store every branch), and POST /api/billing/portal (CSRF-first via isSameOriginNavigation, own-customer scoped, PUBLIC_ORIGIN return_url); Wave 2 (05-02, client) adds src/lib/useAccount.js (the third useSafeFetch consumer) and rebuilds src/routes/Account.jsx (per-product panels in D-16 order, 3-state status, D-13 plan label, D-14 state-aware Renews/Access-until, ACCT-04 Payment-failed notice, one D-12 invoice table, portal POST handlers fixing WR-01). Both plans carry <threat_model> blocks (security gate); plan-checker passed with 0 blockers
 - Phase 5 (executed 2026-09-10, commits 362c693..83ce821): **both waves complete.** Wave 1 shipped server-only reverse maps + GET /api/billing/account (locked per-slug contract; renews server-pre-formatted 'D MMM YYYY'; DB-always-200 with three best-effort Stripe sections) + POST /api/billing/portal (CSRF-first, own-customer, PUBLIC_ORIGIN return_url). Wave 2 shipped src/lib/useAccount.js (fail-closed, single-shot) and the full Account.jsx rebuild (real per-product panels in PRODUCTS order, 3-state status map with '—' fail-closed, state-aware CTA, ACCT-04 --bad notice with zero new CSS, one all-products invoice table, openPortal = POST + location.assign, WR-06/WR-01 verified). `npm run build` green, check-secrets clean, 31/31 client verifier checks PASS. **PLAN-DEFECTS documented in 05-02-SUMMARY/VERIFICATION:** plan's "Subscribe == exactly 1" and "Update payment method ≥ 2" counts are unsatisfiable vs the Copywriting Contract (implemented per contract); `node --check` cannot parse .jsx (build gate used instead). Remaining: end-of-phase human verification matrix (M1–M12) with `vercel dev` + real Google session + seeded DB.
+- [Phase ?]: Phase 5 gap-closure (05-03): closed CR-01 (useSafeFetch now fails closed on any non-2xx/non-401 response; account.js DB-catch returns distinct 500), CR-02 (invoiceItems reads a single held key instead of duplicating the shared invoice list across held products), and CR-03 (cancelAtPeriodEnd now drives the Access-until label plus a confirmation notice, CTA left reachable) — zero regression to Phase 3/4 signed-out rendering, confirmed structurally via git diff.
 
 ### Pending Todos
 
@@ -117,6 +123,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-10T02:27:00.000Z
-Stopped at: Phase 5 both plans executed (Wave 1: server endpoints; Wave 2: useAccount + Account.jsx rebuild) — automated gates green; end-of-phase human verification pending (see 05-02-VERIFICATION.md manual matrix M1–M12 and 05-01 human_judgment items)
-Resume file: .planning/phases/05-account-management-real-status-cancellation-billing-portal/05-02-VERIFICATION.md
+Last session: 2026-09-10T03:25:59.487Z
+Stopped at: Completed 05-03-PLAN.md (gap closure: CR-01/CR-02/CR-03 all closed) — human verification matrix still pending before phase re-verification
+Resume file: None

@@ -40,9 +40,9 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Account Management (ACCT)
 
-- [ ] **ACCT-01**: User can view their real subscription status (active / canceled / past due) and renewal date on the Account page, replacing today's mocked data
-- [ ] **ACCT-02**: User can cancel a subscription from the Account page, via Stripe's hosted Customer Portal
-- [ ] **ACCT-03**: User can view their real invoice history on the Account page, replacing today's mocked invoice table
+- [x] **ACCT-01**: User can view their real subscription status (active / canceled / past due) and renewal date on the Account page, replacing today's mocked data
+- [x] **ACCT-02**: User can cancel a subscription from the Account page, via Stripe's hosted Customer Portal
+- [x] **ACCT-03**: User can view their real invoice history on the Account page, replacing today's mocked invoice table
 - [ ] **ACCT-04**: User sees a clear "payment failed, update your card" notice on the Account page when a subscription is past due
 
 ## v2 Requirements
@@ -95,9 +95,9 @@ Explicitly excluded. Documented to prevent scope creep.
 | GATE-03 | Phase 4 | Complete |
 | GATE-04 | Phase 4 | Complete |
 | GATE-05 | Phase 4 | Complete |
-| ACCT-01 | Phase 5 | Pending |
-| ACCT-02 | Phase 5 | Pending |
-| ACCT-03 | Phase 5 | Pending |
+| ACCT-01 | Phase 5 | Complete |
+| ACCT-02 | Phase 5 | Complete |
+| ACCT-03 | Phase 5 | Complete |
 | ACCT-04 | Phase 5 | Pending |
 
 **Coverage:**
