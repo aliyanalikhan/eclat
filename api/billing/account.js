@@ -48,8 +48,10 @@ export default {
       return Response.json({ subscriptions: {} }, { status: 401, headers: noStore })
     }
 
-    // Step 2 — DB rows ALWAYS (D-04). Fail closed on a DB error, exactly
-    // like status.js — never let the exception escape unhandled.
+    // Step 2 — DB rows ALWAYS (D-04). A DB read failure here is a genuine
+    // server-side outage, not "not signed in" — it must be observably
+    // distinct (status + logging) from Step 1's 401 so the client-side
+    // fail-closed check in useSafeFetch.js can tell the two apart (CR-01).
     let rows
     try {
       rows = await sql`
@@ -57,8 +59,9 @@ export default {
                stripe_customer_id, stripe_price_id, stripe_subscription_id
         FROM subscriptions WHERE user_id = ${session.user.id}
       `
-    } catch {
-      return Response.json({ subscriptions: {} }, { status: 401, headers: noStore })
+    } catch (err) {
+      console.error('account: failed to load subscriptions', err)
+      return Response.json({ error: 'unavailable' }, { status: 500, headers: noStore })
     }
 
     // Step 3 — slug-keyed base map (D-02/D-16): unknown product ids are
