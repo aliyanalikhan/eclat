@@ -242,6 +242,22 @@ export const icons = [
     w: 1024,
     h: 1536,
   },
+  {
+    slug: 'princess-diana',
+    name: 'Princess Diana',
+    bio: 'Princess of Wales (1961–1997), globally recognized for her humanitarian work confronting HIV/AIDS stigma and advocating for a worldwide ban on landmines.',
+    ratio: '1024/1536',
+    w: 1024,
+    h: 1536,
+  },
+  {
+    slug: 'mother-teresa',
+    name: 'Mother Teresa',
+    bio: 'Catholic nun and missionary (1910–1997), founder of the Missionaries of Charity and 1979 Nobel Peace Prize laureate for her work with the poor of Kolkata.',
+    ratio: '1024/1536',
+    w: 1024,
+    h: 1536,
+  },
 ].map((i) => ({ ...i, img: `/assets/images/icons/${i.slug}.png` }))
 
 // American culture, told through speeches and moments people actually lived
