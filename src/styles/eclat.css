@@ -1884,6 +1884,51 @@ a:hover .cover--book {
   border: 0;
 }
 
+/* --- magazine preview modal ---------------------------------------------- */
+.magazine-preview .lightbox__close {
+  background: rgba(247, 243, 236, 0.12);
+  border-color: rgba(247, 243, 236, 0.7);
+}
+
+.magazine-preview .lightbox__close:hover {
+  background: rgba(247, 243, 236, 0.24);
+}
+
+.magazine-preview__frame {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 18px;
+  max-height: 100%;
+  max-width: 100%;
+}
+
+.magazine-preview__img {
+  max-width: 100%;
+  max-height: 78vh;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  background: var(--ink);
+  box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+}
+
+.magazine-preview__nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+}
+
+.magazine-preview__counter {
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: rgba(247, 243, 236, 0.85);
+  min-width: 64px;
+  text-align: center;
+}
+
 /* --- reveal / motion ---------------------------------------------------- */
 .reveal {
   opacity: 0;
