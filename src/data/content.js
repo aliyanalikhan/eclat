@@ -140,65 +140,6 @@ export const writings = [
   },
 ].map((w) => ({ ...w, img: `/assets/images/writings/${w.slug}.jpg` }))
 
-export const samples = [
-  {
-    slug: 'spread-02-03-orchard-road',
-    label: 'Spread 02–03 · Orchard Road',
-    alt: 'A closed orchard road at the turn of the season, hedges heavy on both sides.',
-    tint: 'oklch(0.44 0.08 84)',
-    w: 640,
-    ratio: '16/10',
-  },
-  {
-    slug: 'page-07-portrait',
-    label: 'Page 07 · Portrait',
-    alt: 'Portrait of a baker standing in the doorway of a half-rebuilt bakery.',
-    tint: 'oklch(0.40 0.11 38)',
-    w: 320,
-    ratio: '3/4',
-  },
-  {
-    slug: 'spread-08-09-the-ovens',
-    label: 'Spread 08–09 · The Ovens',
-    alt: 'Two brick ovens, newly lit, in a workshop strung with work lamps.',
-    tint: 'oklch(0.38 0.07 258)',
-    w: 640,
-    ratio: '16/10',
-  },
-  {
-    slug: 'page-11-still-life',
-    label: 'Page 11 · Still Life',
-    alt: 'Still life of flour, a folded cloth and a cooling loaf on scarred wood.',
-    tint: 'oklch(0.46 0.09 148)',
-    w: 320,
-    ratio: '3/4',
-  },
-  {
-    slug: 'spread-12-13-market',
-    label: 'Spread 12–13 · Market',
-    alt: 'A village market at first light, awnings still being cranked open.',
-    tint: 'oklch(0.42 0.10 262)',
-    w: 640,
-    ratio: '16/10',
-  },
-  {
-    slug: 'page-16-letters',
-    label: 'Page 16 · Letters',
-    alt: 'A fan of handwritten letters, one of them answered a year late.',
-    tint: 'oklch(0.34 0.08 300)',
-    w: 320,
-    ratio: '3/4',
-  },
-  {
-    slug: 'page-18-end-of-preview',
-    label: 'Page 18 · End of Preview',
-    alt: 'The last page of the free preview, a wide empty meadow at dusk.',
-    tint: 'oklch(0.40 0.06 160)',
-    w: 400,
-    ratio: '4/5',
-  },
-].map((s) => ({ ...s, img: `/assets/images/samples/no-48/${s.slug}.jpg` }))
-
 export const articles = [
   {
     slug: 'the-power-of-vision',

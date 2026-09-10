@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import Cover from '../components/Cover.jsx'
 import NotFound from './NotFound.jsx'
-import { editionByNo, editions, samples } from '../data/content.js'
+import { articles, editionByNo, editions } from '../data/content.js'
 import { editionJsonLd, editionSeo } from '../data/seo.js'
 import { useSeo } from '../lib/useSeo.js'
 import { runFlip, useDragScroll } from '../lib/motion.js'
@@ -40,6 +40,7 @@ export default function Edition() {
   const idx = editions.findIndex((e) => e.no === ed.no)
   const newer = editions[idx - 1]
   const older = editions[idx + 1]
+  const editionArticles = articles.filter((a) => a.editionNo === ed.no)
 
   return (
     <main id="main">
@@ -82,44 +83,51 @@ export default function Edition() {
       </section>
 
       {/* --- preview strip --- */}
-      <section className="section" style={{ padding: '96px var(--gut) 40px' }}>
-        <div className="section-head">
-          <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, flexWrap: 'wrap' }}>
-            <h2 className="h2" style={{ fontSize: 'clamp(28px,3.6vw,46px)' }}>
-              Inside this edition
-            </h2>
-            <span className="pill">Free preview</span>
+      {editionArticles.length > 0 && (
+        <section className="section" style={{ padding: '96px var(--gut) 40px' }}>
+          <div className="section-head">
+            <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, flexWrap: 'wrap' }}>
+              <h2 className="h2" style={{ fontSize: 'clamp(28px,3.6vw,46px)' }}>
+                Inside this edition
+              </h2>
+              <span className="pill">Free preview</span>
+            </div>
+            <p className="section-head__meta">Drag to browse · click to zoom</p>
           </div>
-          <p className="section-head__meta">Drag to browse · click to zoom</p>
-        </div>
 
-        <div className="strip" ref={stripRef}>
-          {samples.map((s) => (
-            <button
-              key={s.slug}
-              type="button"
-              className="strip__item"
-              style={{ '--tint': s.tint, width: s.w, aspectRatio: s.ratio }}
-              aria-label={`Zoom — ${s.label}`}
-              onClick={(e) => openLightbox(s, e.currentTarget.getBoundingClientRect())}
-            >
-              {s.img && (
-                <img
-                  src={s.img}
-                  alt={s.alt}
-                  className="cover__img is-loaded"
-                  loading="lazy"
-                  decoding="async"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none'
-                  }}
-                />
-              )}
-              <span className="strip__caption">{s.label}</span>
-            </button>
-          ))}
-        </div>
-      </section>
+          <div className="strip" ref={stripRef}>
+            {editionArticles.map((a) => (
+              <button
+                key={a.slug}
+                type="button"
+                className="strip__item"
+                style={{ '--tint': a.tint, width: 360, aspectRatio: '4/3' }}
+                aria-label={`Zoom — ${a.title}`}
+                onClick={(e) =>
+                  openLightbox(
+                    { tint: a.tint, img: a.img, alt: a.alt, label: a.title, ratio: '4/3' },
+                    e.currentTarget.getBoundingClientRect(),
+                  )
+                }
+              >
+                {a.img && (
+                  <img
+                    src={a.img}
+                    alt={a.alt}
+                    className="cover__img is-loaded"
+                    loading="lazy"
+                    decoding="async"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none'
+                    }}
+                  />
+                )}
+                <span className="strip__caption">{a.title}</span>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* --- article body / paywall --- */}
       <section className="section" style={{ padding: '60px var(--gut) 130px' }}>
