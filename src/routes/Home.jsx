@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import Cover from '../components/Cover.jsx'
-import { articles, books, editions } from '../data/content.js'
+import { articles, books, editions, icons } from '../data/content.js'
 import { siteJsonLd, staticSeo } from '../data/seo.js'
 import { useSeo } from '../lib/useSeo.js'
 import { useReveal, useScrollFx, runFlip } from '../lib/motion.js'
@@ -334,6 +334,33 @@ export default function Home() {
               </Link>
             ))}
           </div>
+        </div>
+      </section>
+
+      {/* --- American icons (decoration only — supplied tribute images, not
+          editorial content, not a claim any of these appeared in a real
+          Éclat issue) --- */}
+      <section className="section" aria-labelledby="icons-h">
+        <div className="section-head reveal" data-rev="0" style={{ marginBottom: 52 }}>
+          <h2 className="h2" id="icons-h">
+            American Icons
+          </h2>
+        </div>
+
+        <div className="shelf">
+          {icons.map((icon, i) => (
+            <div key={icon.slug} className="reveal" data-rev={i}>
+              <Cover
+                tint="oklch(0.2 0.02 260)"
+                img={icon.img}
+                alt={`Tribute image of ${icon.name}`}
+                ratio={icon.ratio}
+                width={icon.w}
+                height={icon.h}
+                className="cover--lift"
+              />
+            </div>
+          ))}
         </div>
       </section>
 
