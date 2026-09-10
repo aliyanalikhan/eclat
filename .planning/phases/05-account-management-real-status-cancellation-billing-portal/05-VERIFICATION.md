@@ -1,171 +1,155 @@
 ---
 phase: 05-account-management-real-status-cancellation-billing-portal
-verified: 2026-09-10T19:30:00Z
-status: gaps_found
-score: 2/5 must-haves verified
+verified: 2026-09-10T20:15:00Z
+status: human_needed
+score: 5/5 must-haves verified
 behavior_unverified: 0
 overrides_applied: 0
-gaps:
-  - truth: "useAccount fails closed on a server-side auth/DB failure exactly like useEntitlements — an unknown outcome must never render as 'no subscription' (D-04 client mirror)."
-    status: failed
-    reason: "CR-01 (confirmed in code): src/lib/useSafeFetch.js resolves on any successful fetch() promise, regardless of HTTP status — it never checks response.ok/status before calling r.json(). api/billing/account.js deliberately returns 401 { subscriptions: {} } for BOTH 'not signed in' and a DB query failure (account.js:60-62), which is a well-formed 2xx-shaped JSON body. useSafeFetch treats this as success: setData({ subscriptions: {} }), error stays false. useAccount.js then returns { data: EMPTY, error: false } to Account.jsx, which renders the zero-held 'Subscribe' upsell — not the '--bad' 'Couldn't confirm your account' branch. A transient DB outage for a real paying subscriber is indistinguishable, client-side, from having zero subscriptions."
-    artifacts:
-      - path: "src/lib/useSafeFetch.js"
-        issue: "fetch(url,...).then(r => r.json()) — no r.ok/r.status check before treating the body as data (lines 44-45)"
-      - path: "src/lib/useAccount.js"
-        issue: "Docstring (lines 32-34) promises 'any 401 ... sets error: true' but this is not true given useSafeFetch's implementation — the promise is unenforced"
-    missing:
-      - "useSafeFetch must check r.ok (or r.status) and throw/reject before r.json() so a non-2xx response — including account.js's intentional 401 fail-closed responses — surfaces as error:true, not as a successful empty payload."
-  - truth: "Invoices render in ONE table for all held products (D-12), most-recent-first, up to 12 rows, with no duplication."
-    status: failed
-    reason: "CR-02 (confirmed in code): api/billing/account.js Section C assigns the SAME shared invoice array reference to subscriptions[key].invoices.items for every held product key (account.js:156-158, by design — one Stripe customer, one invoice list). src/routes/Account.jsx:95-99 then does Object.values(subs).map(s => s.invoices.items).flat() — for a customer holding N held products, this concatenates N identical copies of the same invoice list. A subscriber with 2 held products sees every invoice duplicated, halving the effective 12-row cap to 6 distinct invoices, and produces duplicate React list keys (key={number} at Account.jsx:250)."
-    artifacts:
-      - path: "src/routes/Account.jsx"
-        issue: "Lines 95-99: Object.values(subs).flat() re-flattens the same shared invoices.items array once per held product instead of reading it from a single held key"
-    missing:
-      - "Read the shared invoice list from a single held key (e.g. subs[heldKeys[0]]?.invoices?.items) instead of flattening across Object.values(subs), per the reviewer's suggested fix."
-  - truth: "cancel_at_period_end is read LIVE from Stripe and drives the D-14 label — a still-active sub with cancelAtPeriodEnd=true must render 'Access until', not 'Renews' (explicit must-have in 05-01-PLAN.md and locked decision D-14 per 05-RESEARCH.md line 251: '\"Access until {date}\" nuance')."
-    status: failed
-    reason: "CR-03 (confirmed in code): api/billing/account.js Section A does a live stripe.subscriptions.list call specifically to compute cancelAtPeriodEnd per held product and ships it on the wire (account.js:97-104; documented in useAccount.js:24). src/routes/Account.jsx never reads sub.cancelAtPeriodEnd anywhere — grep across src/ finds the field only in the useAccount.js docstring, never as a consumed value. Account.jsx:140 computes renewsKey solely from sub.status === 'canceled', ignoring cancelAtPeriodEnd entirely. A subscriber who has cancelled via the portal but is still within their paid period (Stripe status stays 'active', cancel_at_period_end:true) sees 'Active' / 'Renews: <date>' / a 'Manage' button — no indication their subscription will not renew. This directly undermines ACCT-02 (the user just cancelled and gets no confirmation the cancellation took effect) and the D-14 decision as locked in 05-CONTEXT.md/05-RESEARCH.md."
-    artifacts:
-      - path: "src/routes/Account.jsx"
-        issue: "renewsKey (line 140) and the CTA-row gate (line 185) key only off sub.status, never sub.cancelAtPeriodEnd — the field is fetched server-side (at Stripe API cost) and never rendered"
-    missing:
-      - "renewsKey should read 'Access until' when sub.status === 'canceled' OR sub.cancelAtPeriodEnd is true; ideally also suppress/relabel the 'Manage' CTA or add an inline notice for the canceling-but-still-active case, per the reviewer's suggested fix."
+re_verification:
+  previous_status: gaps_found
+  previous_score: 2/5
+  gaps_closed:
+    - "useAccount fails closed on a server-side auth/DB failure (CR-01) — useSafeFetch now throws before body-parsing on any non-2xx/non-401 response; api/billing/account.js's DB-catch branch returns a distinct 500 (not the 401 no-session shape)."
+    - "Invoices render in ONE table with no duplication (CR-02) — Account.jsx reads the shared invoice list from a single held key (heldKeys[0]) instead of flattening Object.values(subs)."
+    - "cancel_at_period_end drives the D-14 'Access until' label (CR-03) — renewsKey now checks sub.status === 'canceled' || sub.cancelAtPeriodEnd, and a confirmation notice renders for the still-active-but-scheduled-to-end state."
+  gaps_remaining: []
+  regressions: []
 deferred: []
+behavior_unverified_items: []
 human_verification:
-  - test: "Signed-in active subscriber holding 2+ products (e.g. eclat-online + book-online), each with paid invoices — load /account and inspect the Billing history table."
-    expected: "Prior to a CR-02 fix this will show every invoice duplicated once per held product with duplicate React keys (visible as a console key-warning and doubled rows); confirms CR-02 in a live browser."
-    why_human: "Requires a seeded DB with 2+ held products and real Stripe invoices; cannot be exercised via grep/static analysis alone."
+  - test: "With vercel dev and a seeded DB row for a signed-in user, temporarily break the DB connection (or force an exception inside the subscriptions SELECT) and load /account."
+    expected: "The page renders 'Couldn't confirm your account — reload to try again.' (the accountError branch), NOT the zero-subscriptions 'Subscribe' upsell."
+    why_human: "Reproducing a live DB failure against a running server requires vercel dev + a seeded DB; not provable by static code reading alone (though the code trace strongly supports it — see below)."
+  - test: "While signed OUT, visit /subscribe and any /editions/:no page."
+    expected: "/subscribe shows no 'Couldn't confirm your current plans' notice, and the edition page shows its normal paywall preview — both render exactly as before the CR-01 fix, confirming the 401 exemption prevented a Phase 3/4 regression."
+    why_human: "Requires a running server and browser to confirm pixel-identical signed-out rendering; structurally confirmed (zero commits to the 6 shared-primitive consumer files since before this gap-closure plan) but not behaviorally exercised here."
+  - test: "Signed-in active subscriber holding 2+ held products (e.g. eclat-online + book-online), each with paid invoices — load /account and inspect the Billing history table."
+    expected: "Each real invoice appears exactly once, zero duplicate rows, no duplicate-React-key console warning."
+    why_human: "Requires a seeded DB with 2+ held products and real Stripe invoices under one customer; the code fix (heldKeys[0] single-key read) is confirmed correct by direct source reading, but the live multi-product render is not exercised here."
   - test: "Cancel an active subscription via the 'Manage' → Stripe portal flow, return to /account before the current period ends."
-    expected: "Prior to a CR-03 fix, the panel will still show 'Active' / 'Renews <date>' / a 'Manage' button with no indication the subscription was cancelled — confirms CR-03 end-to-end."
-    why_human: "Requires a live Stripe test-mode cancellation round trip through the hosted portal."
-  - test: "Force a transient DB/session failure while a real signed-in paying subscriber loads /account (e.g. temporarily break the DB connection string or throw inside the subscriptions SELECT)."
-    expected: "Prior to a CR-01 fix, the page will render the 'You don't have an active subscription yet. Subscribe...' upsell instead of 'Couldn't confirm your account — reload to try again.' — confirms CR-01 end-to-end and shows the risk of prompting a paying customer to pay again."
-    why_human: "Requires deliberately inducing a server-side failure against a live deployment/dev server; not observable via static code reading alone (the logic path is confirmed by code trace above, but the end-user-visible outcome is best confirmed live)."
-  - test: "Canceled-product panel — verify there is genuinely no path back to /subscribe for that specific product from the Account page itself (WR-04 finding, non-blocking)."
-    expected: "Canceled panel shows Status/Plan/'Access until'/Card and nothing actionable; global header 'Subscribe' link is the only resubscribe path."
-    why_human: "Visual/UX judgment call on whether this is acceptable — confirmed structurally in code (Account.jsx:185 gates the CTA row on status !== 'canceled' with no fallback), routed here as a warning, not a blocker."
+    expected: "The panel shows 'Access until {date}' instead of 'Renews {date}', a confirmation notice states the subscription won't renew, and the 'Manage' button is still present (not hidden)."
+    why_human: "Requires a live Stripe test-mode cancellation round trip through the hosted portal; the render logic (renewsKey + notice condition) is confirmed correct by direct source reading, but the live cancellation flow is not exercised here."
+  - test: "Canceled-product panel — verify there is genuinely no path back to /subscribe for that specific product from the Account page itself (WR-04 finding, non-blocking, carried forward from the prior verification)."
+    expected: "Canceled panel shows Status/Plan/'Access until'/Card and nothing actionable; the global header 'Subscribe' link is the only resubscribe path."
+    why_human: "Visual/UX judgment call on whether this is acceptable — confirmed structurally in code (Account.jsx's CTA row still gates on status !== 'canceled' with no fallback), unchanged since the prior verification and explicitly out of scope for the 05-03 gap-closure plan."
 ---
 
-# Phase 5: Account Management — Real Status, Cancellation & Billing Portal Verification Report
+# Phase 5: Account Management — Real Status, Cancellation & Billing Portal Verification Report (Re-verification)
 
 **Phase Goal:** A user can view and manage their real subscription from the Account page — status, renewal date, invoices, and cancellation are all backed by live Stripe data instead of mocks.
-**Verified:** 2026-09-10T19:30:00Z
-**Status:** gaps_found
-**Re-verification:** No — initial phase-level verification (05-02-VERIFICATION.md was a per-plan automated-gate pass with the manual matrix deferred to this pass)
+**Verified:** 2026-09-10T20:15:00Z
+**Status:** human_needed
+**Re-verification:** Yes — after gap closure (05-03 plan executed, plus an emergent code-review fix in commit a01e33c)
 
 ## Goal Achievement
 
 ### Observable Truths
 
+All 5 original must-haves truths re-verified — the 2 that previously passed (#4, #5) were re-checked for regression, and the 3 that previously failed (#1, #2, #3, which map to CR-01/CR-02/CR-03) were fully re-verified end-to-end against the current source.
+
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | User sees real subscription status (active/canceled/past due) and renewal date (SC1/ACCT-01) | ✗ FAILED | Server contract is correct (`api/billing/account.js` returns DB status + live-enriched renewal verbatim), but the client-side fail-closed guarantee (CR-01) and the missing `cancelAtPeriodEnd` render (CR-03) both undermine the accuracy of what's shown on error/cancellation edge cases — see gaps 1 and 3 below |
-| 2 | User can cancel a subscription via Stripe's hosted Customer Portal (SC2/ACCT-02) | ⚠️ Mechanically VERIFIED, but undermined | `api/billing/portal.js` correctly creates a portal session (CSRF-first, own-customer scoped, `PUBLIC_ORIGIN`-only return_url) and `Account.jsx`'s `openPortal('manage')` correctly redirects via `window.location.assign`. However, after a real cancellation the Account page gives the user zero confirmation it took effect (CR-03) — counted against gap 3, not double-counted here |
-| 3 | User sees real invoice history, one table, most-recent-first, ≤12 rows (SC3/ACCT-03) | ✗ FAILED | `api/billing/account.js` Section C and `Account.jsx`'s render/format/receipt-link logic are individually correct, but the duplication bug (CR-02) means any customer with 2+ held products sees every invoice repeated — see gap 2 below |
-| 4 | User sees a clear "payment failed, update your card" notice when past due (SC4/ACCT-04) | ✓ VERIFIED | `Account.jsx:200-226` renders the verbatim `.demo-notice`-based notice with `--bad` inline overrides exactly under a `past_due` panel only, wired to `openPortal('payment_method_update')` → `POST /api/billing/portal {action:'payment_method_update'}` with `flow_data.type: 'payment_method_update'` server-side (`api/billing/portal.js:118`). Also correctly avoids WR-01's dead-end "Subscribe" CTA for `past_due` (renders "Manage" instead, `Account.jsx:185-195`) |
-| 5 | No raw Stripe identifiers, no server-only imports, presentation-safe payload only (T3/T9/WR-10) | ✓ VERIFIED | Read both endpoint files directly: `card` = `{available,brand,last4,expMonth,expYear}` only; `invoices.items` = `{number,created,amount_paid,hosted_invoice_url}` only; generic `{error:'unavailable'}` on every failure branch; `Cache-Control: no-store` on every branch of both endpoints; `grep -rn "pm_\|cus_\|sub_\|pi_"` across `src/lib/useAccount.js src/routes/Account.jsx` → 0 hits; `lib/products.js` has zero `src/` importers |
+| 1 | User sees real subscription status (active/canceled/past due) and renewal date (SC1/ACCT-01) — fails closed on a server-side auth/DB failure (CR-01) | ✓ VERIFIED | `src/lib/useSafeFetch.js:61` — `if (!r.ok && r.status !== 401) throw new Error(...)` runs BEFORE `r.json()` (line 62), routing any non-2xx/non-401 response through the existing `.catch` fail-closed path (`setData(null); setError(true)`). `api/billing/account.js:83-86` — the DB-catch branch (now wrapping both the SELECT at line 59 AND the base-map build at lines 65-82, per the a01e33c follow-up fix) logs via `console.error` and returns a distinct `500 { error: 'unavailable' }`, never reusing Step 1's `401 { subscriptions: {} }` shape (confirmed: exactly 1 occurrence of `status: 401` remains in the file, at Step 1 only). `Account.jsx:118-123` renders "Couldn't confirm your account — reload to try again." whenever `accountError` is true. Additionally confirmed the a01e33c destructuring fix (`;({ rows } = await sql\`...\`)`) is present and correctly inside the try block — the pre-existing bug that made the DB read throw an *unhandled* TypeError (bypassing the try/catch entirely) is closed; `05-03-REVIEW.md` independently re-derived this same conclusion after re-reading the file |
+| 2 | User can cancel a subscription via Stripe's hosted Customer Portal, and the cancellation is visible after the fact (SC2/ACCT-02, CR-03) | ✓ VERIFIED | `api/billing/portal.js` unchanged since the prior (already-passing) verification. `Account.jsx:147-148` — `renewsKey = sub.status === 'canceled' || sub.cancelAtPeriodEnd ? 'Access until' : 'Renews'` now reads the live-fetched flag. `Account.jsx:198-203` renders a new confirmation notice ("Your subscription won't renew and will end on {date}.") exactly when `cancelAtPeriodEnd && status !== 'canceled'`. The "Manage" CTA (`Account.jsx:207-217`) is deliberately left reachable for this state (not suppressed), preserving the only path to reverse a pending cancellation |
+| 3 | User sees real invoice history, one table, most-recent-first, ≤12 rows, no duplication (SC3/ACCT-03, CR-02) | ✓ VERIFIED | `Account.jsx:100-103` — `invoiceItems` now reads `subs[heldKeys[0]]?.invoices?.items` (a single held key), with a defensive `.slice()` shallow copy, `.sort((a,b) => b.created - a.created)` (most-recent-first), and `.slice(0, 12)` (cap). `grep -c "Object.values(subs)"` → 0 — the cross-product flatten that caused duplication is gone. `api/billing/account.js:150-166` (Section C) confirms the server still intentionally assigns the identical shared `items` array to every held key, so reading from any single key yields the complete, non-duplicated list |
+| 4 | User sees a clear "payment failed, update your card" notice when past due (SC4/ACCT-04) | ✓ VERIFIED (regression-checked) | `Account.jsx:222-248` — unchanged since the prior passing verification; the `.demo-notice`-based notice with `--bad` overrides still renders only under `sub.status === 'past_due'`, wired to `openPortal('payment_method_update')` |
+| 5 | No raw Stripe identifiers, no server-only imports, presentation-safe payload only (T3/T9/WR-10) | ✓ VERIFIED (regression-checked) | `grep -rn "pm_\|cus_\|sub_\|pi_" src/lib/useAccount.js src/routes/Account.jsx` → 0 hits. `api/billing/account.js`'s wire shape (card: `{available,brand,last4,expMonth,expYear}`; invoices.items: `{number,created,amount_paid,hosted_invoice_url}`) unchanged; `Cache-Control: no-store` present on every response branch, including the new/modified ones |
 
-**Score:** 2/5 truths verified (3 failed — see Gaps Summary)
+**Score:** 5/5 truths verified (0 failed, 0 behavior-unverified — all upgraded from "present/wired" to "verified" by direct source trace matching the plan's exact fix design)
 
-### Independent Confirmation of 05-REVIEW.md's 3 Critical Findings
+### Independent Confirmation of Gap Closure (CR-01/CR-02/CR-03) Plus the Emergent a01e33c Fix
 
-All three CRITICAL findings from `05-REVIEW.md` were independently re-derived by reading the actual source (not taken on faith) and are **confirmed real, unresolved defects** as of this verification (no fix commits exist after the review; `git log` on the phase's files shows only the 5 original implementation commits):
+Re-derived independently by reading the actual current source (not taken from 05-03-SUMMARY.md or 05-03-REVIEW.md on faith):
 
-| Review ID | Claim | Independent confirmation |
-|-----------|-------|---------------------------|
-| CR-01 | `useSafeFetch` never checks `response.ok`; a DB-outage 401 with `{subscriptions:{}}` body reads as success | **CONFIRMED.** Read `src/lib/useSafeFetch.js:44-45` — `fetch(url,...).then(r => r.json())` has no status check whatsoever between the two calls. Read `api/billing/account.js:60-62` — the DB-catch branch returns `401 Response.json({subscriptions:{}}, ...)`, a well-formed JSON body that `r.json()` will happily parse. `useAccount.js` returns `error: Boolean(error)` which stays `false` in this path. |
-| CR-02 | Invoice list is one shared array reused per held product; client flattens without dedup | **CONFIRMED.** `api/billing/account.js:156-158` assigns the identical `items` array to `subscriptions[key].invoices` inside a `for (const key of Object.keys(subscriptions))` loop — same reference, not a copy, for every key. `src/routes/Account.jsx:95-99` does `Object.values(subs).map(s => s.invoices.items).flat()` with no dedup — for 2 held products this doubles every invoice. |
-| CR-03 | `cancelAtPeriodEnd` computed server-side but never read client-side | **CONFIRMED.** `grep -rn "cancelAtPeriodEnd" src/` returns exactly one hit — the JSDoc comment in `src/lib/useAccount.js:24`. Zero occurrences in `Account.jsx`. `Account.jsx:140`'s `renewsKey` computation checks only `sub.status === 'canceled'`. Cross-checked against the phase's own locked decision record: `05-RESEARCH.md:251` and `05-CONTEXT.md:50` both define D-14 as requiring the "Access until {date}" nuance to be driven by `cancel_at_period_end` for a still-`active` subscription — this is not implemented. |
+| ID | Prior defect | Independent confirmation of fix |
+|----|--------------|----------------------------------|
+| CR-01 | `useSafeFetch` never checked `response.ok`; a DB-outage 401 read as success | **CONFIRMED FIXED.** `src/lib/useSafeFetch.js:61` throws before parsing for any non-2xx/non-401. `api/billing/account.js:83-86` returns a distinct `500`. |
+| CR-01 (emergent) | `api/billing/account.js` assigned the raw `QueryResult` object (not destructured) to `rows`, throwing an unhandled `TypeError` OUTSIDE the try/catch on every authenticated request — the real data path was unreachable even after the CR-01/02/03 client fixes | **CONFIRMED FIXED.** `api/billing/account.js:59` now reads `;({ rows } = await sql\`...\`)`, and this line sits inside the `try` block (lines 58-86) alongside the base-map construction (lines 65-82), with the shared `catch` at 83-86. Verified `rows` is only ever dereferenced (line 92, `rows[0]?.stripe_customer_id`) after the try block completes successfully — matches `05-03-REVIEW.md`'s independent trace exactly |
+| CR-02 | Invoice list flattened across all held products, duplicating every invoice N times | **CONFIRMED FIXED.** `src/routes/Account.jsx:100-103` reads `subs[heldKeys[0]]` only; `grep -c "Object.values(subs)"` → 0 |
+| CR-03 | `cancelAtPeriodEnd` fetched but never rendered | **CONFIRMED FIXED.** `src/routes/Account.jsx:147-148` (label) and `:198-203` (notice) both consume the flag; `grep -c "cancelAtPeriodEnd"` → 3 in this file (was 0) |
 
 ### Required Artifacts
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `lib/products.js` | Server-only frozen reverse maps: `PRODUCT_ID_TO_KEY`, `PRICE_ID_TO_PRODUCT_KEY`, `planLabelFor` | ✓ VERIFIED | All three present, frozen (`Object.freeze` on both maps), zero `src/` importers confirmed by grep, existing `PRODUCTS`/`isProductKey`/`getProduct` untouched |
-| `api/billing/account.js` | `GET /api/billing/account` — DB-always-200 + 3 independent best-effort Stripe sections | ✓ VERIFIED (artifact level) | Exists, substantive, correctly wired to `lib/products.js`/`lib/db.js`/`lib/stripe.js`/`lib/session-user.js`; no-store on every branch; three independent try/catch sections confirmed by reading the file. Note: correctness of the *composition contract* the client depends on (D-04 fail-closed mirror) is broken client-side — see gap 1 |
-| `api/billing/portal.js` | `POST /api/billing/portal` — CSRF-first, own-customer scoped, `PUBLIC_ORIGIN`-only return_url | ✓ VERIFIED | Ordering confirmed by reading the file top to bottom: method guard → CSRF → session → action enum → own-customer SELECT → `billingPortal.sessions.create` → 200; generic error bodies + no-store on every branch; `console.error` logs the StripeError server-side only |
-| `src/lib/useAccount.js` | Third `useSafeFetch` consumer, fail-closed wrapper | ⚠️ ORPHANED CONTRACT | File exists, is wired (imported and called from `Account.jsx`), single-shot (`enabled:true, key:0`) confirmed — but its documented fail-closed contract (lines 32-34) does not actually hold given `useSafeFetch`'s implementation (gap 1) |
-| `src/routes/Account.jsx` | Full rebuild: per-product panels, 3-state status, D-13/14/15 fields, state-aware CTA, ACCT-04 notice, one invoice table, portal handlers | ⚠️ WIRED but two behaviors defective | Mock invoices import gone (`grep "data/content"` → 0), all panels/CTA/notice render logic present and wired to real data — but invoice dedup (gap 2) and `cancelAtPeriodEnd` (gap 3) are missing/incorrect |
+| `src/lib/useSafeFetch.js` | Status-aware fail-closed check, 401 exempted | ✓ VERIFIED | Read directly: check at line 61 precedes `r.json()` at line 62; JSDoc (lines 21-30) accurately documents the corrected contract |
+| `api/billing/account.js` | DB-catch branch distinct from 401 branch; `rows` destructured correctly; try/catch covers the full base-map build | ✓ VERIFIED | Read directly: 401 branch (line 48) untouched; DB-catch branch (83-86) returns distinct 500; `rows` destructuring (line 59) confirmed correct and inside the try block |
+| `src/routes/Account.jsx` | Single-held-key invoice read; `cancelAtPeriodEnd`-aware renewal label + confirmation notice; CTA not suppressed | ✓ VERIFIED | Read directly: lines 100-103 (invoices), 147-148 (renewsKey), 198-203 (notice), 207-217 (CTA unchanged) |
+| `src/lib/useAccount.js` | Fail-closed wrapper, third `useSafeFetch` consumer | ✓ VERIFIED (wired) | Unchanged since prior verification; correctly delegates to the now-fixed `useSafeFetch`. Note: its own JSDoc (lines 32-34) still states "any 401 ... sets error: true," which is stale relative to the actual (and correct) 401-exempted behavior — flagged as an info-level anti-pattern below, not a functional defect (Account.jsx does not rely on 401 producing an error; a signed-out user is already redirected by `useSession`, independently of `useAccount`) |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 |------|-----|-----|--------|---------|
-| `src/lib/useAccount.js` | `api/billing/account` | `useSafeFetch('/api/billing/account', {enabled:true, key:0})` | ✓ WIRED (mechanically) | Confirmed by reading both files; the link fetches correctly. The *reliability* of what it returns on error is broken (gap 1), which is a behavior defect, not a wiring gap |
-| `src/routes/Account.jsx` | `src/lib/useAccount.js` | `const {loading, data, error} = useAccount()` | ✓ WIRED | `data.subscriptions` drives `heldKeys`/panels directly |
-| `src/routes/Account.jsx` | `src/data/products.js` | `PRODUCTS`/`productName(key)` for D-16 order + eyebrow labels | ✓ WIRED | `heldKeys = PRODUCTS.map(p=>p.key).filter(key=>subs[key])` — confirmed fixed order by construction |
-| `src/routes/Account.jsx` | `api/billing/portal` | `openPortal(action)` → `fetch POST` → `window.location.assign(url)` | ✓ WIRED | Confirmed same-origin POST, no `<a href>`/`window.open`; non-ok response is a no-op (DB state stays) |
-| `api/billing/account.js` | `lib/stripe.js` | Best-effort sections A/B/C | ✓ WIRED | All three sections present, independently try/caught, correct API calls (`subscriptions.list`, `paymentMethods.retrieve`/`listPaymentMethods`, `invoices.list` with `limit:12, status:'paid'`) |
+| `src/lib/useSafeFetch.js` | `src/lib/useAccount.js` | non-2xx/non-401 response throws before `r.json()`, surfacing as `error: true` | ✓ WIRED | Confirmed by direct read; matches the plan's `key_links` pattern `r\.ok` |
+| `api/billing/account.js` | `src/lib/useSafeFetch.js` | DB-catch branch's distinct `500` is the signal the client-side check needs | ✓ WIRED | Confirmed; `status: 500` present, `status: 401` count is exactly 1 (Step 1 only) |
+| `src/lib/useSafeFetch.js` | `src/lib/useEntitlements.js` / `src/lib/useGatedContent.js` | 401 exemption preserves Phase 3/4 signed-out behavior | ✓ WIRED (structurally) | Zero commits to `Subscribe.jsx`, `SubscribeSuccess.jsx`, `useEntitlements.js`, `useGatedContent.js`, `status.js`, `editions/[no].js` since before this gap-closure plan — confirmed via `git log` |
+| `src/routes/Account.jsx` | `api/billing/account.js` | `invoiceItems reads subs[heldKeys[0]].invoices.items` | ✓ WIRED | Confirmed; `heldKeys[0]` present, `Object.values(subs)` for invoices gone |
+| `src/routes/Account.jsx` | `api/billing/account.js` | `renewsKey`/notice read `sub.cancelAtPeriodEnd`, computed live in Section A | ✓ WIRED | Confirmed at both ends |
 
 ### Data-Flow Trace (Level 4)
 
 | Artifact | Data Variable | Source | Produces Real Data | Status |
 |----------|---------------|--------|---------------------|--------|
-| Status/Plan/Renews/Card panel fields | `sub.status`/`sub.planLabel`/`sub.renews`/`sub.card` | `data.subscriptions[key]` ← `GET /api/billing/account` ← DB `SELECT` + live Stripe reads | Yes | ✓ FLOWING |
-| Invoice table rows | `invoiceItems` | `data.subscriptions[*].invoices.items` ← `stripe.invoices.list` | Yes, but duplicated across held products | ⚠️ FLOWING WITH DEFECT (CR-02) |
-| `cancelAtPeriodEnd` | computed server-side, present on the wire | `data.subscriptions[key].cancelAtPeriodEnd` | Computed but never read | ✗ DISCONNECTED (fetched, never rendered — CR-03) |
+| Status/Plan/Renews/Card panel fields | `sub.status`/`sub.planLabel`/`sub.renews`/`sub.card` | `data.subscriptions[key]` ← `GET /api/billing/account` ← DB `SELECT` (now correctly destructured) + live Stripe reads | Yes | ✓ FLOWING |
+| Invoice table rows | `invoiceItems` | `data.subscriptions[heldKeys[0]].invoices.items` ← `stripe.invoices.list` | Yes, single-copy, no duplication | ✓ FLOWING |
+| `cancelAtPeriodEnd` | computed server-side (Section A, live Stripe) | `data.subscriptions[key].cancelAtPeriodEnd` | Yes, now rendered in both the label and the notice | ✓ FLOWING |
+| Fail-closed error state | `accountError` | `useAccount().error` ← `useSafeFetch` status check ← non-2xx/non-401 HTTP response | Yes | ✓ FLOWING |
 
 ### Behavioral Spot-Checks
 
 | Behavior | Command | Result | Status |
 |----------|---------|--------|--------|
-| Build compiles both new/edited client files | `npm run build` | 59 modules + SSR 28 modules + prerender 10 routes, no errors, `check-secrets: no leaked secrets found in dist/` | ✓ PASS |
-| No debt markers in phase files | `grep -n "TODO\|FIXME\|XXX\|HACK\|PLACEHOLDER"` across all 6 phase files | 0 hits | ✓ PASS |
-| No fix commits since review | `git log --oneline -8 -- api/billing/account.js api/billing/portal.js lib/products.js src/lib/useAccount.js src/routes/Account.jsx` | Only the 5 original implementation commits (362c693, 6166e60, b710795, a500a4f, 59e2388) | ✓ PASS (confirms gaps are still open, not stale) |
-| `cancelAtPeriodEnd` client-side usage | `grep -rn "cancelAtPeriodEnd" src/` | 1 hit (docstring only, `useAccount.js:24`) | ✗ FAIL (confirms CR-03) |
-| Invoice flatten dedup | Manual trace of `Account.jsx:95-99` against `account.js:156-158`'s shared-reference assignment | Confirmed: same array object assigned per held key, `Object.values().flat()` has no dedup | ✗ FAIL (confirms CR-02) |
-| Response-status check in `useSafeFetch` | Manual trace of `useSafeFetch.js:44-45` | Confirmed: no `r.ok`/`r.status` check exists | ✗ FAIL (confirms CR-01) |
+| Build compiles all 3 gap-closure-touched files + emergent fix | `npm run build` (run fresh, not taken from SUMMARY) | 59 modules + SSR 28 modules + prerender 10 routes, no errors, `check-secrets: no leaked secrets found in dist/` | ✓ PASS |
+| No debt markers in phase files | `grep -n "TODO\|FIXME\|XXX\|HACK\|PLACEHOLDER"` across `api/billing/account.js`, `src/lib/useSafeFetch.js`, `src/routes/Account.jsx`, `src/lib/useAccount.js`, `api/billing/portal.js` | 0 hits | ✓ PASS |
+| Status-check ordering in `useSafeFetch.js` | Direct read of lines 55-63 | `r.ok`/`status !== 401` check (line 61) precedes `r.json()` (line 62) | ✓ PASS |
+| DB-catch branch distinct from 401 branch | `grep -c "status: 401" api/billing/account.js` → 1; `grep -n "status: 500"` → present | Confirmed distinct | ✓ PASS |
+| Invoice single-key read, no flatten | `grep -c "Object.values(subs)" src/routes/Account.jsx` → 0; `grep -n "heldKeys\[0\]"` → present | Confirmed | ✓ PASS |
+| `cancelAtPeriodEnd` client-side usage | `grep -c "cancelAtPeriodEnd" src/routes/Account.jsx` → 3 (was 0 pre-fix) | Confirmed | ✓ PASS |
+| No raw Stripe identifiers reach the client | `grep -rn "pm_\|cus_\|sub_\|pi_" src/lib/useAccount.js src/routes/Account.jsx` → 0 hits | Confirmed | ✓ PASS |
+| Regression-safety: 6 shared-primitive consumer files untouched | `git log --oneline -5 -- src/routes/Subscribe.jsx src/routes/SubscribeSuccess.jsx src/lib/useEntitlements.js src/lib/useGatedContent.js api/billing/status.js "api/content/editions/[no].js"` | Most recent commit on any of these 6 files is `ff40ecd` (Phase 4), predating the entire 05-03 gap-closure plan and the a01e33c follow-up | ✓ PASS |
 
 ### Probe Execution
 
-No `scripts/*/tests/probe-*.sh` files exist in this repo and no PLAN/SUMMARY/VERIFICATION for this phase references a probe script. Skipped — no probes declared or discovered.
+No `scripts/*/tests/probe-*.sh` files exist in this repo and no PLAN/SUMMARY/VERIFICATION for this phase references a probe script. Skipped — no probes declared or discovered (unchanged from the prior verification).
 
 ### Requirements Coverage
 
 | Requirement | Source Plan | Description | Status | Evidence |
 |--------------|-------------|--------------|--------|----------|
-| ACCT-01 | 05-01, 05-02 | Real subscription status + renewal date | ✗ BLOCKED | Server-side correct; client-side fail-closed contract (CR-01) and missing cancellation-in-progress indicator (CR-03) both undermine the accuracy guarantee this requirement implies |
-| ACCT-02 | 05-01, 05-02 | Cancel via Stripe hosted Customer Portal | ⚠️ NEEDS HUMAN (mechanically works, outcome invisible) | Portal creation/redirect verified correct; post-cancellation UI feedback is the CR-03 gap |
-| ACCT-03 | 05-01, 05-02 | Real invoice history | ✗ BLOCKED | Duplication bug (CR-02) for any customer with 2+ held products |
-| ACCT-04 | 05-01, 05-02 | Payment-failed notice when past due | ✓ SATISFIED | Notice renders correctly, verbatim copy, correct CTA, WR-01 dead-end avoided |
+| ACCT-01 | 05-01, 05-02, 05-03 | Real subscription status + renewal date, fail-closed on failure | ✓ SATISFIED | CR-01 closed (both the client status check and the server-side DB-read/destructuring bugs); server contract unchanged and correct |
+| ACCT-02 | 05-01, 05-02, 05-03 | Cancel via Stripe hosted Customer Portal, visible after the fact | ✓ SATISFIED | Portal mechanics unchanged (already correct); CR-03 closes the "invisible cancellation" gap with a label + notice, CTA still reachable |
+| ACCT-03 | 05-01, 05-02, 05-03 | Real invoice history, no duplication | ✓ SATISFIED | CR-02 closed — single-key read eliminates duplication |
+| ACCT-04 | 05-01, 05-02 | Payment-failed notice when past due | ✓ SATISFIED | Unchanged since prior verification; correctly renders, correct CTA, WR-01 dead-end avoided |
 
-**Orphaned requirements check:** `grep -E "Phase 5" .planning/REQUIREMENTS.md` and the traceability table both map exactly ACCT-01..ACCT-04 to Phase 5; both plans (`05-01-PLAN.md`, `05-02-PLAN.md`) declare `requirements: [ACCT-01, ACCT-02, ACCT-03, ACCT-04]` in frontmatter. No orphaned requirements — full coverage on paper, but 3 of the 4 are undermined by the confirmed defects above.
+**Orphaned requirements check:** `.planning/REQUIREMENTS.md` maps exactly ACCT-01..ACCT-04 to Phase 5. All 4 are declared across the phase's plans (05-01/05-02 declare all 4; 05-03 declares ACCT-01/02/03, the 3 it closed gaps for). No orphaned requirements.
+
+**Note — REQUIREMENTS.md checklist drift:** `.planning/REQUIREMENTS.md` line 46 still shows `ACCT-04` as an unchecked `[ ]` item and its traceability table (line 101) marks it "Pending," even though ACCT-04 was already verified `✓ VERIFIED` in the prior (initial) 05-VERIFICATION.md pass and remains so here — this is a stale tracking-doc artifact, not a code defect. ACCT-01/02/03 are correctly checked `[x]`/"Complete." Flagged for the human decision below since REQUIREMENTS.md is meant to be the traceability source of truth and this phase's own artifacts (both VERIFICATION.md passes) disagree with it on ACCT-04.
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 |------|------|---------|----------|--------|
-| `src/lib/useSafeFetch.js` | 44-45 | Missing HTTP status check before treating a response body as valid data | 🛑 Blocker | Root cause of CR-01; also silently affects `useEntitlements`/`useGatedContent` (Phase 4's gating hooks), a wider blast radius than this phase alone |
-| `src/routes/Account.jsx` | 95-99 | Flattening a shared array reference across multiple map keys without dedup | 🛑 Blocker | Root cause of CR-02 (invoice duplication) |
-| `src/routes/Account.jsx` | 140, 185 | Field fetched server-side (`cancelAtPeriodEnd`) but never consumed client-side | 🛑 Blocker | Root cause of CR-03 (silent cancellation state) |
-| `api/billing/account.js` | 60-62 | DB-error branch returns the identical 401 shape/status as "not authenticated," with no server-side logging | ⚠️ Warning | WR-01 (review numbering) — conflates infra failure with auth failure; makes CR-01's blast radius worse and harder to detect operationally |
-| `api/billing/account.js` | 87 | `rows[0]` with no `ORDER BY` for the "single customer" assumption | ⚠️ Warning | WR-02 — nondeterministic row selection if the single-customer invariant is ever violated |
-| `api/billing/account.js` | 40 | No HTTP method guard on a GET-only endpoint (inconsistent with sibling `portal.js`) | ⚠️ Warning | WR-03 — low exploitability, but inconsistent defensive posture |
-| `src/routes/Account.jsx` | 185 | Canceled-product panels render no CTA at all, and once a product is ever cancelled it holds a `subscriptions` row indefinitely so the page's own zero-held "Subscribe" block never reappears for it | ⚠️ Warning | WR-04 — no in-page resubscribe path for a specific canceled product (global header nav still has "Subscribe", so not a total dead end) |
-| `api/billing/account.js` | 120 | Card fallback (`liveSubs[0]?.default_payment_method`) picks an arbitrary subscription's payment method when no customer-level default exists, applied uniformly to every held product | ⚠️ Warning | WR-05 — could show the wrong card on one panel for a multi-product customer with differing payment methods per subscription |
-| `src/lib/useAccount.js` | 23 | Docstring says `renews` can be `''`; server only ever emits `null` | ℹ️ Info | IN-01 (review numbering) — harmless today (`sub.renews || '—'` treats both identically), but documentation drift |
+| `src/lib/useAccount.js` | 32-34 | JSDoc still states "any 401 ... sets error: true," which is now inaccurate — 401 is explicitly exempted from the error path by design (the established "no session, well-formed empty state" contract) | ℹ️ Info | Documentation drift only; no functional impact since `Account.jsx` gates signed-out users via `useSession`, independently of `useAccount`'s 401 handling. Not part of the 3 confirmed CR gaps and not flagged by 05-03-REVIEW.md, but worth a follow-up doc fix |
+| `.planning/REQUIREMENTS.md` | 46, 101 | ACCT-04 still shown as unchecked/"Pending" despite being verified complete in both VERIFICATION.md passes | ℹ️ Info | Tracking-doc drift, not a code defect — see note above |
+
+No blocker or warning-level anti-patterns found in any of the 5 phase-relevant source files (`api/billing/account.js`, `src/lib/useSafeFetch.js`, `src/routes/Account.jsx`, `src/lib/useAccount.js`, `api/billing/portal.js`). This is a meaningful change from the prior verification pass, which found 3 blocker-level anti-patterns (the CR-01/02/03 root causes) plus 5 warnings — all now resolved or (in the case of WR-04) explicitly carried forward as non-blocking.
 
 ### Human Verification Required
 
-See `human_verification` in the frontmatter above — 4 items, all direct live-environment confirmations of the 3 confirmed CRITICAL code defects plus one UX judgment call (WR-04, non-blocking).
+See `human_verification` in the frontmatter above — 5 items. Four are direct live-environment confirmations of the CR-01/CR-02/CR-03 fixes now present in source (the code trace strongly supports each one working as intended, but a DB-outage simulation, a multi-product Stripe customer, and a live portal cancellation round trip all require a running server + seeded DB/Stripe test-mode data that this static verification pass cannot exercise). The fifth (WR-04, canceled-product resubscribe path) is a non-blocking UX judgment call carried forward unchanged from the prior verification — it was explicitly out of scope for the 05-03 gap-closure plan.
 
 ### Gaps Summary
 
-Phase 5's server-side contract (`lib/products.js`, `api/billing/account.js`, `api/billing/portal.js`) is solid: correct DB-first/Stripe-enrichment composition, correct CSRF/IDOR ordering on the portal, correct presentation-safe payload with zero raw Stripe identifiers, correct no-store discipline. The client rebuild (`useAccount.js`, `Account.jsx`) correctly consumes the new endpoints, replaces every mock, and gets the ACCT-04 payment-failed notice and the WR-01 dead-end-CTA fix exactly right.
+No gaps remain. All 3 previously-confirmed critical defects (CR-01, CR-02, CR-03) are independently re-verified as closed by direct source inspection, matching both `05-03-SUMMARY.md`'s claims and `05-03-REVIEW.md`'s independent code review. The emergent 4th bug found during that code review (the `rows` destructuring defect in `api/billing/account.js`, which made the endpoint's real data path completely unreachable via an unhandled exception) is also confirmed fixed and correctly scoped inside the try/catch, with the try block now covering both the DB read and the base-map construction.
 
-However, three independently-confirmed defects — all flagged by `05-REVIEW.md` and re-derived here directly from the source rather than taken on faith — mean the phase's own headline promises are not fully met:
+The server-side contract (`lib/products.js`, `api/billing/account.js`, `api/billing/portal.js`) and the client rebuild (`useAccount.js`, `Account.jsx`) are now both internally consistent and mutually correct: status/renewal/cancellation/invoices/card all flow from live DB + Stripe data with no client-visible mocks, fail-closed behavior holds on genuine server failures, invoices are not duplicated, and cancellation is visibly acknowledged.
 
-1. **CR-01** breaks the fail-closed guarantee that both `05-01-PLAN.md` and `05-02-PLAN.md` state as an explicit must-have in their own words ("never a fabricated 'no subscription'"). The defect lives in the shared `src/lib/useSafeFetch.js` primitive (not a file phase 5 modified) but is the direct cause of `useAccount.js`'s documented contract being false, and the same defect silently affects Phase 4's `useEntitlements`/`useGatedContent`.
-2. **CR-02** means ACCT-03 ("real invoice history") is factually wrong for any customer holding 2+ products — every invoice is shown once per held product.
-3. **CR-03** means the phase's own D-14 decision (locked in `05-CONTEXT.md`/`05-RESEARCH.md`, restated as an explicit must-have truth in `05-01-PLAN.md`) is unimplemented client-side — a cancelled-but-still-active subscriber gets zero indication their cancellation took effect, which also weakens confidence in ACCT-02 ("user can cancel a subscription") since the cancellation is invisible after the fact.
+Two info-level documentation-drift items are noted (a stale JSDoc comment in `useAccount.js`, and a stale REQUIREMENTS.md checklist entry for ACCT-04) — neither blocks phase completion, but the REQUIREMENTS.md discrepancy is surfaced for a human decision since it contradicts this phase's own verification record.
 
-None of these are cosmetic; each has a concrete "customer gets wrong billing information" or "paying customer wrongly told they have no subscription" consequence, which directly touches the project's Core Value statement (real, accurate, server-verified access/billing state).
-
-**Recommended next step:** a small closure plan targeting exactly these three fixes (the reviewer's suggested patches are concrete and minimal — a status check in `useSafeFetch.js`, a single-key invoice read instead of a flatten, and wiring `cancelAtPeriodEnd` into the renewal label) before this phase can be marked complete.
+**Recommended next step:** Route to human verification for the 5 items above (primarily a live `vercel dev` + seeded DB + Stripe test-mode pass through the 4 CR scenarios, standard end-of-phase UAT). No further closure plan is needed — all code-level gaps are closed.
 
 ---
 
-_Verified: 2026-09-10T19:30:00Z_
+_Verified: 2026-09-10T20:15:00Z_
 _Verifier: Claude (gsd-verifier)_
