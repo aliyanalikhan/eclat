@@ -34,7 +34,10 @@ export default function Home() {
   const { setFlipFrom } = useApp()
   const newest = editions[0]
   const homeBooks = books.slice(0, 5)
-  const fan = buildFan([...editions, ...books])
+  // Hero fan is strictly magazine covers — children's books get their own
+  // "Books & writings" band below, so a browsing visitor doesn't see the two
+  // formats interleaved in the same rotating spread.
+  const fan = buildFan(editions)
 
   useSeo({ ...staticSeo['/'], path: '/', jsonLd: siteJsonLd() })
   useReveal('home')
