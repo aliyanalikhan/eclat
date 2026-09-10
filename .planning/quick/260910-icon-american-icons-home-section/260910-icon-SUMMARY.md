@@ -69,6 +69,15 @@ to "Cultural Icons" since Soyinka and Kuti are Nigerian, not American — report
 names + bio fragments present) rather than a full browser session, to conserve context budget.
 Commit: `67952bd`.
 
+## Extension 2 (same session): 8th icon + uniform sizing
+
+Added Chinua Achebe (Things Fall Apart cover art) as an 8th icon with a bio line. Fixed
+"same size and aligned" request: all 8 icons now render at one fixed ratio (2/3, 800x1200)
+via Cover's `ratio` prop instead of each item's own native dimensions — `object-fit: cover`
+(already in `.cover__img`) crops each source image to fill that uniform box, so grid rows
+line up evenly regardless of source photo dimensions. Verified via prerendered HTML grep
+(name, bio, filename, and `aspect-ratio:2/3` all present). Commit: `cc7386a`.
+
 ## Self-Check: PASSED
 - FOUND: `public/assets/images/icons/` (4 files)
 - FOUND: `src/data/content.js` (icons export)
