@@ -113,7 +113,7 @@ None yet.
 | 260909-kco | Fix checkout.js hard-failing on a stale/invalid stored stripe_customer_id | 2026-09-09 | 5916f7f | [260909-kco-fix-checkout-js-hard-failing-on-a-stale-](./quick/260909-kco-fix-checkout-js-hard-failing-on-a-stale-/) |
 | 260909-l31 | Fix /subscribe page card grid layout: equal-height cards, no orphaned card, aligned buttons | 2026-09-09 | 7b337a2 | [260909-l31-fix-subscribe-page-card-grid-layout-equa](./quick/260909-l31-fix-subscribe-page-card-grid-layout-equa/) |
 | 260910-vid | Separate hero fan to magazines-only; add /videos section (8 oEmbed-verified American culture/history clips, click-to-play modal, CSP update) | 2026-09-10 | 50dc6af, 378e1e6 | [260910-vid-add-videos-section-separate-hero-fan](./quick/260910-vid-add-videos-section-separate-hero-fan/) |
-| 260910-soon | Fill empty hero fan slots with blurred "Coming Soon" placeholder cards to balance the design | 2026-09-10 | e051aa3 | [260910-soon-hero-fan-coming-soon-cards](./quick/260910-soon-hero-fan-coming-soon-cards/) |
+| 260910-soon | Fill empty hero fan slots with blurred "Coming Soon" placeholder cards; later swapped flat tint for a real blurred blank-magazine-mockup photo | 2026-09-10 | e051aa3, 21f9da5 | [260910-soon-hero-fan-coming-soon-cards](./quick/260910-soon-hero-fan-coming-soon-cards/) |
 | 260910-icon | Add "Cultural Icons" decorative section to Home page (7 user-supplied tribute images + bios; renamed from "American Icons") | 2026-09-10 | 2af6218, 67952bd | [260910-icon-american-icons-home-section](./quick/260910-icon-american-icons-home-section/) |
 
 ## Deferred Items

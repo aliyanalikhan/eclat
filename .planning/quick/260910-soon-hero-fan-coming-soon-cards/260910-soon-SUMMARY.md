@@ -75,6 +75,20 @@ None — this closes the sparseness gap flagged in the previous quick task (2609
 *Quick task: 260910-soon*
 *Completed: 2026-09-10*
 
+## Extension (same session, later): real blurred photo instead of flat tint
+
+User asked for the Coming Soon cards to blur a "random magazine cover" photo instead of a flat
+tint. Two Unsplash "magazine covers stack" search results were rejected after inspection — both
+showed real, identifiable, currently-published magazines (Bon Appétit, an IKEA catalog) fully
+legible in the source photo, a copyright/trademark risk even though the on-screen result would be
+blurred (the stored repo asset itself would still be a crisp reproduction). Flagged this to the
+user via AskUserQuestion; user chose to keep searching for an unbranded option. Found one via a
+"blank magazine mockup" search: a genuinely blank, portrait-oriented mockup photo (Unsplash,
+free-license, no real branding) — saved as `public/assets/images/covers/coming-soon.jpg`. Wired
+into the existing `Cover`'s `img` prop; no changes needed to the backdrop-filter blur CSS since it
+already blurs whatever renders behind the "Coming Soon" label. Verified in-browser (zoomed
+screenshot confirms the photo is visible-but-blurred behind the crisp label). Commit: `21f9da5`.
+
 ## Self-Check: PASSED
 
 - FOUND: `src/routes/Home.jsx` (buildFan + render map changes)
