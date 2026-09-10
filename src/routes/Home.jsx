@@ -79,10 +79,8 @@ export default function Home() {
                 <Cover
                   key={ed.no}
                   tint={ed.tint}
-                  img="/assets/images/covers/coming-soon.jpg"
                   alt=""
                   ratio={null}
-                  eager={f.lead}
                   className={`fan-card ${f.cls}`}
                   data-fan="1"
                   data-fx={f.fx}
@@ -93,14 +91,20 @@ export default function Home() {
                     aspectRatio: 'auto',
                   }}
                 >
-                  {/* backdrop-filter blurs the photo behind this overlay
-                      without blurring the label itself — a real
-                      filter:blur() on the whole card would blur its own
-                      children too. The photo is a blank/generic magazine
-                      mockup (free-license stock, no real publication) so
-                      there's nothing identifiable to blur away in the first
-                      place — it's decoration, not a claim about any real
-                      title. */}
+                  {/* A drawn (not photographed) sample cover layout — no
+                      real photo, no real publication, just generic
+                      placeholder blocks standing in for a masthead/cover
+                      line/image well. backdrop-filter blurs this whole
+                      layout without blurring the "Coming Soon" label
+                      sitting on top of it in the same stacking order the
+                      real photo used previously. */}
+                  <div className="fan-card__sample" aria-hidden="true">
+                    <span className="fan-card__sample-mast">MAGAZINE</span>
+                    <div className="fan-card__sample-well" />
+                    <span className="fan-card__sample-line" />
+                    <span className="fan-card__sample-line" style={{ width: '70%' }} />
+                    <span className="fan-card__sample-line" style={{ width: '45%' }} />
+                  </div>
                   <div className="fan-card__soon">
                     <span className="fan-card__soon-label">Coming Soon</span>
                   </div>

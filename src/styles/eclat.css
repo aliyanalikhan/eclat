@@ -548,9 +548,45 @@ a:hover {
   opacity: 0;
 }
 
-/* "Coming soon" hero placeholder — backdrop-filter blurs the tint+stripe
-   texture painted behind this overlay (Cover's own background), not this
-   element's own content, so the label stays crisp against a blurred card. */
+/* Drawn sample cover layout sitting behind the "Coming Soon" blur overlay —
+   generic masthead/cover-line/image-well blocks, not a real photo or a real
+   publication. z-index 1 keeps it above Cover's own tint background but
+   below .fan-card__soon's blur overlay (z-index 2). */
+.fan-card__sample {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 20px 16px;
+  background: #d8d2c4;
+}
+
+.fan-card__sample-mast {
+  font-family: var(--serif);
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  color: #16130f;
+}
+
+.fan-card__sample-well {
+  flex: 1;
+  background: #a39a86;
+  border: 1px solid #16130f;
+}
+
+.fan-card__sample-line {
+  display: block;
+  height: 9px;
+  width: 90%;
+  background: #16130f;
+  opacity: 0.65;
+}
+
+/* "Coming soon" hero placeholder — backdrop-filter blurs the sample cover
+   layout painted behind this overlay, not this element's own content, so
+   the label stays crisp against a blurred card. */
 .fan-card__soon {
   position: absolute;
   inset: 0;
