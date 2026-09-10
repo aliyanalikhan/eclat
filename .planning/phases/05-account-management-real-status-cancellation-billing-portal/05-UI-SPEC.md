@@ -31,17 +31,17 @@ created: 2026-09-10
 
 ## Spacing Scale
 
-This codebase does not use a strict 8-point grid (existing values already in `.panel`/`.upsell`/`.invoice` include 10px, 18px, 20px, 22px, 26px, 28px, 30px). Phase 5 introduces exactly two new spacing decisions — everything else reuses existing values verbatim.
+This codebase does not use a strict 8-point grid (existing values already in `.panel`/`.upsell`/`.invoice` include 10px, 18px, 20px, 22px, 26px, 28px, 30px). Phase 5 introduces exactly four new spacing decisions — everything else reuses existing values verbatim.
 
 | Token | Value | Usage in this phase |
 |-------|-------|-------|
 | Per-product eyebrow → its panel | 20px | New — a multiple of 4. Intentionally **not** matching the existing page-level "Account" eyebrow's `marginBottom: 18` (`Account.jsx:67`) — that 18px value is pre-existing chrome this phase does not touch, so it carries forward unchanged and is not a new decision requiring grid alignment. The per-product `.eyebrow` label (product name) this phase introduces above each panel is a genuinely new spacing decision, so it uses 20px to stay on the 4px grid rather than copying the legacy 18px value verbatim. |
 | Between stacked per-product panels | 40px | New — when 2+ products are held (D-16), panels stack vertically; 40px sits inside the codebase's existing range (between the 30px panel padding and the 44/48px major-block gaps already used on this page) rather than introducing an outlying value |
-| Panel → state-aware CTA row | inherits `.upsell` (`margin-top: 22px`) exactly | Reused verbatim — the CTA row (Manage / Subscribe / Update payment method) occupies the same box `.upsell` occupies today |
-| ACCT-04 notice → its panel | inherits `.upsell`/`.demo-notice` (`margin-top: 22px`) exactly | The past-due notice sits in the same slot the upsell block occupies today, on the panel(s) it applies to |
-| Invoice table, rows, "Billing history" heading | inherits `.invoices`/`.invoice`/`.h2` spacing exactly (`margin-top: 24px`, `padding: 18px 0`, heading `margin: 66px 0 0`) | Unchanged — column content changes (D-11), layout spacing does not |
+| Panel → state-aware CTA row | 24px | New — a multiple of 4. The CTA row (Manage / Subscribe / Update payment method, D-08) is a brand-new phase-5 surface, not a pre-existing box this phase merely leaves untouched — unlike the page-level `h1`/eyebrow chrome, it did not exist before this phase, so its placement is a new spacing decision rather than an inherited one. `.upsell`'s legacy `margin-top: 22px` is **not** reused verbatim here; 24px replaces it to stay on the 4px grid, using the same visual weight class (one step above the 20px eyebrow gap, matching `.upsell`'s existing role as a "next major block" separator) — same discipline applied to the eyebrow-gap fix above. |
+| ACCT-04 notice → its panel | 24px | New — a multiple of 4, for the identical reason as the CTA-row token directly above: the payment-failed notice (ACCT-04) is a brand-new phase-5 surface, so its margin-top is a new decision, not an inherited `.upsell` value. Uses the same 24px as the CTA-row token since both occupy the same structural slot (the box directly below a panel) and should read as one consistent gap across every panel, not two different values for visually equivalent positions. |
+| Invoice table, rows, "Billing history" heading | inherits `.invoices`/`.invoice`/`.h2` spacing exactly (`margin-top: 24px`, `padding: 18px 0`, heading `margin: 66px 0 0`) | Unchanged — this block is pre-existing chrome this phase does not restructure; column *content* changes (D-11), layout spacing does not, so no new spacing decision is being made here |
 
-Exceptions: none beyond the two new tokens above — every other value is reused from the existing `.panel`/`.upsell`/`.invoices`/`.h2`/`.eyebrow` classes, not re-derived.
+Exceptions: none beyond the four new tokens above (eyebrow gap 20px, stacked-panel gap 40px, CTA-row margin 24px, ACCT-04-notice margin 24px) — every other value is reused from the existing `.panel`/`.upsell`/`.invoices`/`.h2`/`.eyebrow` classes, not re-derived. `.upsell`'s legacy 22px is deliberately **not** reused as-is anywhere in this phase's new surfaces.
 
 ---
 
@@ -120,14 +120,14 @@ Concrete visual/interaction specs for the rebuilt `/account` page. These are pre
 
 ### 2. State-aware CTA row (D-08)
 
-- Directly below each panel (at the 22px gap inherited from `.upsell`), render exactly one primary action reflecting that product's state:
+- Directly below each panel (at the 24px gap declared in Spacing Scale — a new phase-5 decision, not `.upsell`'s legacy 22px), render exactly one primary action reflecting that product's state:
   - `active` or `past_due` → **"Manage"** button, `.btn.btn--sm` (plain ink pill, not `--accent` — this is a neutral management action, not an upsell).
   - No subscription for that product → the generalized no-subscription notice (Copywriting Contract) with the **"Subscribe"** CTA, `.btn.btn--sm.btn--accent`, exactly as today's single upsell block, just with generalized copy.
 - Never render a dead-end "Subscribe" CTA for a `past_due` product (this was the Phase 3 WR-01 bug this phase exists to fix) — `past_due` always gets "Manage", paired with the notice below.
 
 ### 3. ACCT-04 payment-failed notice
 
-- Only rendered under a `past_due` product's panel. Structurally a **recolored copy of `.demo-notice`** (`.demo-notice`/`.demo-notice__tag`/`.demo-notice__text` classes reused verbatim, colors overridden via inline `style` — matching the exact Phase 4 precedent of inline-style color overrides over new stylesheet classes, so zero new CSS is added):
+- Only rendered under a `past_due` product's panel, at the 24px margin-top declared in Spacing Scale (a new phase-5 decision, not `.upsell`'s legacy 22px — see Spacing Scale for why this box is treated as new rather than inherited). Structurally a **recolored copy of `.demo-notice`** (`.demo-notice`/`.demo-notice__tag`/`.demo-notice__text` classes reused verbatim, colors overridden via inline `style` — matching the exact Phase 4 precedent of inline-style color overrides over new stylesheet classes, so zero new CSS is added):
   - `border-color: var(--bad)` (was `var(--accent)`)
   - `background: color-mix(in srgb, var(--bad) 7%, transparent)` (was the accent tint)
   - Tag background `var(--bad)` (was `var(--accent)`), tag text unchanged white
