@@ -251,12 +251,12 @@ export const icons = [
     h: 1536,
   },
   {
-    slug: 'mother-teresa',
-    name: 'Mother Teresa',
-    bio: 'Catholic nun and missionary (1910–1997), founder of the Missionaries of Charity and 1979 Nobel Peace Prize laureate for her work with the poor of Kolkata.',
-    ratio: '1024/1536',
-    w: 1024,
-    h: 1536,
+    slug: 'pele',
+    name: 'Pelé',
+    bio: 'Brazilian footballer (1940–2022), born Edson Arantes do Nascimento, a three-time FIFA World Cup winner with Brazil widely regarded as one of the greatest footballers of all time.',
+    ratio: '1254/1254',
+    w: 1254,
+    h: 1254,
   },
 ].map((i) => ({ ...i, img: `/assets/images/icons/${i.slug}.png` }))
 
