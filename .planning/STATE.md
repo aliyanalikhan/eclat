@@ -118,6 +118,8 @@ None yet.
 | 260910-fr3 | Make Edition page's "Inside this edition" free-preview strip edition-specific: swap dead generic `samples` placeholder for real per-edition `articles` filtered by `editionNo` | 2026-09-10 | 71b37cf | [260910-fr3-in-magazine-free-preview-fill-in-some-da](./quick/260910-fr3-in-magazine-free-preview-fill-in-some-da/) |
 | 260910-g36 | Replace Marilyn Monroe + Muhammad Ali Cultural Icons portraits with user-supplied images (JPEG-to-PNG re-encode + corrected aspect-ratio metadata for Ali); add `useOnlinePrice` hook wiring Home/Edition Subscribe CTAs to the real live Stripe price instead of a hardcoded `$9/mo` | 2026-09-10 | c9e9eff, 8a5766d, ae40a01 | [260910-g36-swap-two-cultural-icons-section-images-w](./quick/260910-g36-swap-two-cultural-icons-section-images-w/) |
 | 260910-gwx | Add Princess Diana and Mother Teresa as Cultural Icons entries (user-supplied images, 10 icons total); Mother Teresa removed again in a same-session follow-up task | 2026-09-10 | 91b4c87 | [260910-gwx-add-princess-diana-and-mother-teresa-as-](./quick/260910-gwx-add-princess-diana-and-mother-teresa-as-/) |
+| 260910-jrt | Remove Mother Teresa Cultural Icons entry, add Pelé instead (user-supplied 1254x1254 square image, new aspect ratio) | 2026-09-10 | a95e864 | [260910-jrt-remove-mother-teresa-from-cultural-icons](./quick/260910-jrt-remove-mother-teresa-from-cultural-icons/) |
+| 260910-jsf | Add "The Gettysburg Address" (1863) as a 7th, real (non-fictional) Writings entry — PNG-to-JPEG re-encode of user-supplied artwork, new `Speech` type, own-words dek | 2026-09-10 | 133fd20 | [260910-jsf-add-abraham-lincoln-s-gettysburg-address](./quick/260910-jsf-add-abraham-lincoln-s-gettysburg-address/) |
 
 ## Deferred Items
 
