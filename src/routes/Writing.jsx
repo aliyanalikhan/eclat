@@ -27,9 +27,9 @@ export default function Writing() {
         tint={w.tint}
         img={w.img}
         alt={`Opening image for ${w.title}`}
-        ratio="3/2"
-        width={1200}
-        height={800}
+        ratio={w.ratio || '3/2'}
+        width={w.w || 1200}
+        height={w.h || 800}
       />
 
       <p className="writing__type">
