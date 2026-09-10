@@ -35,7 +35,7 @@ This codebase does not use a strict 8-point grid (existing values already in `.p
 
 | Token | Value | Usage in this phase |
 |-------|-------|-------|
-| Per-product eyebrow → its panel | 18px | New — matches the exact `marginBottom: 18` already used for the page's own "Account" eyebrow (`Account.jsx:67`); each per-product panel gets an `.eyebrow` label (product name) directly above it at this same gap |
+| Per-product eyebrow → its panel | 20px | New — a multiple of 4. Intentionally **not** matching the existing page-level "Account" eyebrow's `marginBottom: 18` (`Account.jsx:67`) — that 18px value is pre-existing chrome this phase does not touch, so it carries forward unchanged and is not a new decision requiring grid alignment. The per-product `.eyebrow` label (product name) this phase introduces above each panel is a genuinely new spacing decision, so it uses 20px to stay on the 4px grid rather than copying the legacy 18px value verbatim. |
 | Between stacked per-product panels | 40px | New — when 2+ products are held (D-16), panels stack vertically; 40px sits inside the codebase's existing range (between the 30px panel padding and the 44/48px major-block gaps already used on this page) rather than introducing an outlying value |
 | Panel → state-aware CTA row | inherits `.upsell` (`margin-top: 22px`) exactly | Reused verbatim — the CTA row (Manage / Subscribe / Update payment method) occupies the same box `.upsell` occupies today |
 | ACCT-04 notice → its panel | inherits `.upsell`/`.demo-notice` (`margin-top: 22px`) exactly | The past-due notice sits in the same slot the upsell block occupies today, on the panel(s) it applies to |
@@ -47,14 +47,18 @@ Exceptions: none beyond the two new tokens above — every other value is reused
 
 ## Typography
 
-| Role | Size | Weight | Line Height |
-|------|------|--------|-------------|
-| Body | 15–17px | 400 | 1.5–1.6 — `.upsell__text` (15px/1.6), `.invoice` row text (15px), `.fine` (13px/1.6) |
-| Label | 10–11px | 400 | 1 — uppercase, `.14–.2em` letter-spacing, `--narrow` font — `.eyebrow`, `.panel__key`, `.invoice__date`, `.invoice__link`, notice tag (mirrors `.demo-notice__tag`) |
-| Heading | clamp(30px, 4vw, 52px) | 400 | ~1 — `.h2`, "Billing history" section heading, unchanged |
-| Display | clamp(34px, 5vw, 64px) | 400 | 1.02 — page `h1` ("Reader since 2021" — unchanged, out of this phase's scope; no requirement touches this line) |
+Exactly **4** declared size tiers. The 22px data-value size is explicitly **folded into the Heading tier** (both are `--serif`, weight 400 — the same typographic role rendered at two scales, not a fifth tier). Every value below is an exact px, or a single `clamp()` formula, never a vague range.
 
-Data values (`.panel__val` — Status, Plan, Renews, Card, per-product) use 22px `--serif` at weight 400, unchanged from today. Weights in use across the whole codebase: **400 (regular, default everywhere)** and 500 (medium, `.wordmark`/`.auth-trigger__name` header chrome only — not touched by this phase). Every new element this phase introduces uses 400 exclusively.
+| Role | Size | Weight | Line Height | Usage |
+|------|------|--------|-------------|-------|
+| Label | 10px (`.panel__key`, notice tag — mirrors `.demo-notice__tag`) · 11px (`.eyebrow`, `.invoice__date`, `.invoice__link`) | 400 | 1 | Uppercase, `.14–.2em` letter-spacing, `--narrow` font |
+| Body | 15px | 400 | 1.6 | `.upsell__text`, `.invoice` row text — the single body-copy size this phase's rebuilt surfaces use |
+| Fine | 13px (`.fine` — error/degraded fine print, per Copywriting Contract) · 14px (`.demo-notice__text` — reused verbatim, colors overridden via inline style, for the ACCT-04 notice body per Component Notes §3) | 400 | 1.6 | Smaller supporting copy, always `--sans`, never the primary reading size |
+| Heading | clamp(30px, 4vw, 52px) — `.h2` "Billing history" section heading, unchanged · **22px** — `.panel__val` data values (Status/Plan/Renews/Card, per-product), folded in here rather than counted separately | 400 | ~1 (heading) / 1 (data value) | `--serif` — the only two serif sizes this page uses |
+
+Weights in use across the whole codebase: **400 (regular, default everywhere)** and 500 (medium, `.wordmark`/`.auth-trigger__name` header chrome only — not touched by this phase). Every new element this phase introduces uses 400 exclusively.
+
+The page `h1` ("Reader since 2021" — clamp(34px, 5vw, 64px), unchanged) is deliberately **not** one of the 4 tiers above: it is pre-existing chrome this phase does not touch and no requirement (ACCT-01..04) touches this line, so it is out of this contract's scope rather than a fifth size decision.
 
 No "loading…" text or spinner is introduced — the existing page-level "Checking your session…" gate (`Account.jsx`, already present) is extended to also cover the new `useAccount` fetch, matching the established silent-gate precedent from `02-UI-SPEC.md`/`04-UI-SPEC.md`.
 
@@ -70,6 +74,13 @@ No "loading…" text or spinner is introduced — the existing page-level "Check
 | Destructive | `var(--bad)` `oklch(0.55 0.16 25)` | Reserved for: the ACCT-04 past-due payment-failed notice (border, tinted background, tag — recolored copy of the `.demo-notice` structure via inline style, not a new class); the whole-page `useAccount` fetch-error fine print ("Couldn't confirm your account — reload to try again."); the invoice-section best-effort-degraded fine print ("Invoice history is temporarily unavailable."). Never used for the ordinary active/canceled/no-subscription states — those stay in the existing `--ok`/`--accent`/`--muted` palette |
 
 Accent reserved for: the "Subscribe" CTA, per-product eyebrow labels, the free-tier status dot, and the no-subscription upsell border — **never** for a payment-failure indicator (payment failure = `--bad`, exactly as `03-UI-SPEC.md` already established for checkout-creation failures). `--ok` (`oklch(0.56 0.14 148)`, unchanged) remains reserved for the active-status dot only.
+
+---
+
+## Visual Focal Point
+
+- **Multiple stacked product panels (D-16):** the eye lands first on the **top-most panel's Status field** — the `.status-dot` + "Active"/"Past due"/"Canceled" pairing inside the first panel, which is always `eclat-online` per D-16's fixed product order. It is the only colored dot above the fold and the first data point in reading order; no other element on the page (eyebrow labels, CTA buttons, the invoice table below) competes with it for attention.
+- **ACCT-04 notice present alongside its panel:** the notice must be the strongest visual pull on the page. Its `var(--bad)` border + tinted background + "Payment failed" tag is the *only* alarm-colored surface anywhere on `/account` (see Color — Destructive), so it draws the eye ahead of the panel's own neutral-ink Status/Plan/Renews/Card values, even though it sits below the panel in document order. A past-due subscriber must register "payment failed" before reading anything else in that product's block.
 
 ---
 
@@ -98,7 +109,7 @@ Concrete visual/interaction specs for the rebuilt `/account` page. These are pre
 ### 1. Per-product summary panels (replaces the single `eclat-online`-only `.panel`, D-02/D-16)
 
 - Render one `.eyebrow` + `.panel` pair **per product the user holds**, in fixed order: `eclat-online`, `eclat-hardcopy`, `book-online`, `book-hardcopy` (D-16's "eclat-online first, then the rest" — this is the exact order `src/data/products.js`'s `PRODUCTS` array already declares). Only render a panel for a product the user actually holds a `subscriptions` row for — no empty/placeholder panels for unowned products.
-- Each panel is preceded by an `.eyebrow` label holding the product's display name from `src/data/products.js`'s `productName(key)` (e.g. "Éclat Online", "Children's Book Hard Copy"), at the 18px gap declared in Spacing Scale.
+- Each panel is preceded by an `.eyebrow` label holding the product's display name from `src/data/products.js`'s `productName(key)` (e.g. "Éclat Online", "Children's Book Hard Copy"), at the 20px gap declared in Spacing Scale.
 - Each `.panel` keeps the existing 4-field grid (`.panel__key`/`.panel__val` pairs) unchanged: **Status**, **Plan**, **Renews**, **Card**.
   - **Status** — `.status-dot` colored `var(--ok)` + "Active" for `active`; `var(--bad)` + "Past due" for `past_due`; `var(--accent)` + "Canceled" for `canceled`. (Today's binary "Active"/"Free tier" + `--ok`/`--accent` dot becomes this 3-state version.)
   - **Plan** — `{Product Name} — {Monthly|Annual}` (D-13), e.g. "Éclat Online — Monthly", server-derived from `stripe_price_id` via `lib/products.js`; `—` if somehow unresolvable.
