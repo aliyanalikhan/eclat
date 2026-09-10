@@ -257,9 +257,9 @@ export const icons = [
     slug: 'muhammad-ali',
     name: 'Muhammad Ali',
     bio: 'Three-time world heavyweight boxing champion (1942–2016) and civil-rights advocate, widely regarded as one of the 20th century’s greatest athletes.',
-    ratio: '1122/1402',
-    w: 1122,
-    h: 1402,
+    ratio: '896/1200',
+    w: 896,
+    h: 1200,
   },
   {
     slug: 'marilyn-monroe',
