@@ -5,13 +5,13 @@ milestone_name: milestone
 current_phase: 05
 current_phase_name: account-management-real-status-cancellation-billing-portal
 status: executing
-stopped_at: "Completed 05-03-PLAN.md (gap closure: CR-01/CR-02/CR-03 closed, plus an emergent critical bug in account.js fixed) — re-verified 5/5 must-haves, status human_needed, 05-UAT.md pending"
-last_updated: "2026-09-10T20:15:00.000Z"
+stopped_at: context exhaustion at 75% (2026-09-10)
+last_updated: "2026-09-10T04:49:11.461Z"
 last_activity: 2026-09-10
 last_activity_desc: Phase 05 re-verified after gap closure (05-VERIFICATION.md) — 5/5 must-haves pass, status human_needed — run /gsd-verify-work 05 to work through 05-UAT.md
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 5
   total_plans: 14
   completed_plans: 14
 ---
@@ -113,7 +113,7 @@ None yet.
 | 260909-kco | Fix checkout.js hard-failing on a stale/invalid stored stripe_customer_id | 2026-09-09 | 5916f7f | [260909-kco-fix-checkout-js-hard-failing-on-a-stale-](./quick/260909-kco-fix-checkout-js-hard-failing-on-a-stale-/) |
 | 260909-l31 | Fix /subscribe page card grid layout: equal-height cards, no orphaned card, aligned buttons | 2026-09-09 | 7b337a2 | [260909-l31-fix-subscribe-page-card-grid-layout-equa](./quick/260909-l31-fix-subscribe-page-card-grid-layout-equa/) |
 | 260910-vid | Separate hero fan to magazines-only; add /videos section (8 oEmbed-verified American culture/history clips, click-to-play modal, CSP update) | 2026-09-10 | 50dc6af, 378e1e6 | [260910-vid-add-videos-section-separate-hero-fan](./quick/260910-vid-add-videos-section-separate-hero-fan/) |
-| 260910-soon | Fill empty hero fan slots with blurred "Coming Soon" placeholder cards; later swapped flat tint for a real blurred blank-magazine-mockup photo | 2026-09-10 | e051aa3, 21f9da5 | [260910-soon-hero-fan-coming-soon-cards](./quick/260910-soon-hero-fan-coming-soon-cards/) |
+| 260910-soon | Fill empty hero fan slots with blurred "Coming Soon" cards; iterated from flat tint -> stock photo -> drawn CSS sample cover (no external assets) | 2026-09-10 | e051aa3, 21f9da5, 34a1e02 | [260910-soon-hero-fan-coming-soon-cards](./quick/260910-soon-hero-fan-coming-soon-cards/) |
 | 260910-icon | Add "Cultural Icons" decorative section to Home page (7 user-supplied tribute images + bios; renamed from "American Icons") | 2026-09-10 | 2af6218, 67952bd | [260910-icon-american-icons-home-section](./quick/260910-icon-american-icons-home-section/) |
 
 ## Deferred Items
@@ -126,6 +126,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-10T03:25:59.487Z
-Stopped at: Completed 05-03-PLAN.md (gap closure: CR-01/CR-02/CR-03 all closed) — human verification matrix still pending before phase re-verification
+Last session: 2026-09-10T04:49:11.433Z
+Stopped at: context exhaustion at 75% (2026-09-10)
 Resume file: None

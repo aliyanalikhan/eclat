@@ -89,6 +89,15 @@ into the existing `Cover`'s `img` prop; no changes needed to the backdrop-filter
 already blurs whatever renders behind the "Coming Soon" label. Verified in-browser (zoomed
 screenshot confirms the photo is visible-but-blurred behind the crisp label). Commit: `21f9da5`.
 
+## Extension 2 (same session): drawn CSS cover instead of any photo
+
+User asked to remove the stock photo entirely and draw a sample cover in CSS instead. Deleted
+`coming-soon.jpg`; added `.fan-card__sample` (masthead text + image-well box + cover-line bars)
+rendered behind the existing blur overlay. First attempt (thin near-white details on the dark
+tint) was invisible after blur+compression — fixed with a distinct lighter card background
+(#d8d2c4) and dark text/lines, verified visible in-browser. Zero external assets now. Commit:
+`34a1e02`.
+
 ## Self-Check: PASSED
 
 - FOUND: `src/routes/Home.jsx` (buildFan + render map changes)
