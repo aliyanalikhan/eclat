@@ -79,8 +79,10 @@ export default function Home() {
                 <Cover
                   key={ed.no}
                   tint={ed.tint}
+                  img="/assets/images/covers/coming-soon.jpg"
                   alt=""
                   ratio={null}
+                  eager={f.lead}
                   className={`fan-card ${f.cls}`}
                   data-fan="1"
                   data-fx={f.fx}
@@ -91,10 +93,14 @@ export default function Home() {
                     aspectRatio: 'auto',
                   }}
                 >
-                  {/* backdrop-filter blurs the tint+stripe-texture sitting
-                      behind this overlay without blurring the label itself
-                      — a real filter:blur() on the whole card would blur its
-                      own children too. */}
+                  {/* backdrop-filter blurs the photo behind this overlay
+                      without blurring the label itself — a real
+                      filter:blur() on the whole card would blur its own
+                      children too. The photo is a blank/generic magazine
+                      mockup (free-license stock, no real publication) so
+                      there's nothing identifiable to blur away in the first
+                      place — it's decoration, not a claim about any real
+                      title. */}
                   <div className="fan-card__soon">
                     <span className="fan-card__soon-label">Coming Soon</span>
                   </div>
