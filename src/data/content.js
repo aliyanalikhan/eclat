@@ -315,6 +315,14 @@ export const videos = [
     dek: 'From the steps of the Lincoln Memorial — Martin Luther King Jr.’s address to the March on Washington for Jobs and Freedom, and the defining speech of the civil-rights era.',
     source: 'RARE FACTS',
   },
+  {
+    slug: 'amanda-gorman-inauguration-poem',
+    youtubeId: 'Jp9pyMqnBzk',
+    kicker: 'Inaugural Address · 2021',
+    title: 'Amanda Gorman — "The Hill We Climb"',
+    dek: 'At twenty-two, Amanda Gorman became the youngest inaugural poet in U.S. history — reciting "The Hill We Climb" to a nation asking what came next.',
+    source: 'CNBC Television',
+  },
 ]
 
 export const invoices = [
