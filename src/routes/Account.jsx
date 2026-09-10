@@ -92,9 +92,13 @@ export default function Account() {
   const invoicesUnavailable = heldKeys.some(
     (key) => subs[key].invoices && subs[key].invoices.available === false
   )
-  const invoiceItems = Object.values(subs)
-    .map((s) => (s.invoices && s.invoices.items) || [])
-    .flat()
+  // The server intentionally assigns the SAME shared invoice list to every
+  // held product key (one Stripe customer, one invoice list — see
+  // api/billing/account.js Section C) — read it from a single held key
+  // rather than combining every held product's copy, which would just
+  // duplicate the identical list once per held product.
+  const invoiceItems = ((subs[heldKeys[0]] && subs[heldKeys[0]].invoices && subs[heldKeys[0]].invoices.items) || [])
+    .slice() // defensive shallow copy — never mutate the underlying payload
     .sort((a, b) => b.created - a.created) // most-recent-first (D-10)
     .slice(0, 12) // cap at 12 rows (D-09)
 
