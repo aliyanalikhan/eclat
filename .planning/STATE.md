@@ -117,6 +117,7 @@ None yet.
 | 260910-icon | Add "Cultural Icons" decorative section to Home page (8 user-supplied tribute images + bios, uniform sizing; renamed from "American Icons") | 2026-09-10 | 2af6218, 67952bd, cc7386a | [260910-icon-american-icons-home-section](./quick/260910-icon-american-icons-home-section/) |
 | 260910-fr3 | Make Edition page's "Inside this edition" free-preview strip edition-specific: swap dead generic `samples` placeholder for real per-edition `articles` filtered by `editionNo` | 2026-09-10 | 71b37cf | [260910-fr3-in-magazine-free-preview-fill-in-some-da](./quick/260910-fr3-in-magazine-free-preview-fill-in-some-da/) |
 | 260910-g36 | Replace Marilyn Monroe + Muhammad Ali Cultural Icons portraits with user-supplied images (JPEG-to-PNG re-encode + corrected aspect-ratio metadata for Ali); add `useOnlinePrice` hook wiring Home/Edition Subscribe CTAs to the real live Stripe price instead of a hardcoded `$9/mo` | 2026-09-10 | c9e9eff, 8a5766d, ae40a01 | [260910-g36-swap-two-cultural-icons-section-images-w](./quick/260910-g36-swap-two-cultural-icons-section-images-w/) |
+| 260910-gwx | Add Princess Diana and Mother Teresa as Cultural Icons entries (user-supplied images, 10 icons total); Mother Teresa removed again in a same-session follow-up task | 2026-09-10 | 91b4c87 | [260910-gwx-add-princess-diana-and-mother-teresa-as-](./quick/260910-gwx-add-princess-diana-and-mother-teresa-as-/) |
 
 ## Deferred Items
 
