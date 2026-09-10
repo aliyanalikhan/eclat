@@ -138,6 +138,14 @@ export const writings = [
     dek: 'Swimming pieces, collected — rivers, harbours, one reservoir.',
     tint: 'oklch(0.44 0.09 232)',
   },
+  {
+    slug: 'the-gettysburg-address',
+    title: 'The Gettysburg Address',
+    type: 'Speech',
+    year: '1863',
+    dek: 'Two minutes at a battlefield dedication that November, and a new birth of freedom promised in return.',
+    tint: 'oklch(0.55 0.05 70)',
+  },
 ].map((w) => ({ ...w, img: `/assets/images/writings/${w.slug}.jpg` }))
 
 export const articles = [
