@@ -141,7 +141,11 @@ export default function Account() {
                 const sub = subs[key]
                 const product = PRODUCTS.find((p) => p.key === key)
                 const state = STATUS[sub.status]
-                const renewsKey = sub.status === 'canceled' ? 'Access until' : 'Renews'
+                // D-14: "Access until" when the sub is canceled OR still
+                // active but scheduled not to renew (cancelAtPeriodEnd,
+                // fetched live from Stripe in api/billing/account.js).
+                const renewsKey =
+                  sub.status === 'canceled' || sub.cancelAtPeriodEnd ? 'Access until' : 'Renews'
                 const brand = sub.card && sub.card.brand
                 const card =
                   sub.card && sub.card.available && sub.card.brand && sub.card.last4
@@ -183,6 +187,20 @@ export default function Account() {
                         <p className="panel__val">{card}</p>
                       </div>
                     </div>
+
+                    {/* CR-03 confirmation notice: still-active but scheduled
+                        not to renew — positive acknowledgement that a
+                        cancellation was received. The "Manage" CTA below is
+                        deliberately NOT suppressed for this state: Stripe's
+                        hosted portal is the only path to reverse a pending
+                        cancellation (suppressing it would recreate a WR-01
+                        dead end). */}
+                    {sub.cancelAtPeriodEnd && sub.status !== 'canceled' && (
+                      <p className="fine" style={{ marginTop: 12 }}>
+                        Your subscription won't renew and will end on{' '}
+                        {sub.renews || 'the current period end'}.
+                      </p>
+                    )}
 
                     {/* State-aware CTA row (§2, D-08): active/past_due → Manage;
                         canceled → no CTA; never a dead-end upsell CTA (WR-01). */}
