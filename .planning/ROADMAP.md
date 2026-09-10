@@ -128,7 +128,16 @@ Plans:
   3. User sees their real invoice history on the Account page, replacing today's mocked invoice table
   4. User sees a clear "payment failed, update your card" notice on the Account page when a subscription is past due
 
-**Plans**: TBD
+**Plans**: 2 plans (authored, ready to execute)
+Plans:
+**Wave 1**
+
+- [ ] 05-01-PLAN.md — lib/products.js reverse maps (PRODUCT_ID_TO_KEY/PRICE_ID_TO_PRODUCT_KEY/planLabelFor), GET /api/billing/account (DB-always + best-effort Stripe enrichment), POST /api/billing/portal (CSRF-first, own-customer scoped)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 05-02-PLAN.md — src/lib/useAccount.js (third useSafeFetch consumer) + Account.jsx rebuild: per-product panels, 3-state status, state-aware CTA (WR-01 fix), ACCT-04 notice, one real invoice table, portal handlers
+
 **UI hint**: yes
 
 ## Progress
@@ -142,4 +151,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Authentication — Google Sign-In & Server-Side Sessions | 3/3 | Complete    | 2026-09-09 |
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | 3/3 | Complete    | 2026-09-09 |
 | 4. Content Gating — Real Server-Side Entitlement Enforcement | 2/2 | Pending human verification | - |
-| 5. Account Management — Real Status, Cancellation & Billing Portal | TBD | Not started | - |
+| 5. Account Management — Real Status, Cancellation & Billing Portal | 2/2 planned | Planned | - |

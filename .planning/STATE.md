@@ -2,16 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 5 context gathered
-last_updated: "2026-09-09T23:35:50.774Z"
-last_activity: 2026-09-10 -- Phase 4 goal-verified (04-VERIFICATION.md); status human_needed — run /gsd-verify-work 04 to work through 04-UAT.md
+current_phase: 5
+current_phase_name: Account Management — Real Status, Cancellation & Billing Portal — **Planned (ready to execute)**
+status: planned
+stopped_at: Phase 5 planning complete — 05-01-PLAN.md + 05-02-PLAN.md authored and plan-checker-verified (0 blockers)
+last_updated: "2026-09-10T01:19:35.962Z"
+last_activity: 2026-09-10
+last_activity_desc: Phase 5 planned — 2 executable plans (Wave 1 server, Wave 2 client) created and verified; run /gsd-execute-phase 5 to begin (Phase 4 UAT still open)
 progress:
   total_phases: 5
   completed_phases: 4
-  total_plans: 11
+  total_plans: 13
   completed_plans: 11
-  percent: 80
 ---
 
 # Project State
@@ -25,11 +27,11 @@ See: .planning/PROJECT.md (updated 2026-09-09)
 
 ## Current Position
 
-Phase: 4 — Content Gating — Real Server-Side Entitlement Enforcement — **Pending human verification** (2/2 plans executed, 0/2 UAT items signed off)
-Status: All automated checks passed (8/8 must-haves, code review clean of blockers); phase held open pending human verification of 04-UAT.md before being marked complete
-Last activity: 2026-09-10 -- Phase 4 goal-verified (04-VERIFICATION.md); status human_needed — run /gsd-verify-work 04 to work through 04-UAT.md
+Phase: 5 — Account Management — Real Status, Cancellation & Billing Portal (2/2 plans authored, 0/2 executed; Phase 4 UAT still open)
+Status: Phase 5 planning complete — 05-01 (Wave 1: server) + 05-02 (Wave 2: client) authored and plan-checker-verified (0 BLOCKERs, 3 WARNINGs fixed; requirement coverage ACCT-01..04 + decision coverage D-01..D-16 both pass)
+Last activity: 2026-09-10 -- Phase 5 planned; run /gsd-execute-phase 5 to begin execution
 
-Progress: [████████████░░░░░░░░] 60% (3/5 phases complete; Phase 4 executed and verified, pending human sign-off)
+Progress: [████████████░░░░░░░░] 60% (3/5 phases complete; Phase 4 executed and verified, pending human sign-off; Phase 5 planned)
 
 ## Performance Metrics
 
@@ -77,6 +79,7 @@ Recent decisions affecting current work:
 - Phase 4: Plan 04-02 restored content.js editions[].excerpt as FREE-ONLY 2-paragraph arrays and re-targeted check-secrets.js's marker to 'quiet luxury of authenticity' — npm run build is green end-to-end again; Phase 4 is complete (GATE-01..GATE-05 all delivered)
 - Phase 4: Plan 04-02's --bad fetch-failure fine print uses className="fine" + inline style={{ color: 'var(--bad)' }} rather than a fine--bad CSS class (no such class exists in eclat.css; this phase makes zero CSS additions by design) — matches the existing inline-style convention already used in Subscribe.jsx/SubscribeSuccess.jsx for the same color
 - Phase 4: Plan 04-02 left Account.jsx's Plan/Renews/Card fields and billing-history rows as explicitly-deferred placeholders (real plan cadence, renewal date, card-on-file, and per-user invoice history are Phase 5's ACCT-01/ACCT-04 scope) — see 04-02-SUMMARY.md Known Stubs
+- Phase 5 (via /gsd-plan-phase 5, locked D-01..D-16): two-wave plan — Wave 1 (05-01, server) adds lib/products.js reverse maps (PRODUCT_ID_TO_KEY / PRICE_ID_TO_PRODUCT_KEY / planLabelFor), the new sibling GET /api/billing/account (DB-always-200 + three independent best-effort live Stripe sections; no-store every branch), and POST /api/billing/portal (CSRF-first via isSameOriginNavigation, own-customer scoped, PUBLIC_ORIGIN return_url); Wave 2 (05-02, client) adds src/lib/useAccount.js (the third useSafeFetch consumer) and rebuilds src/routes/Account.jsx (per-product panels in D-16 order, 3-state status, D-13 plan label, D-14 state-aware Renews/Access-until, ACCT-04 Payment-failed notice, one D-12 invoice table, portal POST handlers fixing WR-01). Both plans carry <threat_model> blocks (security gate); plan-checker passed with 0 blockers
 
 ### Pending Todos
 
@@ -108,6 +111,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-09-09T23:35:50.767Z
-Stopped at: Phase 5 context gathered
-Resume file: .planning/phases/05-account-management-real-status-cancellation-billing-portal/05-CONTEXT.md
+Last session: 2026-09-10T01:19:35.962Z
+Stopped at: Phase 5 planning complete — 05-01-PLAN.md + 05-02-PLAN.md ready to execute
+Resume file: .planning/phases/05-account-management-real-status-cancellation-billing-portal/05-01-PLAN.md
