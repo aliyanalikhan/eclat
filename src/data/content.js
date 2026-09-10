@@ -91,54 +91,6 @@ export const books = [
 
 export const writings = [
   {
-    slug: 'on-rebuilding-slowly',
-    title: 'On Rebuilding Slowly',
-    type: 'Essay',
-    year: '2026',
-    dek: 'Fourteen months, one oven at a time, and what speed costs.',
-    tint: 'oklch(0.48 0.10 38)',
-  },
-  {
-    slug: 'the-bakery-on-the-square',
-    title: 'The Bakery on the Square',
-    type: 'Reportage',
-    year: '2025',
-    dek: 'A village, a roof, and eleven hundred bricks carried by hand.',
-    tint: 'oklch(0.44 0.08 84)',
-  },
-  {
-    slug: 'letters-to-the-meadow',
-    title: 'Letters to the Meadow',
-    type: 'Collection',
-    year: '2024',
-    dek: 'Thirty-eight years of a botanist’s correspondence, annotated.',
-    tint: 'oklch(0.46 0.09 148)',
-  },
-  {
-    slug: 'night-shift',
-    title: 'Night Shift',
-    type: 'Essay',
-    year: '2023',
-    dek: 'What the country looks like between two and five in the morning.',
-    tint: 'oklch(0.38 0.08 300)',
-  },
-  {
-    slug: 'a-short-history-of-the-long-table',
-    title: 'A Short History of the Long Table',
-    type: 'Nonfiction',
-    year: '2021',
-    dek: 'One recipe, six households, a hundred years of substitutions.',
-    tint: 'oklch(0.42 0.09 210)',
-  },
-  {
-    slug: 'cold-water',
-    title: 'Cold Water',
-    type: 'Collection',
-    year: '2019',
-    dek: 'Swimming pieces, collected — rivers, harbours, one reservoir.',
-    tint: 'oklch(0.44 0.09 232)',
-  },
-  {
     slug: 'the-gettysburg-address',
     title: 'The Gettysburg Address',
     type: 'Speech',
@@ -150,14 +102,6 @@ export const writings = [
       'But, in a larger sense, we cannot dedicate, we cannot consecrate, we cannot hallow, this ground. The brave men, living and dead, who struggled here, have consecrated it, far above our poor power to add or detract. The world will little note, nor long remember what we say here, but it can never forget what they did here. It is for us the living, rather, to be dedicated here to the unfinished work which they who fought here have thus far so nobly advanced. It is rather for us to be here dedicated to the great task remaining before us—that from these honored dead we take increased devotion to that cause for which they gave the last full measure of devotion—that we here highly resolve that these dead shall not have died in vain—that this nation, under God, shall have a new birth of freedom—and that government of the people, by the people, for the people, shall not perish from the earth.',
     ],
     tint: 'oklch(0.55 0.05 70)',
-  },
-  {
-    slug: 'yes-we-can-2008',
-    title: 'Yes We Can',
-    type: 'Speech',
-    year: '2008',
-    dek: 'A January 2008 primary-night concession in New Hampshire, recast into one of the era’s most quoted rallying cries.',
-    tint: 'oklch(0.42 0.08 250)',
   },
 ].map((w) => ({ ...w, img: `/assets/images/writings/${w.slug}.jpg` }))
 
