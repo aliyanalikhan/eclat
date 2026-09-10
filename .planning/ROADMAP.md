@@ -17,7 +17,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Authentication — Google Sign-In & Server-Side Sessions** - Users sign in with Google only, verified server-side, with persistent sessions (completed 2026-09-09)
 - [x] **Phase 3: Billing & Webhooks — Stripe Checkout and Subscription Sync** - Users subscribe via Stripe Checkout; webhook-verified events are the single source of truth for subscription state (completed 2026-09-09)
 - [ ] **Phase 4: Content Gating — Real Server-Side Entitlement Enforcement** - Every gated page checks real per-user entitlement server-side; the fake `subscribed` flag is gone (pending human verification — see 04-UAT.md)
-- [ ] **Phase 5: Account Management — Real Status, Cancellation & Billing Portal** - The Account page shows real subscription status, invoices, and payment-failure notices, backed by Stripe
+- [ ] **Phase 5: Account Management — Real Status, Cancellation & Billing Portal** - The Account page shows real subscription status, invoices, and payment-failure notices, backed by Stripe (gaps found — see 05-VERIFICATION.md: fail-closed bypass, invoice duplication, cancel_at_period_end never rendered)
 
 ## Phase Details
 
@@ -128,7 +128,7 @@ Plans:
   3. User sees their real invoice history on the Account page, replacing today's mocked invoice table
   4. User sees a clear "payment failed, update your card" notice on the Account page when a subscription is past due
 
-**Plans**: 2 plans (executed, pending human verification)
+**Plans**: 2/2 plans executed; 05-VERIFICATION.md found 3 unresolved critical gaps (score 2/5 must-haves) — success criteria 1, 2, and 3 are NOT yet correctly delivered
 Plans:
 **Wave 1**
 
@@ -151,4 +151,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Authentication — Google Sign-In & Server-Side Sessions | 3/3 | Complete    | 2026-09-09 |
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | 3/3 | Complete    | 2026-09-09 |
 | 4. Content Gating — Real Server-Side Entitlement Enforcement | 2/2 | Pending human verification | - |
-| 5. Account Management — Real Status, Cancellation & Billing Portal | 2/2 | Pending human verification | - |
+| 5. Account Management — Real Status, Cancellation & Billing Portal | 2/2 | Gaps found (2/5 must-haves) | - |
