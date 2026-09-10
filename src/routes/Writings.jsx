@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom'
 import Cover from '../components/Cover.jsx'
 import { writings } from '../data/content.js'
 import { staticSeo } from '../data/seo.js'
@@ -52,7 +53,11 @@ export default function Writings() {
 
             <div>
               <p className="writing__type">{w.type}</p>
-              <h2 className="writing__title">{w.title}</h2>
+              <h2 className="writing__title">
+                <Link to={`/writings/${w.slug}`} onClick={(e) => e.stopPropagation()}>
+                  {w.title}
+                </Link>
+              </h2>
               <p className="writing__dek">{w.dek}</p>
             </div>
 
