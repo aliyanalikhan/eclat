@@ -115,6 +115,7 @@ None yet.
 | 260910-vid | Separate hero fan to magazines-only; add /videos section (8 oEmbed-verified American culture/history clips, click-to-play modal, CSP update) | 2026-09-10 | 50dc6af, 378e1e6 | [260910-vid-add-videos-section-separate-hero-fan](./quick/260910-vid-add-videos-section-separate-hero-fan/) |
 | 260910-soon | Fill empty hero fan slots with blurred "Coming Soon" cards; iterated flat tint -> stock photo -> drawn CSS covers -> 4 varied looks + real glassmorphism | 2026-09-10 | e051aa3, 21f9da5, 34a1e02, cde2156 | [260910-soon-hero-fan-coming-soon-cards](./quick/260910-soon-hero-fan-coming-soon-cards/) |
 | 260910-icon | Add "Cultural Icons" decorative section to Home page (8 user-supplied tribute images + bios, uniform sizing; renamed from "American Icons") | 2026-09-10 | 2af6218, 67952bd, cc7386a | [260910-icon-american-icons-home-section](./quick/260910-icon-american-icons-home-section/) |
+| 260910-fr3 | Make Edition page's "Inside this edition" free-preview strip edition-specific: swap dead generic `samples` placeholder for real per-edition `articles` filtered by `editionNo` | 2026-09-10 | 71b37cf | [260910-fr3-in-magazine-free-preview-fill-in-some-da](./quick/260910-fr3-in-magazine-free-preview-fill-in-some-da/) |
 
 ## Deferred Items
 
