@@ -8,6 +8,7 @@ import Archive from './routes/Archive.jsx'
 import Edition from './routes/Edition.jsx'
 import Books from './routes/Books.jsx'
 import Writings from './routes/Writings.jsx'
+import Writing from './routes/Writing.jsx'
 import Videos from './routes/Videos.jsx'
 import Subscribe from './routes/Subscribe.jsx'
 import SubscribeSuccess from './routes/SubscribeSuccess.jsx'
@@ -68,6 +69,7 @@ export default function App() {
         <Route path="/editions/:no" element={<Edition />} />
         <Route path="/books" element={<Books />} />
         <Route path="/writings" element={<Writings />} />
+        <Route path="/writings/:slug" element={<Writing />} />
         <Route path="/videos" element={<Videos />} />
         <Route path="/subscribe" element={<Subscribe />} />
         <Route path="/subscribe/success" element={<SubscribeSuccess />} />

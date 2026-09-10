@@ -1,4 +1,4 @@
-import { SITE, editions } from './content.js'
+import { SITE, editions, writings } from './content.js'
 
 const DEFAULT_OG = '/assets/images/og/eclat-default.webp'
 
@@ -71,6 +71,13 @@ export const editionSeo = (ed) => ({
   type: 'article',
 })
 
+export const writingSeo = (w) => ({
+  title: `${w.title} — Éclat`,
+  description: w.dek,
+  og: DEFAULT_OG,
+  type: 'article',
+})
+
 /** Every prerenderable path, with its resolved metadata. */
 export function allRoutes() {
   const out = Object.entries(staticSeo).map(([path, meta]) => ({
@@ -79,6 +86,9 @@ export function allRoutes() {
   }))
   for (const ed of editions) {
     out.push({ path: `/editions/${ed.no}`, meta: { ...editionSeo(ed), jsonLd: editionJsonLd(ed) } })
+  }
+  for (const w of writings) {
+    out.push({ path: `/writings/${w.slug}`, meta: writingSeo(w) })
   }
   return out
 }
