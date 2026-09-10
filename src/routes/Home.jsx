@@ -199,17 +199,16 @@ export default function Home() {
           <div className="hero__halo" aria-hidden="true" />
           <p className="hero__flag" data-hero-copy="1">
             <span className="dot" aria-hidden="true" />
-            New issue — {newest.date}
+            THE {newest.date.toUpperCase()} ISSUE
           </p>
-          <h1 data-hero-copy="1">
-            Two issues
-            <br />
-            <em>of paying attention</em>
-          </h1>
+          <h1 data-hero-copy="1">Where remarkable stories come to light.</h1>
           <p className="hero__lede" data-hero-copy="1">
-            The complete Éclat archive, the children&rsquo;s books, and the essays — one
-            subscription, every edition, from No. 1 to whatever comes next.
+            Éclat celebrates the visionaries, leaders, creators, and changemakers whose stories
+            deserve to be told.
           </p>
+          <Link to={`/editions/${newest.no}`} className="btn">
+            Explore the Issue
+          </Link>
         </div>
 
         <p className="hero__scroll" data-hero-copy="1" aria-hidden="true">
