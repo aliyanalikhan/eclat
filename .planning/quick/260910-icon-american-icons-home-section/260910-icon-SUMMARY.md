@@ -6,7 +6,7 @@ tags: [content, home, images, decoration]
 
 requires: []
 provides:
-  - New "American Icons" decorative band on Home page (4 user-supplied tribute images)
+  - "Cultural Icons" decorative band on Home page (7 user-supplied tribute images with bio captions; renamed from "American Icons" — 2 of 7 aren't American)
 affects: []
 
 tech-stack:
@@ -57,6 +57,17 @@ status: complete
 ---
 *Quick task: 260910-icon*
 *Completed: 2026-09-10*
+
+## Extension (same session, immediately after): 3 more icons + bios
+
+User supplied 3 more images (James Brown, Wole Soyinka, Fela Kuti) and asked for a short bio
+under each icon. Added `bio` field to all 7 `content.js` icons entries (short, widely-documented
+public facts — dates + primary claim to fame, no particular source cited) and a `<p className="label">`
+caption under each `Cover` in the Home.jsx section. Renamed the section heading from "American Icons"
+to "Cultural Icons" since Soyinka and Kuti are Nigerian, not American — reported to user, not asked
+(low-stakes, easily-reversible naming call). Verified via prerendered `dist/index.html` grep (all 7
+names + bio fragments present) rather than a full browser session, to conserve context budget.
+Commit: `67952bd`.
 
 ## Self-Check: PASSED
 - FOUND: `public/assets/images/icons/` (4 files)
