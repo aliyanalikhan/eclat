@@ -309,6 +309,22 @@ export const videos = [
     dek: 'At twenty-two, Amanda Gorman became the youngest inaugural poet in U.S. history — reciting "The Hill We Climb" to a nation asking what came next.',
     source: 'CNBC Television',
   },
+  {
+    slug: 'paul-onwuanibe-real-estate-empire',
+    youtubeId: 'clhvBJua_A4',
+    kicker: 'Enterprise · The Joey Akan Experience',
+    title: 'How Paul Onwuanibe Built a $1B Real Estate Empire',
+    dek: 'Paul Onwuanibe discusses building a landmark real estate enterprise, visionary design, and institution-building in modern Africa.',
+    source: 'Glitch Africa Studios',
+  },
+  {
+    slug: 'chikwe-ihekweazu-pandemics-power-institutions',
+    youtubeId: 'RYi5FDvTF-w',
+    kicker: 'Public Health & Governance · ONE2ONE',
+    title: 'Dr. Chikwe Ihekweazu — Pandemics, Power & Institutions',
+    dek: 'The former NCDC Director General on leadership under pressure, managing global health crises, and strengthening institutions.',
+    source: 'ONE2ONE',
+  },
 ]
 
 export const invoices = [

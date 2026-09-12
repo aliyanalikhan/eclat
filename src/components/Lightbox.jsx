@@ -81,7 +81,7 @@ export default function Lightbox() {
       <figure
         data-lb-frame="1"
         className="lightbox__frame"
-        style={{ '--tint': tint, aspectRatio: ratio }}
+        style={{ '--tint': tint, '--lb-ratio': ratio, aspectRatio: ratio }}
         onClick={(e) => e.stopPropagation()}
       >
         {img && (

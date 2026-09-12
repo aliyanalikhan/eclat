@@ -1780,8 +1780,10 @@ a:hover .cover--book {
 .lightbox__frame {
   position: relative;
   max-width: 100%;
-  max-height: 100%;
+  max-height: 88vh;
   width: min(1000px, 100%);
+  height: auto;
+  max-width: min(1000px, calc(88vh * (var(--lb-ratio, 1))));
   background: var(--tint, var(--ink));
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
   overflow: hidden;

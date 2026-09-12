@@ -8,9 +8,6 @@ export default function Footer() {
       <div className="footer__inner">
         <div>
           <div className="footer__mark">ÉCLAT</div>
-          <p className="footer__fine" style={{ marginTop: 12 }}>
-            Quarterly since {SITE.founded}.
-          </p>
         </div>
 
         <nav className="footer__nav" aria-label="Footer">

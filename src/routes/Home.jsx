@@ -410,7 +410,7 @@ export default function Home() {
               Two issues, two children&rsquo;s books, every essay. New editions land quarterly.
             </p>
             <Link to="/subscribe" className="btn btn--light btn--lg">
-              Start subscribing
+              Subscribe
             </Link>
           </div>
         </div>
