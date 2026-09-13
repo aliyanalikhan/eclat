@@ -162,7 +162,7 @@ Plans:
   4. The header's nav drawer opens and closes correctly at phone widths, respects safe-area insets on notched devices, every nav/menu/auth tap target meets a 44px minimum, and sign-in/sign-out works with no regression
   5. The footer renders legibly at phone-portrait widths with no overlapping or cut-off content
 
-**Plans**: 2/2 plans executed
+**Plans**: 2/2 plans executed; 1 gap-closure plan pending (06-03, addresses 06-VERIFICATION.md's CR-01/WR-01 gaps)
 Plans:
 **Wave 1**
 
@@ -171,6 +171,10 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 06-02-PLAN.md — Nav-drawer safe-area insets, 44px tap-target fixes, and a real 375px/430px chrome-regression + footer-legibility verification (CHROME-01..03)
+
+**Wave 3** *(gap closure — blocked on Wave 2 completion)*
+
+- [ ] 06-03-PLAN.md — Gap closure: CSS-default-closed mobile nav fixing CR-01's first-paint open-nav defect (CHROME-01), and grep-able anchor comments replacing the breakpoint doc block's stale line citations (FOUND-01)
 
 **UI hint**: yes
 
