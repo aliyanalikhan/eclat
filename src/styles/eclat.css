@@ -48,6 +48,7 @@
   --gut: 32px;
   --nav-h: 70px;
   --wordmark-fs: clamp(20px, 5.4vw, 26px);
+  --footer-pad-y: clamp(40px, 10vw, 56px);
 }
 
 /* --- reset -------------------------------------------------------------- */
@@ -512,6 +513,7 @@ a:hover {
 .hero {
   position: relative;
   height: 100vh;
+  height: 100svh;
   min-height: 780px;
   overflow: hidden;
 }
@@ -1746,7 +1748,7 @@ a:hover .cover--book {
 /* --- footer ------------------------------------------------------------- */
 .footer {
   border-top: 1px solid var(--line);
-  padding: 56px var(--gut);
+  padding: var(--footer-pad-y) var(--gut);
   background: var(--bg);
 }
 
@@ -1787,6 +1789,7 @@ a:hover .cover--book {
   align-items: center;
   justify-content: center;
   padding: 6vh 6vw;
+  padding: 6svh 6vw;
   border: 0;
   animation: fadeUp 0.3s ease-out both;
 }
@@ -1795,9 +1798,11 @@ a:hover .cover--book {
   position: relative;
   max-width: 100%;
   max-height: 88vh;
+  max-height: 88svh;
   width: min(1000px, 100%);
   height: auto;
   max-width: min(1000px, calc(88vh * (var(--lb-ratio, 1))));
+  max-width: min(1000px, calc(88svh * (var(--lb-ratio, 1))));
   background: var(--tint, var(--ink));
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
   overflow: hidden;
@@ -2031,6 +2036,7 @@ a:hover .cover--book {
     padding: 8px var(--gut) 22px;
     box-shadow: 0 18px 40px rgba(22, 19, 15, 0.12);
     max-height: calc(100vh - var(--nav-h));
+    max-height: calc(100svh - var(--nav-h));
     overflow-y: auto;
   }
 
