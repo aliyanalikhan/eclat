@@ -156,7 +156,7 @@ export default function Home() {
                       <>
                         <div className="cover__top">
                           <span className="cover__mark" style={{ fontSize: 16 }}>
-                            ÉCLAT
+                            ÉcLAT
                           </span>
                           <span className="cover__no">NO. {ed.no}</span>
                         </div>
@@ -175,7 +175,7 @@ export default function Home() {
                     ) : (
                       <>
                         <span className="cover__mark" style={{ fontSize: 15 }}>
-                          ÉCLAT
+                          ÉcLAT
                         </span>
                         {/* Veiled at rest — useScrollFx fades these in as the fan
                             opens, so a neighbouring card never cuts them mid-word. */}
@@ -244,7 +244,7 @@ export default function Home() {
                 {!newest.plateSuppressed && (
                   <div className="cover__plate">
                     <div className="cover__top">
-                      <span className="cover__mark">ÉCLAT</span>
+                      <span className="cover__mark">ÉcLAT</span>
                       <span className="cover__no">NO. {newest.no}</span>
                     </div>
                     <div>
@@ -402,12 +402,12 @@ export default function Home() {
           <div className="cta__scale" data-cta="1">
             <p className="cta__eyebrow">One subscription</p>
             <h2 id="cta-h">
-              Everything, always,
+              Our stories, our voice, our eclate
               <br />
-              <em style={{ fontStyle: 'italic' }}>including what&rsquo;s next</em>
+              <em style={{ fontStyle: 'italic' }}>Come belong</em>
             </h2>
             <p className="cta__lede">
-              Two issues, two children&rsquo;s books, every essay. New editions land quarterly.
+              Two issues, two children&rsquo;s books, every essay. New editions land bimonthly.
             </p>
             <Link to="/subscribe" className="btn btn--light btn--lg">
               Subscribe

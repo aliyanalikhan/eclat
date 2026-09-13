@@ -54,13 +54,13 @@ export const editions = [
     w: 1200,
     h: 1600,
     blurb:
-      'The maiden edition of ÉCLAT by LaDidiér, built around a conversation with Ebuka Osuorah on becoming the new architect of modern living — plus an editorial on essence over excess, a Minneapolis city guide, and LaDidiér Bridal’s elegance reimagined.',
+      'The maiden edition of ÉcLAT by LaDidiér, built around a conversation with Ebuka Osuorah on becoming the new architect of modern living — plus an editorial on essence over excess, a Minneapolis city guide, and LaDidiér Bridal’s elegance reimagined.',
     // FREE-ONLY (D-11) — everything but the last paragraph, matching the
     // exact free-preview boundary this page has always shown. The gated
     // third paragraph lives only in lib/gated-content.js, server-side.
     excerpt: [
-      'ÉCLAT is born from a simple belief: that style is not only what you wear, but how you move through the world. It lives in the confidence of a well-chosen outfit, the calm of a beautifully designed space, the glow of healthy skin, and the curiosity that leads you to new places.',
-      'Inside these pages, we bring together the worlds that shape modern living — fashion, beauty, lifestyle, and travel — curated with intention and a distinctly global perspective. We chose to celebrate Minnesota, our beautiful home state and the place where the stories of LaDidiér and ÉCLAT began.',
+      'ÉcLAT is born from a simple belief: that style is not only what you wear, but how you move through the world. It lives in the confidence of a well-chosen outfit, the calm of a beautifully designed space, the glow of healthy skin, and the curiosity that leads you to new places.',
+      'Inside these pages, we bring together the worlds that shape modern living — fashion, beauty, lifestyle, and travel — curated with intention and a distinctly global perspective. We chose to celebrate Minnesota, our beautiful home state and the place where the stories of LaDidiér and ÉcLAT began.',
     ],
     excerptBy: 'Ebuka Osuorah, Founder',
   },
@@ -324,6 +324,14 @@ export const videos = [
     title: 'Dr. Chikwe Ihekweazu — Pandemics, Power & Institutions',
     dek: 'The former NCDC Director General on leadership under pressure, managing global health crises, and strengthening institutions.',
     source: 'ONE2ONE',
+  },
+  {
+    slug: 'our-stories-our-voice-our-eclat',
+    youtubeId: 'U4jOI7N3qwo',
+    kicker: 'Our Stories · Éclat',
+    title: 'Our Stories, Our Voice, Our Éclat',
+    dek: 'Come belong — the Éclat story in its own voice.',
+    source: 'Éclat',
   },
 ]
 
