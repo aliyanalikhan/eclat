@@ -143,7 +143,7 @@ export default function Header() {
           </svg>
         </button>
 
-        <nav id={navId} className="nav" hidden={navHidden} aria-label="Primary">
+        <nav id={navId} className={`nav${open ? ' is-open' : ''}`} hidden={navHidden} aria-label="Primary">
           {LINKS.map((l) => (
             <NavLink key={l.to} to={l.to} className="link-underline">
               {l.label}

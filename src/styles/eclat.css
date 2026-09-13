@@ -2027,6 +2027,11 @@ a:hover .cover--book {
   }
 
   .nav {
+    /* CR-01 safe default-closed state: `hidden` is absent during SSR/pre-
+       hydration (Header.jsx's isMobile/open initial useState(false) values),
+       so this rule must default closed and only open via .is-open below —
+       see the breakpoint-tier doc block at eclat.css:7. */
+    display: none;
     position: fixed;
     inset: var(--nav-h) 0 auto 0;
     flex-direction: column;
@@ -2042,6 +2047,10 @@ a:hover .cover--book {
     max-height: calc(100vh - var(--nav-h));
     max-height: calc(100svh - var(--nav-h));
     overflow-y: auto;
+  }
+
+  .nav.is-open {
+    display: flex;
   }
 
   .nav[hidden] {
