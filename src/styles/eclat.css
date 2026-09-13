@@ -479,7 +479,7 @@ a:hover {
 
 .auth-menu__item {
   display: block;
-  padding: 8px 16px;
+  padding: 14px 16px;
   border: 0;
   border-radius: 2px;
   background: transparent;
@@ -2056,6 +2056,15 @@ a:hover .cover--book {
   .nav>.btn {
     margin-top: 18px;
     text-align: center;
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .nav .auth-trigger {
+    min-height: 44px;
+    padding-block: 10px;
   }
 
   .nav__toggle {
