@@ -162,7 +162,7 @@ Plans:
   4. The header's nav drawer opens and closes correctly at phone widths, respects safe-area insets on notched devices, every nav/menu/auth tap target meets a 44px minimum, and sign-in/sign-out works with no regression
   5. The footer renders legibly at phone-portrait widths with no overlapping or cut-off content
 
-**Plans**: 2/2 plans executed; 1 gap-closure plan pending (06-03, addresses 06-VERIFICATION.md's CR-01/WR-01 gaps)
+**Plans**: 3/3 plans executed; 1 gap-closure plan pending (06-03, addresses 06-VERIFICATION.md's CR-01/WR-01 gaps)
 Plans:
 **Wave 1**
 
@@ -174,7 +174,7 @@ Plans:
 
 **Wave 3** *(gap closure — blocked on Wave 2 completion)*
 
-- [ ] 06-03-PLAN.md — Gap closure: CSS-default-closed mobile nav fixing CR-01's first-paint open-nav defect (CHROME-01), and grep-able anchor comments replacing the breakpoint doc block's stale line citations (FOUND-01)
+- [x] 06-03-PLAN.md — Gap closure: CSS-default-closed mobile nav fixing CR-01's first-paint open-nav defect (CHROME-01), and grep-able anchor comments replacing the breakpoint doc block's stale line citations (FOUND-01)
 
 **UI hint**: yes
 
@@ -235,7 +235,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | 3/3 | Complete    | 2026-09-09 |
 | 4. Content Gating — Real Server-Side Entitlement Enforcement | 2/2 | Pending human verification | - |
 | 5. Account Management — Real Status, Cancellation & Billing Portal | 3/3 | Pending human verification | - |
-| 6. Foundation & Global Chrome — Breakpoint Tokens, Header, Nav & Footer | 2/2 | In Progress|  |
+| 6. Foundation & Global Chrome — Breakpoint Tokens, Header, Nav & Footer | 3/3 | In Progress|  |
 | 7. Content Pages — Home, Archive, Edition, Books & Writings | 0/TBD | Not started | - |
 | 8. Modal Overlays — Lightbox & Magazine Preview | 0/TBD | Not started | - |
 | 9. Subscribe & Account — Pricing, Sign-In & Billing Surfaces | 0/TBD | Not started | - |
