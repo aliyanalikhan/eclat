@@ -1251,6 +1251,7 @@ a:hover .cover--book {
   scrollbar-width: none;
   scroll-snap-type: x proximity;
   overscroll-behavior-x: contain;
+  touch-action: pan-x;
 }
 
 .strip::-webkit-scrollbar {

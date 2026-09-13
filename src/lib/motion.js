@@ -263,6 +263,7 @@ export function useDragScroll(ref) {
     let moved = 0
 
     const onDown = (e) => {
+      if (window.matchMedia('(pointer: coarse)').matches) return
       down = true
       moved = 0
       startX = e.clientX
