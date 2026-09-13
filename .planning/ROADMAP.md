@@ -162,11 +162,11 @@ Plans:
   4. The header's nav drawer opens and closes correctly at phone widths, respects safe-area insets on notched devices, every nav/menu/auth tap target meets a 44px minimum, and sign-in/sign-out works with no regression
   5. The footer renders legibly at phone-portrait widths with no overlapping or cut-off content
 
-**Plans**: 0/2 plans executed
+**Plans**: 1/2 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 06-01-PLAN.md — Breakpoint-tier documentation, fluid wordmark/footer tokens, 3 svh viewport-height fixes, touch-scroll pointer-coarse gate (FOUND-01..04)
+- [x] 06-01-PLAN.md — Breakpoint-tier documentation, fluid wordmark/footer tokens, 3 svh viewport-height fixes, touch-scroll pointer-coarse gate (FOUND-01..04)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
@@ -231,7 +231,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5 → 6 → 7 → 8 →
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | 3/3 | Complete    | 2026-09-09 |
 | 4. Content Gating — Real Server-Side Entitlement Enforcement | 2/2 | Pending human verification | - |
 | 5. Account Management — Real Status, Cancellation & Billing Portal | 3/3 | Pending human verification | - |
-| 6. Foundation & Global Chrome — Breakpoint Tokens, Header, Nav & Footer | 0/2 | Planned    |  |
+| 6. Foundation & Global Chrome — Breakpoint Tokens, Header, Nav & Footer | 1/2 | In Progress|  |
 | 7. Content Pages — Home, Archive, Edition, Books & Writings | 0/TBD | Not started | - |
 | 8. Modal Overlays — Lightbox & Magazine Preview | 0/TBD | Not started | - |
 | 9. Subscribe & Account — Pricing, Sign-In & Billing Surfaces | 0/TBD | Not started | - |
