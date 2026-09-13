@@ -2,117 +2,86 @@
 phase: 06-foundation-global-chrome-breakpoint-tokens-header-nav-footer
 reviewed: 2026-09-13T00:00:00Z
 depth: standard
-files_reviewed: 4
+files_reviewed: 3
 files_reviewed_list:
   - src/styles/eclat.css
   - src/lib/motion.js
   - src/components/Header.jsx
-  - index.html
 findings:
-  critical: 1
-  warning: 3
-  info: 1
-  total: 5
+  critical: 0
+  warning: 2
+  info: 2
+  total: 4
 status: issues_found
 ---
 
-# Phase 6: Code Review Report
+# Phase 06: Code Review Report (re-review after gap-closure wave 06-03)
 
-**Reviewed:** 2026-09-13T00:00:00Z
+**Reviewed:** 2026-09-13
 **Depth:** standard
-**Files Reviewed:** 4
+**Files Reviewed:** 3
 **Status:** issues_found
 
 ## Summary
 
-Reviewed the breakpoint-tier documentation, fluid `clamp()` tokens, `svh` viewport-height fallbacks, touch-vs-mouse drag-scroll gating, `viewport-fit=cover` + safe-area nav padding, and 44px tap-target work in `eclat.css`, `motion.js`, `Header.jsx`, and `index.html`.
+This is a re-review of the current state of `src/styles/eclat.css`, `src/lib/motion.js`, and `src/components/Header.jsx` after plan 06-03 closed two findings from the prior review: CR-01 (mobile nav rendered open before hydration) and WR-01 (stale line-number citations in the breakpoint doc block). This report supersedes `06-REVIEW.md` (prior version).
 
-The `svh`/`vh` fallback pairs, the `viewport-fit=cover` meta tag, safe-area-inset padding on the mobile nav, and the fluid `clamp()` tokens (`--wordmark-fs`, `--footer-pad-y`) are all implemented correctly and consistently. However, the mobile nav has a real first-paint defect (nav renders open on every prerendered/hydrating mobile page load), the new breakpoint-tier documentation block is already out of sync with the line numbers it cites, and the drag-scroll/hero-fan breakpoint detection has stale-state edge cases.
+**CR-01 verification: fix confirmed correct.** The mobile nav (`eclat.css:2033-2062`) now defaults to `display: none` inside `@media (max-width: 900px)`, independent of any JS/React state, and `.nav.is-open { display: flex }` (eclat.css:2056) is the only rule that opens it. Traced the full state machine in `Header.jsx`:
+- SSR/pre-hydration render always has `isMobile=false, open=false` → no `hidden` attribute, no `is-open` class is present in the markup regardless of actual viewport width. Previously this meant the nav fell through to its old default-visible CSS; now the CSS default (`display:none` under the media query) hides it on mobile with zero dependency on JS having run. This closes the original gap correctly.
+- Post-hydration, `hidden={navHidden}` (`navHidden = isMobile && !open`) and the `is-open` class are driven by mutually exclusive conditions (`open` is true → `is-open` present and `hidden` absent; `open` is false → `is-open` absent and, on mobile, `hidden` present). Confirmed via grep that `is-open` appears in exactly one place in each file, with no orphaned `.nav--open`/`.open` variants left over from before the fix — no other selector still assumes the old default-visible state.
+- The `.nav.is-open` / `.nav[hidden]` pair have equal specificity (two class-equivalent selectors each), with `.nav[hidden]` last in source order. Since the two conditions are never simultaneously true in the current code, this ordering is inert today; and in the one case it isn't (`is-open` and `hidden` both true), the fail-safe direction is closed-wins, which is the *correct* direction relative to the CR-01 regression it fixed (fail hidden, not fail open). No fix needed here — noted for completeness, not raised as a finding.
 
-## Critical Issues
-
-### CR-01: Mobile nav renders open (unhidden) on first paint / before hydration
-
-**File:** `src/components/Header.jsx:24,112`
-**Issue:** `isMobile` is initialized to `false` (`useState(false)`) and is only set correctly inside a `useEffect` that runs after mount (line 38-47). `navHidden` is computed as `isMobile && !open` (line 112). Because the effect never runs during SSR/prerendering and hasn't run yet at the moment of initial client hydration, the prerendered/first-painted HTML always has `navHidden === false`, so the `hidden` attribute is never applied to `<nav>` (line 146) on the initial markup.
-
-At mobile viewport widths, `.nav` (eclat.css:2029-2045) becomes `position: fixed; inset: var(--nav-h) 0 auto 0; ...` — a full-width dropdown menu — as soon as the CSS (loaded synchronously via `<link>` in `index.html`) is applied, which happens before the deferred `type="module"` script has executed. The net effect: every mobile visitor sees the full nav flyout (all links + the auth slot + the Subscribe button) rendered open over the top of the page on first paint, until JS loads, hydrates, and the `useEffect` finally sets `isMobile` true (which then adds `hidden` since `open` is still `false`). On slow connections/low-end devices this flash is clearly visible and looks like a broken layout on every single page load — directly undermining this phase's mobile-nav work.
-
-**Fix:** Default-hide the mobile nav via CSS rather than relying on a client-computed `hidden` attribute as the fail-safe state, e.g. gate visibility with a JS-added "open" class instead of a JS-removed default-visible state:
-```css
-/* eclat.css, inside @media (max-width: 900px) */
-.nav { display: none; /* ...existing fixed/column layout... */ }
-.nav.is-open { display: flex; }
-```
-```jsx
-// Header.jsx
-<nav id={navId} className={`nav${open ? ' is-open' : ''}`} aria-label="Primary">
-```
-This makes "closed" the safe default at every stage (SSR, pre-hydration paint, and post-hydration), eliminating the flash, and matches the existing desktop behavior where `.nav` is always `display: flex` regardless of JS.
+**WR-01 verification: fix is incomplete.** See WR-01-recurrence finding below — a raw line-number citation of the same kind WR-01 was meant to eliminate exists in three places, one of which (`eclat.css:2037`) was written as part of the very fix that closed CR-01/WR-01.
 
 ## Warnings
 
-### WR-01: Breakpoint-tier doc-block line references are already stale
+### WR-01-recurrence: New/leftover stale line-number citations reintroduce the exact defect WR-01 closed
 
-**File:** `src/styles/eclat.css:12-17`
-**Issue:** The new breakpoint-tier documentation block explicitly states these literals are "kept in sync by convention, not enforcement" and cites specific line numbers to help future maintainers find each call site. Those citations are already wrong:
-- `--bp-tablet` cites `eclat.css:1996`; the actual `@media (max-width: 1080px)` is at line **2014** (off by 18).
-- `--bp-nav` cites `eclat.css:2006`; the actual `@media (max-width: 900px)` is at line **2024** (off by 18).
-- `--bp-mobile` cites `eclat.css:2094`; the actual `@media (max-width: 720px)` is at line **2125** (off by 31).
-- `--bp-phone` cites `eclat.css:2178`; the actual `@media (max-width: 460px)` is at line **2209** (off by 31).
-- The cross-references to `Header.jsx:38` and `motion.js:76` also point at the *comment line* in each file, not the actual `matchMedia`/`window.innerWidth` call (lines 39 and 77 respectively).
+**File:** `src/components/Header.jsx:37`, `src/lib/motion.js:76`, `src/styles/eclat.css:2037`
+**Issue:** WR-01 replaced the breakpoint doc block's per-tier line-number references with grep-able anchor comments (`[anchor: bp:tablet]`, `[anchor: bp:nav]`, etc. — confirmed present and correct at `eclat.css:16-21` and at all four call sites). However, three comments still cite the doc block's own location by raw line number, `eclat.css:7`:
+- `Header.jsx:37`: `// --bp-nav: 900px — matches eclat.css's breakpoint-tier doc block above :root (eclat.css:7); ...`
+- `motion.js:76`: `// --bp-mobile: 720px — matches eclat.css's breakpoint-tier doc block above :root (eclat.css:7); ...`
+- `eclat.css:2037`: `... see the breakpoint-tier doc block at eclat.css:7. */` — this comment was newly authored as part of the CR-01 fix itself, meaning the gap-closure wave introduced a fresh instance of the exact citation style it was simultaneously supposed to be eliminating elsewhere in the same file.
 
-A documentation block whose entire purpose is preventing breakpoint drift, but which is inaccurate on arrival, will actively mislead the next person who trusts it to find a call site, and undermines confidence that the four *values* (1080/900/720/460) are actually still in sync everywhere.
-
-**Fix:** Correct the line numbers now, and consider replacing hard line numbers with a `grep`-able anchor comment (e.g. `// bp:tablet`) at each call site instead of numeric line references that will drift again on the next edit:
+None of these three will break today (line 7 is right after the 6-line file header and unlikely to move), but the whole point of the WR-01 fix was that "these are repeated literals kept in sync by convention, not enforcement" (eclat.css:10) — any future edit that adds a line to the file-header comment block silently desyncs all three citations, and nothing greps for them the way `bp:tablet|bp:nav|bp:mobile|bp:phone` does.
+**Fix:** Add a self-referential anchor to the doc block's opening line (e.g. `/* --- breakpoint tiers [anchor: bp:doc] ---`) and change all three citations to reference it instead of a line number:
+```diff
+- // --bp-nav: 900px — matches eclat.css's breakpoint-tier doc block above :root (eclat.css:7); keep this literal in sync with that block.
++ // --bp-nav: 900px — matches eclat.css's breakpoint-tier doc block above :root [anchor: bp:doc]; keep this literal in sync with that block.
 ```
---bp-tablet : 1080px — @media (max-width: 1080px), eclat.css:2014
---bp-nav    :  900px — @media (max-width: 900px), eclat.css:2024; Header.jsx matchMedia call, Header.jsx:39
---bp-mobile :  720px — @media (max-width: 720px), eclat.css:2125; motion.js window.innerWidth < 720, motion.js:77
---bp-phone  :  460px — @media (max-width: 460px), eclat.css:2209
-```
+and likewise for `motion.js:76` and `eclat.css:2037`.
 
-### WR-02: `useScrollFx`'s mobile flag is computed once and never re-evaluated on resize
+### WR-02: Truncating/initialing a display name by UTF-16 code unit can corrupt names with astral-plane characters
 
-**File:** `src/lib/motion.js:77,113,184,202-205`
-**Issue:** `const mobile = window.innerWidth < 720` (line 77) is computed a single time when the effect mounts and is then closed over for the lifetime of the effect. `onResize` (lines 202-205) calls `measure()` again but never recomputes `mobile`. If the viewport is resized across the 720px `--bp-mobile` breakpoint without a route change (e.g. rotating a tablet/foldable, resizing a desktop browser window, entering/exiting a split-screen view), the hero fan-effect logic keeps using the stale decision: a session that started above 720px keeps running the desktop fan math (`tick`'s `if (cards.length && !mobile)` branch, line 113) even after the layout has switched to the mobile CSS (where `.fan-card` elements other than `.fan-card--lead` are `display:none` per eclat.css:2153-2162), and the reverse case silently skips the fan math even though the layout is now wide enough for it. This directly parallels the `--bp-mobile: 720px` literal this same diff added a sync-comment for, but the JS side doesn't actually stay in sync across resizes the way `Header.jsx`'s `isMobile` (driven by a live `matchMedia` change listener) does.
-
-**Fix:** Recompute `mobile` inside `onResize` (and read it via a `let` rather than a `const`), mirroring the pattern already used correctly in `Header.jsx`:
+**File:** `src/components/Header.jsx:16-19`, `186`
+**Issue:** `truncateName` does `trimmed.slice(0, 18)` and the avatar-fallback initial does `displayName.charAt(0)`. Both operate on UTF-16 code units. A Google account display name containing a character outside the Basic Multilingual Plane (many emoji, some CJK extension characters, some scripts) is represented as a surrogate pair; slicing/charAt at an arbitrary boundary can split the pair, producing a rendered replacement glyph (mojibake) in the nav and in the avatar-fallback badge instead of a truncated-but-valid string. This is real user-facing text corruption for a plausible (if not majority) subset of real Google account names, not a crash.
+**Fix:** Use `Array.from(trimmed)` (which is surrogate-pair aware) before slicing:
 ```js
-let mobile = window.innerWidth < 720
-const onResize = () => {
-  mobile = window.innerWidth < 720
-  measure()
-  if (reduced) tick(true)
+function truncateName(name) {
+  const trimmed = (name || '').trim()
+  if (!trimmed) return 'Account'
+  const chars = Array.from(trimmed)
+  return chars.length > 18 ? `${chars.slice(0, 18).join('')}…` : trimmed
 }
 ```
-
-### WR-03: Touch/mouse drag-scroll gating uses a static device query instead of the per-event pointer type
-
-**File:** `src/lib/motion.js:266`
-**Issue:** `onDown` gates the custom drag-scroll behavior with `window.matchMedia('(pointer: coarse)').matches`, which reflects the *device's primary pointer* at the time of the event, not the pointer that actually triggered it. On hybrid-input devices (touchscreen laptops/Chromebooks/Surface-style devices with a mouse attached), this can misfire in both directions:
-- If the primary pointer is reported as coarse (touch), a real mouse-drag on the strip is silently disabled (the function returns before `down = true` is ever set), even though the user is dragging with a precise pointer.
-- If the primary pointer is fine (mouse), a touch drag on the same element is *not* gated out, so the custom `pointermove` handler (line 273-278, `strip.scrollLeft = startLeft - dx`, no `preventDefault`) runs concurrently with the browser's native touch scrolling driven by `touch-action: pan-x` (eclat.css:1254), which can produce jittery/fighting scroll behavior for touch users on that class of device.
-
-**Fix:** Gate per-event using `PointerEvent.pointerType`, which reflects the actual input that fired the event rather than a device-wide media query:
-```js
-const onDown = (e) => {
-  if (e.pointerType !== 'mouse') return
-  down = true
-  ...
-}
-```
+and for the initial: `Array.from(displayName)[0]` instead of `displayName.charAt(0)`.
 
 ## Info
 
-### IN-01: `truncateName` slices by UTF-16 code unit, not by grapheme
+### IN-01: No focus trap while the mobile nav overlay is open
 
-**File:** `src/components/Header.jsx:15-19`
-**Issue:** `trimmed.slice(0, 18)` truncates by UTF-16 code unit. A display name containing a surrogate-pair character (e.g. an emoji or certain non-BMP characters) that straddles index 18 will be cut mid-character, rendering a broken/replacement glyph immediately before the appended ellipsis. Google account display names can contain emoji.
-**Fix:** Use `Array.from(trimmed).slice(0, 18).join('')` (iterates by code point) if this needs to be robust against non-BMP characters, or leave as-is if this is an accepted low-probability edge case.
+**File:** `src/components/Header.jsx:38-65`, `src/styles/eclat.css:2033-2054`
+**Issue:** The mobile `<nav>` panel is a `position: fixed` overlay, but Tab/Shift+Tab is not constrained to it while `open` is true — focus can move past the last nav link into whatever page content sits underneath the fixed panel (visually hidden behind it but still in tab order). Escape-to-close plus refocusing the toggle is handled (Header.jsx:56-65), but there is no keydown-based wraparound or `inert`/tabindex management for the rest of the document while the panel is open.
+**Fix:** Either add a minimal focus trap (cycle Tab between the toggle and the last nav item) or set `inert` (or `aria-hidden` + `tabindex="-1"` on siblings) on the rest of `<main>`/page content while `open` is true.
+
+### IN-02: `useScrollFx`'s `tick` closure is a single ~90-line function with high branching complexity
+
+**File:** `src/lib/motion.js:110-199`
+**Issue:** The inner `tick(finalOnly)` function mixes hero-fan geometry, side-title fade, parallax, and CTA-scale logic in one closure with multiple early returns and nested loops. It is well-commented for the *math*, but the function's size and branching make it hard to reason about in isolation or to unit test any one effect (fan geometry vs. parallax vs. CTA) independently.
+**Fix:** Not urgent — this is pre-existing, ported-from-prototype logic unrelated to the CR-01/WR-01 fixes under review. If touched again, consider splitting into `applyFan(...)`, `applyParallax(...)`, `applyCta(...)` helper functions called from `tick`.
 
 ---
 
-_Reviewed: 2026-09-13T00:00:00Z_
+_Reviewed: 2026-09-13_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
