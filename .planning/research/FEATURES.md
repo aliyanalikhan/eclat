@@ -1,174 +1,165 @@
 # Feature Research
 
-**Domain:** Subscriber accounts + Stripe billing for a digital magazine/publishing site
-**Researched:** 2026-09-08
-**Confidence:** MEDIUM-HIGH (Stripe/Google official-doc-backed findings HIGH; general paywall pattern findings MEDIUM — cross-checked across multiple independent sources)
+**Domain:** Mobile-responsive behavior for an existing editorial/magazine SPA (Éclat) — horizontal scroll strips, image lightbox, page-flip preview modal, pricing picker, account panels, global nav
+**Researched:** 2026-09-13
+**Confidence:** HIGH (general mobile-UX patterns — corroborated by Smashing Magazine, WCAG 2.5.8, Apple HIG, Material Design, and multiple independent UX-practice sources) / MEDIUM where recommendations depend on Éclat's specific existing implementation (verified directly against `src/` source, not third-party claims)
+
+This file assumes no new features are being built — everything below is scoped to *how the six existing feature types should behave correctly at ~375–430px*, per `.planning/PROJECT.md`'s v1.1 milestone. Each item also notes what the current codebase already does right vs. what's missing, verified by reading `src/lib/motion.js`, `src/components/Lightbox.jsx`, `src/components/MagazinePreview.jsx`, `src/components/Header.jsx`, `src/routes/Subscribe.jsx`, `src/routes/Account.jsx`, and `src/styles/eclat.css`.
 
 ## Feature Landscape
 
 ### Table Stakes (Users Expect These)
 
-Features users assume exist. Missing these = product feels incomplete or broken.
+Features users assume exist. Missing these = the site feels broken on a phone, not just "unpolished."
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Google sign-in (one click, no forms) | It's the only auth method for this project; users expect a standard Google button that "just works" and doesn't ask for a password | LOW | Use Google Identity Services (GIS) `credential` POST flow. Server verifies JWT signature, `aud`, `exp`, `iss`; use `sub` (not email) as the permanent user identifier — Google explicitly warns email can be reused/changed while `sub` never is. |
-| Persistent signed-in session | Users don't expect to re-authenticate with Google on every page load | LOW-MEDIUM | Server-issued session (cookie, httpOnly, secure) after ID-token verification — do NOT re-trust the Google credential on every request; verify once at sign-in, then trust your own session token thereafter. |
-| Clear "why am I seeing this paywall" messaging | Users get frustrated by ambiguous locked content — expect a specific CTA ("Subscribe to ÉCLAT Online to read this issue") | LOW | Content-type-aware CTA copy per the 4 products, not a generic "subscribe" wall. |
-| Stripe Checkout for purchase | Users expect a fast, trusted, familiar checkout (Apple Pay/Google Pay, saved cards) rather than a custom payment form | LOW | Stripe-hosted Checkout is the standard, fastest-to-launch integration and reduces PCI/security scope versus building a custom payment form. |
-| View current subscription status on Account page | Users expect to see what they're paying for and when it renews, without contacting support | LOW-MEDIUM | Minimum: plan name, status (active/canceled/past_due), renewal or end date. Can be Stripe-Customer-Portal-driven or a custom read of cached Stripe data. |
-| Self-serve cancellation | Users expect to cancel without emailing support; forced "contact us to cancel" flows are a well-known dark pattern and consumer complaint magnet | LOW-MEDIUM | Either link out to Stripe Customer Portal, or implement `cancel_at_period_end` via API from the Account page. |
-| Immediate re-lock on cancellation taking effect | If a user's subscription lapses (or they cancel and the period ends), they expect content to actually lock again — a paywall that "forgets" to re-lock destroys trust in the whole product | MEDIUM-HIGH | Requires server-side entitlement check on every gated request, driven by webhook-synced status, not client cache. This is the project's stated Core Value. |
-| Payment failure handling / dunning | Users expect a grace period and a clear "your payment failed, update your card" notice, not silent cancellation | MEDIUM | Stripe Smart Retries + `invoice.payment_failed` webhook; minimum is surfacing a "past_due" banner and portal link. |
-| Correct product/price shown pre-checkout | Since 4 discrete products exist (magazine/book × online/hard copy), users must clearly pick the right one and see its real price | LOW | Reconcile the current `/subscribe` page's placeholder $9/mo, $84/yr copy with the actual Stripe price objects on the 4 products. |
-| Consistent access across all gated surfaces | A subscriber to "Magazine Online" expects every magazine page/route to unlock, not just the one they clicked from | MEDIUM | Single entitlement-check function/middleware reused across `Edition.jsx`, `Archive.jsx`, `Books.jsx`, `Account.jsx`, replacing the scattered `subscribed` flag reads. |
-| Sign-out | Basic expectation once there's a real session | LOW | Clear server session/cookie. |
+| Native touch-swipe on horizontal strips (hero fan omitted — see below) | Every mobile user expects a horizontally-scrolling row of cards to pan with a finger drag, no special gesture library needed | LOW | **Already 90% there.** `.strip` (`src/styles/eclat.css:1229`) already has `overflow-x:auto`, `scroll-snap-type: x proximity`, `overscroll-behavior-x: contain`, and a hidden scrollbar — this is native, so touch panning already works without any JS. `useDragScroll` (`src/lib/motion.js:254`) only attaches `pointerdown/move/up` listeners for *mouse*-drag; touch devices scroll natively regardless, so this hook is desktop-only sugar, not a mobile blocker. Remaining work is tuning peek width and snap strictness (below), not building swipe from scratch. |
+| Visible "there's more" affordance (partial next-card peek) | A carousel/strip that exactly fills the viewport reads as "the whole gallery," and users never discover there's more — this is the single most common horizontal-scroll UX failure | LOW | At the existing `max-width: 720px` breakpoint, `.strip__item { max-width: 86vw }` already leaves a ~14vw peek of the next card — correct pattern, just needs re-verifying at 375px specifically (86vw of 375px ≈ 322px, leaving ~53px peek, which is enough to read as "more content" per Smashing Magazine's carousel guidance). No architecture change needed, just confirm this holds down to 375px and isn't only checked at tablet widths. |
+| One card-stop per swipe (no fling-past) | Users expect one deliberate swipe to land on one card, not skid past 2–3 | LOW | `scroll-snap-type: x proximity` is a "soft" snap (browser may not snap at all on a fast fling). `scroll-snap-stop: always` on `.strip__item` would guarantee a hard stop per item — cheap CSS-only addition, no JS. |
+| Pricing tiles stack to a single column | Comparing 4 tiles side-by-side is impossible below ~600px; industry data shows ~78% of pricing pages stack cards on mobile vs. ~8% using a carousel | LOW | **Already implemented.** `.plans` collapses via `grid-template-columns: minmax(0, 1fr)` at the existing 720px breakpoint (`eclat.css:2166`) — this already matches the recommended pattern for ≤4 tiles (stack, not carousel). Remaining work at 375–430px is tap-target sizing on the Monthly/Annual `chip` toggle buttons inside each tile and confirming price-skeleton/CTA button don't get cramped, not restructuring the layout. |
+| Account panels stack to one column | Same reasoning as pricing — a `key/value` grid of Status/Plan/Renews/Card is unreadable side-by-side on a phone | LOW | **Already implemented.** `.panel` uses `grid-template-columns: repeat(auto-fit, minmax(180px, 1fr))` (`eclat.css:1642`), which auto-collapses to 1 column once the container is under ~2×180px+gap — true well below 430px. Verify padding (`24px` at 720px bp) doesn't crowd `panel__val` at 22px serif font on a 375px screen; no grid rework needed. |
+| Global nav collapses to a toggleable off-canvas panel | Users expect either a hamburger/drawer or a simple stack below ~900px; a full horizontal nav bar simply doesn't fit 4 links + auth slot + Subscribe CTA at 375px | LOW–MEDIUM | **Already implemented as a top-down dropdown drawer**, not a hamburger-triggered side drawer: `Header.jsx` toggles `.nav[hidden]` via a hamburger/X icon button at a 900px `matchMedia` breakpoint, and `.nav` becomes a `position: fixed` full-width panel below the header (`eclat.css:2004-2039`). This is a valid, common pattern (top drawer vs. side drawer) — no pattern change needed. Two phone-specific things to verify: (1) `position: fixed; inset: var(--nav-h) 0 auto 0` needs `env(safe-area-inset-*)` accounted for on notched/Dynamic-Island phones so the drawer doesn't sit under a status bar or get clipped at the bottom; (2) touch target height of `.nav>a` (`padding: 16px 2px`) and the auth avatar/menu trigger meet the ~44px minimum. |
+| Touch target sizing ≥ 44×44 (iOS)/48×48dp (Android), and WCAG 2.5.8 minimum 24×24 | Sub-40px tap targets have measurably higher mis-tap/rage-tap rates; this applies to the lightbox close button, magazine-preview Prev/Next buttons, interval chips, and nav toggle | LOW | `.lightbox__close` is already `44px × 44px` (`eclat.css:1812`) — correct. Audit `magazine-preview__nav` Prev/Next buttons (currently `btn--sm`) and `.chip` (interval toggle) sizes specifically at 375px; these are the two spots most likely to render under 44px in the current desktop-tuned CSS. |
+| Touch-appropriate microcopy in modals (no keyboard-only instructions) | A hint that says "Press Esc" or "Use ← → to browse" is actively confusing on a device with no keyboard | LOW | **Gap found, not yet handled.** `Lightbox.jsx:100` renders `"Press Esc or click anywhere to close"` unconditionally, and `MagazinePreview.jsx:123` renders `"Use ← → to browse · Esc to close"` unconditionally — neither has a touch-aware variant. Fix is a simple conditional string (e.g. via a `(hover: hover) and (pointer: fine)` media query or a `matchMedia('(pointer: coarse)')` check) swapping to "Tap anywhere to close" / "Swipe or tap to browse · Tap outside to close". Cheap, but easy to miss because it's copy, not layout. |
+| No unintended horizontal page scroll anywhere | The #1 "this site is broken on my phone" signal is a body/page that scrolls sideways because one element (a strip, a wide table, a fixed-width image) overflows the viewport | LOW–MEDIUM | Needs a systematic sweep (devtools responsive mode at 375px, then real-device check) across Archive/Edition/Books/Writings grids, not just the six named interactive features — anything with a fixed `min-width`, a wide inline `style={{ width: ... }}`, or an un-clamped `font-size`/`letter-spacing` combination is a candidate. `.grid-covers` and `.books-grid` already have 720px-breakpoint rules; re-verify at 375px specifically since most existing breakpoints target 720/900px, not phone-portrait exactly. |
 
-### Differentiators (Competitive Advantage)
+### Differentiators (Nice Polish, Not Required)
 
-Features that set the product apart. Not required, but valuable — and should map to this project's Core Value (real, server-enforced access).
+Features that meaningfully improve the mobile experience but whose absence wouldn't make the site feel broken.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| Bundle awareness across the 4 products | A subscriber to both magazine + children's book products gets a unified "your subscriptions" view instead of 4 disconnected line items | LOW-MEDIUM | Cheap to add given the entitlement table already tracks per-product status; mostly a UI grouping decision on the Account page. |
-| Format-aware gating (Online vs Hard Copy) | Hard Copy subscribers may reasonably expect Online digital access bundled in (common publisher pattern — print subscribers get web access too) | LOW (decision) / MEDIUM (implementation) | This is a product/business decision more than a technical one — flag it back to the user/roadmap rather than assuming. If chosen, it's just an entitlement-mapping rule (Hard Copy product ⇒ also grants Online entitlement), not new infrastructure. |
-| Graceful degraded preview of gated content | Instead of a blank wall, show a partial preview (first few pages of an edition, cover + excerpt of a children's book) — increases conversion without giving away paid value | MEDIUM | Requires content model to support a "preview" slice, distinct from full content. Not in current data model (`content.js`) — would need a scoping decision. |
-| "Content unlocked instantly after payment" confirmation UX | Immediate visual confirmation and redirect back into the content the user was trying to read, right after Stripe Checkout completes | LOW-MEDIUM | Requires Checkout `success_url` to route back to the originating content, plus a short-poll or optimistic-then-verify UI state while the webhook catches up (webhook delivery is not synchronous with checkout redirect). |
-| Real invoice history | Genuine invoice list from Stripe )replacing today's mocked invoices/plan) reduces support burden and increases trust vs. a fake table | LOW | Straightforward if using Stripe Customer Portal (invoices included for free) or the Invoices API. |
+| Swipe-left/right to turn pages in the magazine preview modal | Matches the mental model of "flipping" a magazine and removes reliance on small Prev/Next buttons | MEDIUM | **Currently absent.** `MagazinePreview.jsx` only wires `ArrowLeft`/`ArrowRight` keydown handlers and on-screen Previous/Next buttons — there is no touch/pointer swipe handler at all. Adding one is a bounded scope: a `touchstart/touchend` (or `pointerdown/up`) delta-X threshold on `.magazine-preview__frame` that calls the same `setIndex` logic already used by the buttons. Table-stakes tap-to-advance already exists via the visible buttons, so this is additive polish, not a blocker — the existing buttons already satisfy "usable on phone-width touch screens" from PROJECT.md. |
+| Tap left-half/right-half of the image as invisible turn zones (in addition to visible buttons) | Common e-reader/comic-app pattern — larger, thumb-friendly hit areas than small buttons | MEDIUM | Adds a discoverability risk (invisible zones can be tapped by accident, e.g. when a user is just trying to look closer at the page) unless paired with a first-use hint. Given the visible Prev/Next buttons already meet the table-stakes bar, treat this as optional — only worth it if user testing shows people missing the small buttons. |
+| Pinch-to-zoom or double-tap-to-zoom inside Lightbox / magazine preview | Lets a reader inspect fine detail (text, illustration) beyond what `object-fit: contain` shows at phone width | MEDIUM–HIGH | Neither `Lightbox.jsx` nor `MagazinePreview.jsx` implements pinch/double-tap zoom today — both are `object-fit: contain` static frames. Real pinch-zoom (not just relying on the OS/browser's native double-tap-to-zoom, which can be blocked by `user-scalable=no`/`maximum-scale` in the viewport meta — verify `index.html` isn't disabling this) requires either careful custom gesture code (competing with the modal's own swipe/close gestures — a common source of the "gesture conflict" bugs called out in mobile-lightbox implementations) or a small dependency. Given editorial cover/spread images aren't dense reference documents, this is genuinely optional polish, not required for "usable." If pursued, the simplest safe version is: don't block the browser's native pinch-zoom (avoid `user-scalable=no`) rather than building custom pinch logic. |
+| Swipe-down-to-dismiss on Lightbox/magazine-preview (in addition to tap-outside/close button) | Matches iOS Photos-app / Instagram-style dismiss gesture users increasingly expect | LOW–MEDIUM | Tap-anywhere-to-close already exists (`onClick={closeLightbox}` on the backdrop) and satisfies the table-stakes bar. A vertical-drag-to-dismiss is a nice-to-have that must be careful not to conflict with pinch-zoom or horizontal swipe-to-turn if those are added later (sequencing note in Feature Dependencies below). |
+| Bottom tab bar instead of top drawer for primary nav | Research shows bottom nav has better one-handed thumb reach and generally the highest satisfaction/task-completion scores on mobile, when there are ≤5 primary destinations | HIGH (relative to this milestone) | Éclat has 4 nav links + Subscribe CTA + auth — within bottom-nav's typical 3–5 item sweet spot, so this *would* be a valid pattern. But PROJECT.md scope is "fix the existing site's mobile responsiveness," not "redesign navigation," and a working top-drawer toggle already exists. Replacing it is a much larger UI change (new persistent chrome, footer/bottom-bar collision, safe-area handling for home-indicator devices) than fixing the current drawer's edge cases. Treat as an explicit anti-scope call for this milestone (see Anti-Features) rather than a differentiator to pursue now. |
+| Sticky/condensed pricing-tile summary bar while scrolling `/subscribe` on mobile | Common SaaS pattern (e.g., a floating "select a plan" bar) to keep the CTA reachable while comparing 4 stacked tiles | LOW–MEDIUM | Genuinely optional since with only 4 stacked tiles the page isn't very long; only worth adding if UAT shows people losing track of which tile they were comparing. |
 
-### Anti-Features (Commonly Requested, Often Problematic — Explicitly Excluded Here)
+### Anti-Features (Common Mistakes to Avoid)
+
+Patterns that look like reasonable mobile fixes but create more problems than they solve, or that are simply out of scope for this milestone.
 
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|------------------|-------------|
-| Email/password sign-in (as a fallback to Google) | "What if a user doesn't have Google?" | Reintroduces password storage, reset-flow, credential-stuffing, and breach-liability surface the project explicitly chose to avoid | Google-only, as decided in PROJECT.md. If ever needed later, treat as a new milestone with its own threat model. |
-| Multi-tenant / white-label subscription platform | Architecting "in case we sell this to other publishers" | Massive scope/complexity increase (tenant isolation, per-tenant billing config, per-tenant branding) for a single-brand product — explicitly out of scope | Single-brand schema: one set of 4 fixed products, one brand, many user accounts. |
-| Custom-built payment form (raw Stripe Elements card form) instead of Checkout | Perceived design control | More PCI scope, more edge cases (3DS, wallets, localized payment methods) to hand-build for zero functional benefit at this stage | Stripe Checkout (hosted), which is the standard fast-launch path and already handles this. |
-| New/flexible pricing tiers or custom pricing rules | "Wouldn't dynamic tiers be nice" | Explicitly out of scope — 4 real products/prices already exist in the live Stripe account; changing pricing model was never requested | Reuse the 4 existing products/prices as-is. |
-| Client-trusted access flags (localStorage/cookie booleans set by the client) | Fast to build, worked for the demo | This is precisely the flaw the milestone exists to fix — the current `subscribed` localStorage flag is trivially spoofable in devtools | Server-side entitlement check on every request that serves gated content, sourced from webhook-synced Stripe state. |
-| Building a fully custom subscription-management UI (upgrade/downgrade/pause/multi-item editing) from scratch | "More polished/branded than Stripe's portal" | High build+maintenance cost for functionality Stripe's hosted Customer Portal already provides for free, configurable from the Dashboard with no code | Default to Stripe Customer Portal for plan changes/cancellation/payment updates; only build custom views (read-only status) where branding truly matters. |
-| Real-time WebSocket "your subscription just activated" push | Feels modern | Unnecessary complexity — webhook-to-DB sync plus a short client poll/redirect after Checkout success covers the real UX need | Poll/refetch entitlement on the success redirect page, or optimistic UI + background verification. |
-| Metered/soft paywall with free-article counting | Common in general news publishing (NYT-style) | Not what this product is — it's a fixed-catalog magazine/book subscription with 4 discrete paid products, not a continuous article stream; introducing article-count metering adds a whole new tracking subsystem for a pattern that doesn't match the business model | Keep the existing table-stakes structure: some content public (as today), rest gated behind the relevant product's entitlement — a hybrid free/hard-gated split, not per-article metering. |
+| Converting `.strip` drag-scroll rows into a JS carousel library (react-slick, Swiper, etc.) | "We need swipe support" is easy to over-solve by reaching for a full carousel dependency | The strips already get native touch-swipe for free from `overflow-x: auto` + `scroll-snap`; a JS carousel library adds bundle weight, a new dependency to keep patched, and its own set of accessibility/focus-order bugs, to replace something that already works. This directly matches the CLAUDE.md constraint to build on the existing stack, not introduce new frameworks/libraries where plain CSS already does the job. | Keep the existing CSS scroll-snap approach; only add `scroll-snap-stop: always` and confirm peek-width/tap-targets, as noted above. |
+| Rebuilding the magazine preview as a "real" page-flip/curl animation (3D page-turn effect) library | Feels more premium/on-brand ("magazine" implies physical page-turning) | Page-curl/3D-flip libraries are heavy, frequently janky on mid-range Android GPUs, and commonly fight with the browser's own scroll/zoom gestures on touch — exactly the "gesture conflict" pitfall called out in page-flip UX research. It also isn't what PROJECT.md scoped: the requirement is that the *existing* preview modal "work correctly on phone-width touch screens," not that its visual metaphor be upgraded. | Keep the current image-swap-with-Prev/Next-and-counter implementation; optionally add swipe-to-advance (a differentiator, above) using the same simple index-based state, not a physics/curl engine. |
+| Replacing the top-drawer nav with a hamburger-triggered *side* drawer or a bottom tab bar | "That's the more modern pattern" | Both are legitimate patterns in isolation, but swapping an already-working, already-toggle-driven nav for a structurally different one is a redesign, not a responsive-bug fix — it risks introducing new focus-trap/animation/z-index bugs in exactly the kind of security-adjacent, accessibility-sensitive chrome (`Header.jsx` also hosts the auth menu) that this milestone should be de-risking, not expanding. Out of scope per PROJECT.md ("this milestone does not add new content or business features" and targets fixing, not redesigning). | Keep the top-drawer + hamburger-icon-toggle pattern; fix its phone-specific edges only (safe-area insets, tap target sizes, scroll-lock when open). |
+| Disabling native pinch-zoom site-wide via `user-scalable=no` / `maximum-scale=1` to "prevent accidental zoom" | A common but outdated defensive move to keep layouts pixel-perfect | This is a well-documented accessibility anti-pattern — it removes a core mobile-accessibility affordance (low-vision users rely on native pinch-zoom) for the entire site to solve a narrow problem in two modals. It's explicitly the kind of "seems good, isn't" mobile mistake worth flagging given this milestone touches viewport-sensitive components. | Scope any zoom-prevention (if genuinely needed inside the Lightbox/magazine-preview backdrop only, to stop the *page* from scrolling under a modal) to `document.body.style.overflow = 'hidden'` while the modal is open — which `Lightbox.jsx` and `MagazinePreview.jsx` already do — not a global viewport-meta change. |
+| Building a distinct "mobile version" of the pricing/account data model or a separate mobile-only route | Tempting shortcut when a layout feels hard to make responsive | Éclat is one prerendered SPA with one content/data layer (per CLAUDE.md architecture); a parallel mobile route or data shape would violate "content and code are the same deployable artifact" and double the surface area to keep correct (and to secure, given `/account` and `/subscribe` touch real entitlement data). | Fix layout via CSS breakpoints and (where unavoidable) conditional rendering within the *same* components — exactly the pattern the existing 720px/900px media queries already use. |
+| Adding a new animation/gesture library (Framer Motion, Hammer.js, etc.) purely to implement mobile swipe gestures | Feels like the "proper" way to handle touch gestures | The project has zero animation dependencies today — `src/lib/motion.js` is hand-rolled (`runFlip`, `useScrollFx`, `useDragScroll`) specifically to avoid one, and CLAUDE.md's stack constraint is to build on the existing Vite+React app, not introduce new frameworks. Any swipe-to-turn addition (a differentiator, not table stakes) should follow the same hand-rolled `pointerdown/pointermove/pointerup` delta-threshold pattern already used by `useDragScroll`, not a new dependency. | Extend `src/lib/motion.js` with a small `useSwipe(ref, { onLeft, onRight })`-style hook mirroring `useDragScroll`'s existing structure, if swipe-to-turn is pursued. |
 
 ## Feature Dependencies
 
 ```
-Google Sign-In (ID token verify + session)
-    └──requires──> Server-side session issuance
-                       └──requires──> A database/store for users + sessions
+[Fix strip/carousel touch behavior] (table stakes: scroll-snap-stop, peek-width audit)
+    └──independent of──> [everything else — pure CSS, no shared state]
 
-Stripe Checkout (subscribe flow)
-    └──requires──> Signed-in user (need a Stripe customer <-> user mapping)
-    └──requires──> Server-side session issuance   [same dependency as above]
+[Fix Lightbox touch microcopy + tap targets] (table stakes)
+    └──shares a component with──> [Fix MagazinePreview touch microcopy + tap targets]
+                                       (both extend the same `.lightbox` CSS class and
+                                        dialog/focus-trap pattern — fix the shared
+                                        `.lightbox__hint` conditional-copy approach once,
+                                        apply to both, rather than solving it twice)
 
-Webhook-driven entitlement sync
-    └──requires──> A database table for subscriptions/entitlements
-    └──requires──> Stripe Checkout having created customer/subscription records to react to
+[Add swipe-to-turn in MagazinePreview] (differentiator)
+    └──requires──> [Fix MagazinePreview touch microcopy + tap targets] (table stakes)
+                       (swipe should be additive to, not replace, the working
+                        button/keyboard navigation — sequence the table-stakes
+                        pass first so there's a known-good fallback)
 
-Real content gating (replacing `subscribed` flag)
-    └──requires──> Webhook-driven entitlement sync
-    └──requires──> Server-side session issuance (need to know WHO is asking)
+[Add pinch-to-zoom in Lightbox/MagazinePreview] (differentiator)
+    ──conflicts with──> [Add swipe-down-to-dismiss] (differentiator)
+                       (both are touch gestures on the same element; if both are
+                        pursued, dismiss-swipe must only trigger when not
+                        mid-pinch/mid-zoom — this is the well-documented
+                        "gesture conflict" failure mode in mobile lightboxes)
 
-Subscription management UI (Account page)
-    └──requires──> Webhook-driven entitlement sync   [reads the same synced state]
-    └──enhances──> Real content gating (user can see WHY they're locked/unlocked)
+[Fix pricing-tile stacking + tap targets] (table stakes — layout already exists)
+    └──independent of──> [Fix account-panel stacking + tap targets] (table stakes — layout already exists)
+                       (both already collapse via existing CSS grid rules;
+                        neither blocks the other)
 
-Immediate access revocation on cancel
-    └──requires──> Webhook-driven entitlement sync
-    └──requires──> Real content gating doing a live (not cached-at-login) check per request
-
-Format-aware gating (Hard Copy -> also grants Online) [differentiator]
-    └──enhances──> Real content gating
-    └──conflicts with──> nothing technical, but is a business-rule decision that must be made before entitlement-mapping code is written
+[Fix nav drawer safe-area/tap-targets] (table stakes)
+    └──touches the same file/component as──> [Auth menu dropdown inside Header.jsx]
+                       (do not regress the existing sign-in/sign-out menu's
+                        focus-trap and outside-click-close behavior — Header.jsx
+                        is auth-adjacent, not purely cosmetic chrome)
 ```
 
 ### Dependency Notes
 
-- **Everything gated requires a server-side session first.** Google sign-in producing a verified session is the single foundational dependency — checkout, entitlement checks, and account management all sit downstream of "we know who this request is from." This should be phase 1.
-- **Webhook-driven entitlement sync is the load-bearing dependency for the Core Value.** Both "real content gating" and "immediate revocation" depend on it, not on the Checkout success redirect alone — Stripe webhook delivery is asynchronous relative to the Checkout redirect, so gating logic must never assume "just paid" == "entitlement row exists yet."
-- **Subscription management UI enhances but does not block gating.** The product can technically gate content correctly with zero account-page polish; the Account page is a UX layer over the same synced state. Sequence gating correctness before UI polish if time-constrained.
-- **Format-aware gating (Hard Copy → Online access) is a decision, not a research finding.** Flag this to the user during requirements/roadmap — it changes the entitlement-mapping rule from "1 product = 1 entitlement" to "1 product = N entitlements," which is cheap to implement either way but must be decided before the entitlement schema is finalized.
+- **Strip/carousel fixes are the lowest-risk, most independent item** — pure CSS (`scroll-snap-stop`, confirming peek-width at 375px), no JS logic changes, no shared component with anything else in scope. Good candidate to sequence first or in parallel with everything else.
+- **Lightbox and MagazinePreview share a pattern, not a component** — they both reuse the `.lightbox` CSS class and a hand-rolled dialog/focus-trap/scroll-lock structure (see the shared `role="dialog"` + `document.body.style.overflow` pattern in both files), but are two separate React components. Fixing the "desktop-only microcopy" gap and tap-target sizing in one is a template for the other — do them together so the fix pattern (e.g., a shared `usePointerHint()` helper) isn't duplicated ad hoc.
+- **Swipe-to-turn (differentiator) depends on the table-stakes MagazinePreview pass being done first**, because it's additive to the existing Prev/Next/keyboard navigation, not a replacement — if the table-stakes copy/tap-target fixes land first, the swipe addition has a known-good, already-verified fallback to fall back to if swipe detection has edge cases (e.g., a tap that jitters slightly and gets misread as a swipe).
+- **Pinch-zoom and swipe-down-dismiss conflict if both are pursued** — this is a real, commonly-reported failure mode (see Sources), not a theoretical one. If the milestone stays scoped to table stakes only (as PROJECT.md suggests — "work correctly on phone-width touch screens" doesn't require these two differentiators), this conflict never has to be resolved. Flag clearly to the roadmap: don't schedule both in the same phase without an explicit gesture-priority decision.
+- **Nav drawer fixes must not regress the auth menu.** `Header.jsx` isn't purely cosmetic — it renders the same sign-in/sign-out/session-menu logic built in Phase 2 of the OAuth milestone. Any phone-width CSS/safe-area fix to `.nav`/`.nav__toggle` should be tested against the signed-in state (avatar, name-truncation, auth dropdown) at 375px, not just the signed-out nav links.
 
 ## MVP Definition
 
-### Launch With (v1)
+### Launch With (v1 — this milestone's Active requirements, per PROJECT.md)
 
-Minimum viable product for this milestone — matches the "Active" requirements in PROJECT.md.
+All six items below are table-stakes only — no differentiators are required to satisfy PROJECT.md's "fully usable and visually correct at phone-portrait widths" bar.
 
-- [ ] Google sign-in with server-side ID-token verification and server session — foundational, nothing else works without it
-- [ ] Stripe Checkout for all 4 existing products, each mapped to its real Stripe product/price ID — the core revenue mechanism
-- [ ] Webhook handler (signature-verified) syncing `customer.subscription.created/updated/deleted` and `invoice.payment_failed` into a database entitlement table — the mechanism that makes gating real instead of fake
-- [ ] Server-side entitlement check replacing the `subscribed` localStorage flag across `Edition.jsx`, `Archive.jsx`, `Books.jsx`, `Account.jsx` — directly satisfies the Core Value
-- [ ] Account page showing real subscription status (active/canceled/past_due) and a cancel action — table stakes, currently mocked
-- [ ] Immediate re-lock on cancellation/period end — table stakes, this is literally the stated success metric
+- [ ] Strip/carousel touch scrolling confirmed correct at 375–430px: `scroll-snap-stop: always`, peek-width verified (not just at 720px), scrollbar hidden — *why essential: horizontal strips appear on Home, Archive, and elsewhere; broken swipe here is highly visible*
+- [ ] Lightbox and MagazinePreview: touch-appropriate microcopy (no "Press Esc"/"←→" hints on touch), tap targets audited to ≥44px (Prev/Next buttons, close button already correct) — *why essential: these are the two full-screen modals most likely to feel "broken" if their only instructions assume a keyboard*
+- [ ] No unintended horizontal page-scroll anywhere in scope, verified at 375px specifically (not just at existing 720/900px breakpoints) — *why essential: this is the single clearest "this site is broken on mobile" signal to a real user*
+- [ ] Pricing picker (`/subscribe`) and Account panels: confirm existing stacking/auto-fit CSS holds at 375–430px, fix any cramped padding/font-size/tap-target issues on the interval chips and CTA buttons — *why essential: these are the two paid-conversion and entitlement-management surfaces — a cramped or mis-tappable Subscribe/Manage button directly undermines the product's Core Value*
+- [ ] Global nav drawer: safe-area-inset handling on notched devices, tap-target sizing on nav links and the auth avatar/menu trigger, confirmed no regression to the sign-in/sign-out flow — *why essential: nav is present on every page; a broken drawer or auth menu at phone width blocks navigation and account access entirely*
 
 ### Add After Validation (v1.x)
 
-- [ ] Stripe Customer Portal integration (instead of/alongside a hand-rolled cancel button) — add once basic cancel-from-Account works, to reduce future support load with zero extra build cost
-- [ ] Real invoice history on Account page — trivial add once Customer Portal or Invoices API is wired up
-- [ ] Bundle/unified view across the 4 products on the Account page — add once multiple test subscriptions exist to validate against
-- [ ] Past-due / payment-failed banner with clear "update payment method" CTA — add once basic webhook sync is proven stable
+- [ ] Swipe-left/right to turn pages in MagazinePreview — *trigger: UAT or real usage shows people relying on/missing the small Prev/Next buttons instead of intuitively trying to swipe*
+- [ ] Swipe-down-to-dismiss on Lightbox/MagazinePreview — *trigger: same signal as above; low cost to add once the table-stakes pass is stable*
+- [ ] Sticky plan-comparison summary bar on `/subscribe` — *trigger: only if the page's stacked-tile length becomes a UAT complaint, which is unlikely at just 4 tiles*
 
 ### Future Consideration (v2+)
 
-- [ ] Format-aware gating rule (Hard Copy grants Online access too) — defer until the business explicitly decides this; don't bake it into the schema prematurely
-- [ ] Preview/excerpt gating (partial content shown pre-subscription) — defer until conversion data suggests the current "just show a locked wall" approach is under-converting; requires a content-model change
-- [ ] Plan upgrade/downgrade self-serve (e.g., switching Online to Hard Copy) — defer; not in current requirements and adds proration complexity
+- [ ] Pinch-to-zoom / double-tap-to-zoom inside Lightbox or MagazinePreview — *defer: real gesture-conflict risk with any dismiss/turn gesture added in v1.x; editorial images aren't dense-detail content that clearly needs deep zoom; not requested in PROJECT.md scope*
+- [ ] Bottom tab-bar navigation — *defer: legitimate pattern in the abstract, but a structural nav redesign, not a responsive-bug fix; explicitly out of this milestone's "fix, don't rebuild" framing*
 
 ## Feature Prioritization Matrix
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Google sign-in + server session | HIGH | MEDIUM | P1 |
-| Stripe Checkout for 4 products | HIGH | LOW-MEDIUM | P1 |
-| Webhook-driven entitlement sync | HIGH | MEDIUM-HIGH | P1 |
-| Server-side content gating (replace localStorage flag) | HIGH | MEDIUM | P1 |
-| Account page: real status + cancel | HIGH | LOW-MEDIUM | P1 |
-| Immediate revocation on cancel | HIGH | MEDIUM (depends on P1 items above) | P1 |
-| Stripe Customer Portal integration | MEDIUM | LOW | P2 |
-| Real invoice history | MEDIUM | LOW | P2 |
-| Payment-failed banner/dunning UX | MEDIUM | LOW-MEDIUM | P2 |
-| Bundle/unified subscriptions view | LOW-MEDIUM | LOW | P2 |
-| Format-aware gating (Hard Copy→Online) | MEDIUM (if business wants it) | LOW | P3 (decision-gated) |
-| Preview/excerpt gating | MEDIUM | MEDIUM-HIGH | P3 |
-| Plan upgrade/downgrade self-serve | LOW (not requested) | MEDIUM-HIGH | P3 |
+| Strip/carousel snap + peek tuning | MEDIUM | LOW | P1 |
+| Lightbox/MagazinePreview touch microcopy + tap targets | HIGH | LOW | P1 |
+| Eliminate unintended horizontal page-scroll (site-wide sweep) | HIGH | LOW–MEDIUM | P1 |
+| Pricing picker phone-width tap-target/spacing pass | HIGH | LOW | P1 |
+| Account panel phone-width spacing pass | MEDIUM | LOW | P1 |
+| Nav drawer safe-area + tap-target + auth-menu regression check | HIGH | LOW–MEDIUM | P1 |
+| Swipe-to-turn in MagazinePreview | MEDIUM | MEDIUM | P2 |
+| Swipe-down-to-dismiss on modals | LOW–MEDIUM | LOW–MEDIUM | P2 |
+| Pinch/double-tap zoom in modals | LOW | MEDIUM–HIGH | P3 |
+| Bottom tab-bar nav redesign | LOW (relative to milestone scope) | HIGH | P3 (explicitly deferred) |
 
 **Priority key:**
-- P1: Must have for launch (matches PROJECT.md Active requirements)
-- P2: Should have, add when possible
-- P3: Nice to have, future consideration / decision-gated
+- P1: Must have for this milestone (matches PROJECT.md's five Active requirements)
+- P2: Should have, add once P1 is UAT-verified
+- P3: Nice to have, explicitly future/out-of-scope for v1.1
 
-## Competitor Feature Analysis
+## Competitor / Reference Pattern Analysis
 
-| Feature | NYT / large metered publishers | Financial Times / hard-paywall publishers | Our Approach |
-|---------|-------------------------------|--------------------------------------------|--------------|
-| Gating model | Metered (N free articles/month, then gate) | Hard (all premium content gated immediately) | Neither exactly — fixed-catalog hybrid: some content stays public as today, the rest (full editions, book spreads, paywalled writings) is hard-gated per the relevant one of 4 products. Not article-count metering; that's an anti-feature here given the catalog (not stream) content model. |
-| Sign-in method | Email/password + social + sometimes magic link | Email/password + social | Google-only, deliberately narrower — matches the single-brand, security-minimal-surface goal |
-| Subscription management | Custom-built account centers (large eng investment, many tiers) | Custom-built, often phone/chat support-heavy for cancellation | Stripe Customer Portal-backed — right-sized for a single small team managing 4 products, not a large publisher's bespoke billing team |
-| Access enforcement | Server-side, article-level entitlement checks at request time | Server-side, section-level | Server-side, per-content-type entitlement check tied to the relevant Stripe product — matches best practice found in research (never trust cached/client state) |
+| Feature | Reference pattern A | Reference pattern B | Éclat's approach |
+|---------|---------------------|----------------------|-------------------|
+| Horizontal content strips | Native CSS scroll-snap with peek (used by most modern editorial/e-commerce sites — cheap, accessible, no JS dependency) | JS carousel library (Swiper, Slick) with custom pagination dots | Already on pattern A (`.strip` + `useDragScroll` for desktop mouse only) — keep it, tune snap-stop and peek |
+| Multi-plan pricing on mobile | Stack (≈78% of sites, per CXL/industry data) — best for ≤4 plans | Carousel/tabs — used when >4-5 plans need comparing | Already stacks via `.plans` grid collapse at ≤720px — matches the majority pattern correctly for exactly 4 tiles |
+| Full-screen preview/lightbox dismissal | Tap-outside + explicit close button (most common, most discoverable) | Swipe-down-to-dismiss (Instagram/iOS Photos-style, increasingly expected but not universal) | Already has tap-outside + close button (table stakes met); swipe-down not yet built (differentiator) |
+| Mobile primary nav | Off-canvas/top drawer behind a hamburger toggle (very common, works for any nav-item count) | Persistent bottom tab bar (best thumb reach, but capped at ~5 items and is a bigger structural commitment) | Already uses pattern A (top drawer + hamburger/X toggle) — correct choice given nav has 4 links + CTA + auth slot; no reason to switch to pattern B for this milestone |
 
 ## Sources
 
-- [Build a subscriptions integration | Stripe Documentation](https://docs.stripe.com/billing/subscriptions/build-subscriptions)
-- [Provide a customer portal to your customers | Stripe Documentation](https://docs.stripe.com/customer-management)
-- [Integrate the customer portal with the API | Stripe Documentation](https://docs.stripe.com/customer-management/integrate-customer-portal)
-- [How subscriptions work | Stripe Documentation](https://docs.stripe.com/billing/subscriptions/overview)
-- [Using webhooks with subscriptions | Stripe Documentation](https://docs.stripe.com/billing/subscriptions/webhooks)
-- [Cancel a subscription | Stripe API Reference](https://docs.stripe.com/api/subscriptions/cancel)
-- [docs.stripe.com/billing/entitlements](https://docs.stripe.com/billing/entitlements)
-- [Verify the Google ID token on your server side | Google for Developers](https://developers.google.com/identity/gsi/web/guides/verify-google-id-token)
-- [Authenticate with a backend server | Google for Developers](https://developers.google.com/identity/sign-in/web/backend-auth)
-- [Sign in with Google One Tap prompt for Web | Google Codelabs](https://codelabs.developers.google.com/codelabs/google-one-tap)
-- [Learn How to Add Subscriptions and Protected Content With Stripe | Netlify](https://www.netlify.com/blog/2020/07/13/manage-subscriptions-and-protect-content-with-stripe/)
-- [How to Set Up a Stripe Paywall for Your Content in 2026 | PayRequest](https://payrequest.io/blog/stripe-paywall-content-monetization-2026)
-- [Soft Paywall vs Hard Paywall: 2% vs 10% Explained | Leaky Paywall](https://leakypaywall.com/soft-paywall-vs-hard-paywall/)
-- [The different types of paywalls (and how publishers use them) | Blockthrough](https://blockthrough.com/blog/the-different-types-of-paywalls-and-how-publishers-use-them/)
-- [2025 Paywall Index: A Data-Driven Study Across Industries](https://www.websiteplanet.com/blog/2025-paywall-index-a-data-driven-study-across-industries/)
-- [How to Create a Paywall Website: A Guide for Publishers & Creators | Memberful](https://memberful.com/blog/paywall)
-- [Stripe Webhooks: Complete Guide with Event Examples | MagicBell](https://www.magicbell.com/blog/stripe-webhooks-guide)
-- [Stripe subscription webhooks that survive the edge cases | Amplified Creations](https://amplifiedcreations.com/journal/stripe-subscription-webhooks)
-- [Stripe Subscription Access Checklist: customer.subscription.deleted and Entitlements](https://ofeliacode.github.io/ai-saas-safety/guides/stripe-subscription-access-entitlements-checklist.html)
-- Project context: `.planning/PROJECT.md` (requirements, Stripe product IDs, constraints)
+- [Building a modern carousel with CSS scroll snap, smooth scrolling, and pinch-zoom — Read the Tea Leaves](https://nolanlawson.com/2019/02/10/building-a-modern-carousel-with-css-scroll-snap-smooth-scrolling-and-pinch-zoom/) — `scroll-snap-stop`, `overscroll-behavior-x`, peek-width affordance guidance (MEDIUM confidence, independent practitioner writeup, technically verifiable against MDN spec)
+- [CSS Scroll Snap: Properties, Recipes and Traps](https://theplusaddons.com/blog/css-scroll-snap/) — snap-type/snap-align/snap-stop behavior reference (MEDIUM confidence)
+- [How to Design Mobile SaaS Pricing Pages that Don't Suck — CXL](https://cxl.com/blog/mobile-saas-pricing-pages/) — stacking vs. carousel vs. tabs usage data for pricing tables on mobile (MEDIUM confidence, cites usage-pattern statistics)
+- [Best Practices: Planning & Designing Pricing Tables — Think About Mobile Users](https://webdesign.tutsplus.com/best-practices-planning-designing-pricing-tables--CRS-200797c/think-about-mobile-users) — corroborating stack-for-≤4-plans guidance (MEDIUM confidence)
+- [Lightbox mobile gesture discussions — Webflow/Squarespace/WordPress community forums](https://discourse.webflow.com/t/lightbox-pinch-zoom-pan-on-mobile/77218) — real-world reports of pinch-zoom/swipe gesture-conflict bugs in production lightboxes (MEDIUM confidence, practitioner reports not a formal spec, but consistent across multiple independent platforms)
+- [Designing for Touch — UXmatters](https://www.uxmatters.com/mt/archives/2020/02/designing-for-touch.php) — tap-zone sizing and touch-target design guidance for paginated/touch content (MEDIUM confidence)
+- [Mobile Navigation Patterns: Pros and Cons — UXPin](https://www.uxpin.com/studio/blog/mobile-navigation-patterns-pros-and-cons/) and [The Future of Mobile Navigation: Hamburger Menus vs. Tab Bars — Acclaim](https://acclaim.agency/blog/the-future-of-mobile-navigation-hamburger-menus-vs-tab-bars) — hamburger/drawer vs. bottom-tab-bar tradeoffs, item-count guidance (MEDIUM confidence)
+- [Accessible Target Sizes Cheatsheet — Smashing Magazine](https://www.smashingmagazine.com/2023/04/accessible-tap-target-sizes-rage-taps-clicks/) — 44×44/48×48dp/WCAG 2.5.8 24×24 minimum touch-target guidance, mis-tap error-rate research (HIGH confidence — Smashing Magazine is an established, technically-edited source, and the underlying WCAG 2.5.8 criterion is a normative W3C standard)
+- Direct source reads (HIGH confidence — primary source, this codebase): `src/lib/motion.js`, `src/components/Lightbox.jsx`, `src/components/MagazinePreview.jsx`, `src/components/Header.jsx`, `src/routes/Subscribe.jsx`, `src/routes/Account.jsx`, `src/styles/eclat.css` (breakpoints at 460/720/900/1080px)
 
 ---
-*Feature research for: subscriber accounts + Stripe billing on a magazine/publishing site (Éclat)*
-*Researched: 2026-09-08*
+*Feature research for: Mobile-responsive design fixes — Éclat v1.1 milestone*
+*Researched: 2026-09-13*

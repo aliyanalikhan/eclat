@@ -1,177 +1,161 @@
 # Project Research Summary
 
-**Project:** Éclat — subscriber accounts + Stripe billing for a digital magazine/publishing site
-**Domain:** Adding real Google-only auth, server-side sessions, and Stripe subscription billing to an existing prerendered Vite + React SPA on Vercel (currently zero-backend)
-**Researched:** 2026-09-08
-**Confidence:** MEDIUM
+**Project:** Eclat - Mobile-Responsive Retrofit (v1.1 milestone)
+**Domain:** Mobile-responsive layout/touch/UX fixes for an existing prerendered Vite + React SPA (magazine/subscription product with server-verified entitlements from a prior auth/billing milestone)
+**Researched:** 2026-09-13
+**Confidence:** HIGH
 
 ## Executive Summary
 
-This is a bolt-on backend slice for an existing static/prerendered marketing site, not a framework rewrite: Vercel serverless Functions under `/api` handle everything server-only (Google ID verification, Stripe Checkout/webhooks, entitlement checks), while the existing `prerender.js` + Vite/React Router SPA continues serving public marketing pages unchanged. Experts building this pattern separate two concerns rigorously — a long-lived session cookie that proves who the user is, and a live, webhook-synced database read on every gated request that proves what they're currently allowed to see. The entire project hinges on never conflating these: the current `subscribed` localStorage flag is the anti-pattern this milestone must eliminate root and branch, and it is easy to accidentally re-create the same flaw in a fancier form (a signed cookie/JWT with `subscribed: true` baked in) if session and entitlement aren't kept structurally separate from day one.
+Eclat's v1.1 milestone is not a technology-adoption project - it is a targeted retrofit of an existing, working desktop-first site to be correct at phone-portrait widths (roughly 375-430px). The codebase already has most of the right primitives in place (native CSS scroll-snap strips, Pointer Events-based drag-scroll, a working top-drawer nav, CSS grid auto-collapse on pricing/account panels), so the recommended approach is disciplined extension of the existing plain-CSS/hand-rolled-JS conventions - zero new npm dependencies - rather than introducing a CSS framework, gesture library, or preprocessor. The correct fixes are native browser features (clamp, svh/dvh, touch-action, matchMedia pointer:coarse) layered onto src/styles/eclat.css and src/lib/motion.js.
 
-The recommended approach is Vercel Functions (Node 22.x) + Neon Postgres (via `drizzle-orm`/`@neondatabase/serverless` HTTP driver, avoiding serverless connection-pool exhaustion) + `iron-session` for stateless identity cookies + the official `stripe` Node SDK for Checkout and signature-verified webhooks. For both Google sign-in and Stripe checkout/billing management, use server-initiated redirect flows (see Reconciliation below) rather than embedding client-side Google/Stripe SDKs — this keeps the site's existing strict CSP essentially untouched, which matters because the codebase's current CSP is a deliberate, already-flagged-as-fragile security control. Stripe webhooks are the single source of truth for subscription state; Checkout success-page redirects and client-supplied `session_id` values are never trusted on their own.
+The single biggest structural risk is breakpoint/state drift: three independent "what is mobile" literals already exist today (720px in useScrollFx, 900px in Header.jsx matchMedia, and CSS's own 1080/900/720/460 tiers), and per-page fixes done without first consolidating these will make the drift worse, not better. The second major risk cluster is desktop-only assumptions baked into interactive/modal code that were never exercised on a real touchscreen: iOS Safari overflow hidden does not actually lock background scroll, Pointer Events already fire for touch but race against native overflow-x auto scrolling, 100vh does not account for mobile toolbar collapse, and modal focus-traps are keyboard-only (invisible to VoiceOver/TalkBack swipe navigation). A third cluster is specific to this product's paid/entitlement surfaces: Stripe Checkout/portal redirects can leave stale pre-purchase state visible after mobile back-gesture navigation (bfcache), and the combined loading gate on /account has no fetch timeout, so a flaky mobile connection can strand a user on an infinite spinner.
 
-The key risks are all trust-boundary risks, not technical-integration risks: (1) re-implementing the fake paywall as a server-issued but still stale cookie claim instead of a live per-request DB check, (2) trusting the Checkout success redirect over the asynchronous webhook (a genuine race condition, not a hypothetical), (3) broken or skipped webhook signature verification due to body-parsing middleware touching the raw bytes first, (4) missing webhook idempotency causing duplicate/out-of-order state corruption, (5) secrets leaking into the client bundle via a mistaken `VITE_` prefix, and (6) gated content still being baked into the build-time prerendered HTML/JS bundle. All six are well-documented, avoidable, and should be designed against from the first line of code in their respective phases, not retrofitted.
+Recommended mitigation: land a shared foundation pass first (breakpoint-tier documentation plus fluid tokens in CSS, plus the touch-vs-native-scroll decision in motion.js) before any per-page visual work, then fix global chrome (header/nav), then content pages, then the two modals (which share a lightbox base class and duplicate scroll-lock/focus-trap code that should be extracted into one shared hook), then Subscribe/Account (which carries the Stripe-redirect and fetch-timeout risks). All verification must happen on a real device or real touch-emulation (Chrome DevTools touch flag, not just a resized viewport) - several of the critical pitfalls (bfcache, iOS scroll-lock, dvh toolbar collapse, VoiceOver) simply do not reproduce in ordinary desktop DevTools device emulation.
 
 ## Key Findings
 
 ### Recommended Stack
 
-Vercel Functions (Node.js 22.x runtime) host all new server logic under root-level `/api`, deployed by the existing `vercel.json`/Vercel project with zero new infra. Google Identity Services + `google-auth-library` (server-side `verifyIdToken()`) handles sign-in, using the token's `sub` claim — never email — as the permanent user identifier. Stripe's official Node SDK creates Checkout Sessions and verifies webhook signatures via `constructEvent()`. Neon (serverless Postgres) is the database, accessed through `drizzle-orm`'s `neon-http` adapter and `@neondatabase/serverless`'s HTTP driver — this avoids the classic serverless failure mode of a pooled TCP Postgres client exhausting connections under concurrent short-lived invocations. `iron-session` provides a stateless, encrypted-cookie session (identity only, no entitlement baked in) with no server-side session store needed.
+Zero new npm packages. Every capability needed (fluid typography/spacing via clamp, correct full-height sections via svh/dvh with a vh fallback, unified touch/mouse handling via the already-in-use Pointer Events API, gesture ownership via touch-action) is a native browser feature already within the project's browserslist target. The project's own zero-dependency CDP script (verify-hero.mjs) should be generalized to sweep phone widths (375/390/414/430px) rather than introducing Playwright/Cypress.
 
 **Core technologies:**
-- Vercel Functions (Node 22.x) — serverless backend for auth callbacks, Stripe checkout/webhooks, entitlement API — zero new infra, bolts onto the existing static build
-- Google Identity Services + `google-auth-library` — Google-only sign-in with server-verified identity — server independently verifies the JWT rather than trusting the client
-- `stripe` (Node SDK) — Checkout Sessions + signature-verified webhooks, server-only — official SDK, required so no money-moving logic or secrets ever reach the client
-- Neon Postgres + `drizzle-orm`/`@neondatabase/serverless` — users, sessions, subscription/entitlement state — HTTP-based driver matches Vercel's cold-start-per-invocation model; scale-to-zero fits this project's size
-- `iron-session` — stateless, encrypted-cookie session carrying identity only — no session-store table needed; every gated request still re-checks live entitlement from Neon
+- CSS Custom Properties (root tokens) - central design tokens - extend the existing token block in eclat.css rather than adding a theming library
+- clamp() fluid typography/spacing - replaces "one more breakpoint" with a single continuous CSS value, zero tooling
+- svh viewport units (with vh fallback) - fixes hero/modal/nav height jumping as mobile browser chrome shows/hides; svh preferred over dvh for overflow-sensitive sections due to iOS lag
+- Pointer Events API (already in use in useDragScroll) - no new touch library needed; the real gap is a pointerType touch guard, not missing capability
+- touch-action: pan-x - tells the browser to cede horizontal drag gesture ownership to JS on the drag-scroll strip
+
+**Explicitly rejected:** Tailwind/Bootstrap, CSS-in-JS, device-detection/UA-sniffing libraries, gesture libraries (Hammer.js, react-swipeable, use-gesture), Playwright/Cypress/Puppeteer, Sass/Less/PostCSS - all would add dependencies or build-tooling changes for capabilities the platform already provides or the codebase already implements.
 
 ### Expected Features
 
-Table-stakes features center on making the existing mocked flows (fake `subscribed` flag, mocked invoices/plan on Account) genuinely real: one-click Google sign-in with a persistent session, Stripe-hosted Checkout for all 4 existing products at correct real prices, visible real subscription status with self-serve cancellation, and — critically — immediate re-lock of gated content the moment a subscription lapses or is cancelled, driven by webhook-synced state rather than a cache. Differentiators (Stripe Customer Portal integration, real invoice history, bundle-awareness across the 4 products) are valuable but not launch-blocking. Anti-features explicitly excluded: email/password fallback auth, a custom-built payment form, flexible/new pricing tiers, and any client-trusted access flag — the last being precisely what this milestone must remove.
+Research treats this as "make six existing feature types correct at phone width," not new feature work.
 
-**Must have (table stakes):**
-- Google sign-in with server-verified session
-- Stripe Checkout for all 4 products, correctly priced
-- Webhook-driven entitlement sync replacing `subscribed` across `Edition.jsx`/`Archive.jsx`/`Books.jsx`/`Account.jsx` — this is the Core Value
-- Account page with real status + self-serve cancellation
-- Immediate re-lock on cancellation — this is the stated success metric
+**Must have (table stakes) - all P1, matching PROJECT.md's Active requirements:**
+- Horizontal strip touch-scroll correctness (scroll-snap-stop always, peek-width verified at 375px - layout already about 90 percent correct)
+- Lightbox/MagazinePreview: touch-appropriate microcopy (no "Press Esc" or arrow-key hints on touch) and 44px minimum tap targets
+- No unintended horizontal page-scroll anywhere, verified specifically at 375px
+- Pricing picker (/subscribe) and Account panels: confirm existing CSS-grid stacking holds at 375-430px; fix cramped padding/tap targets on interval chips and CTAs
+- Global nav drawer: safe-area-inset handling on notched devices, tap-target sizing, no regression to sign-in/sign-out flow
 
-**Should have (competitive):**
-- Stripe Customer Portal integration in place of a hand-rolled cancel button
-- Real invoice history (trivial once Portal/Invoices API is wired)
-- Payment-failed/dunning banner with clear CTA
+**Should have (differentiators, v1.x - add after UAT signal, not required for launch):**
+- Swipe-left/right to turn pages in MagazinePreview (additive to existing Prev/Next buttons)
+- Swipe-down-to-dismiss on modals
 
 **Defer (v2+):**
-- Format-aware gating (Hard Copy → also grants Online) — this is a business decision, not a technical one; flag to the user before finalizing the entitlement schema
-- Preview/excerpt gating (partial content shown pre-subscription)
-- Plan upgrade/downgrade self-serve
+- Pinch/double-tap zoom in Lightbox/MagazinePreview (gesture-conflict risk with dismiss/turn gestures)
+- Bottom tab-bar navigation redesign (legitimate pattern but a structural nav redesign, explicitly out of "fix don't rebuild" scope)
 
 ### Architecture Approach
 
-Two artifact types share one Vercel deploy: the existing build-time prerendered `dist/` output (unchanged for public marketing pages) and new `/api/*` serverless Functions (all secrets, sessions, DB, Stripe/Google calls). The frontend SPA hydrates as today, then post-hydration fetches gated regions from `/api/*` using the session cookie. A single entitlement function/table is the one place that decides whether a user currently has access, always by live DB read, never by trusting a cookie payload — this directly replaces the scattered `subscribed` flag reads throughout the route components.
+No new build tooling. The fix is organizational: consolidate three independently-hardcoded "what is mobile" breakpoint literals (CSS's 1080/900/720/460 tiers, useScrollFx's innerWidth less than 720 check, Header.jsx's matchMedia max-width 900px) into one documented tier source before touching per-page CSS, since CSS custom properties cannot be referenced inside media query conditions - the discipline has to be a documented comment convention, not a technical enforcement mechanism.
 
 **Major components:**
-1. Static prerendered shell — public marketing pages + free excerpts, unchanged `prerender.js` output
-2. Auth functions (`/api/auth/google/*`) — OAuth exchange, ID token verification, session cookie issuance
-3. Billing functions (`/api/checkout`, `/api/billing-portal`) — create Stripe Checkout/Billing Portal Sessions for the signed-in user
-4. Webhook function (`/api/stripe/webhook`) — the single writer of subscription state, idempotent by `event.id`
-5. Entitlement/content functions (`/api/me`, `/api/content/*`) — per-request server-side resolution of access, sourced from the DB, never from client or cookie claims
-
-### Reconciliation: Client-side SDKs vs. server-initiated redirects (STACK.md vs. ARCHITECTURE.md)
-
-STACK.md and ARCHITECTURE.md proposed two different integration shapes for Google sign-in and Stripe checkout. This summary adopts ARCHITECTURE.md's server-initiated redirect flow as the primary recommendation — Google OAuth Authorization Code flow (redirect to `accounts.google.com`, server-side callback exchanges the code) and Stripe Checkout/Billing Portal Sessions created server-side with the browser simply navigating to the returned `url` — rather than STACK.md's client-loaded Google Identity Services button + `@stripe/stripe-js` client SDK.
-
-Why: the deciding factor is CSP impact, and it is not a close call given this codebase's existing constraints. `.planning/codebase/CONCERNS.md`'s own flagged concern is that adding Google/Stripe will force a CSP relaxation; the redirect-based approach makes that relaxation near-zero (full-page top-level navigations are not governed by `script-src`/`frame-src` at all — only `connect-src`/`form-action` need minor, surgical entries), whereas loading GIS's script and Stripe.js client-side would require adding both origins to `script-src` and `frame-src`. Since this project has no product requirement for One Tap or embedded Stripe Elements (Checkout is Stripe-hosted either way), the redirect flow achieves the identical user-facing outcome (one-click Google sign-in, Stripe-hosted checkout) with materially less security-surface change. The extra cost is a full-page redirect instead of an in-page popup/button — a minor UX tradeoff, not a functional gap.
-
-Practical implication for the stack list: `google-auth-library` (server-side `OAuth2Client` + `verifyIdToken()`) remains required exactly as STACK.md specifies. Google Identity Services' client-loaded script and `@react-oauth/google` become optional/unneeded for v1 under this flow choice — retain them only if a future milestone explicitly wants One Tap. `@stripe/stripe-js` likewise becomes unnecessary for v1; the `stripe` Node SDK (server-only) is sufficient since Checkout/Billing Portal Sessions are consumed via a server-side redirect, not a client-side redirect call. If a future need for embedded Stripe Elements or Google One Tap arises, treat that as a scoped follow-up decision with its own CSP diff, not a default.
+1. src/styles/eclat.css root token block - gets new breakpoint-tier documentation and fluid-spacing/type custom properties; single source of truth for values (not media-query conditions)
+2. src/lib/motion.js useDragScroll - gets a pointer-coarse gate so native touch scrolling isn't fought by the JS drag handler; useScrollFx's stale mobile flag gets reconciled to the same tier
+3. Shared modal scroll-lock/focus-trap pattern (currently duplicated verbatim across Lightbox.jsx and MagazinePreview.jsx) - should be extracted into one hook before mobile-specific fixes are applied twice
+4. Suggested build order: (A) shared foundation/tokens then (B) global chrome (Header/Footer) then (C) content pages (Home/Archive/Edition/Books/Writings) then (D) modals then (E) Subscribe/Account
 
 ### Critical Pitfalls
 
-1. **Re-implementing the fake paywall as a server-issued cookie/JWT with `subscribed: true` baked in** — treat session (who) and entitlement (what they can see right now) as separate concerns; entitlement is always a live DB read per gated request, sourced from webhook-synced state, never a long-lived signed claim.
-2. **Trusting the Stripe Checkout success-page redirect (or a client-supplied `session_id`) instead of the webhook, or vice versa with no reconciliation** — the redirect and webhook are unordered, racing signals; the success-page handler should re-fetch the real Checkout Session from Stripe's API to reconcile immediately, with the webhook as the independent, authoritative background confirmation. Both paths must call the same idempotent sync function.
-3. **Skipping or breaking Stripe webhook signature verification** — almost always caused by a global JSON body parser touching the request before the raw bytes reach `constructEvent()`; the webhook route must read raw, unparsed bytes specifically, tested against a deliberately-tampered payload before shipping.
-4. **No webhook idempotency** — Stripe delivers at-least-once, unordered; store every processed `event.id` under a unique constraint and treat events as triggers to reconcile against live Stripe state, not as directly-trusted, order-sensitive writes.
-5. **Gated content still present in the prerendered HTML/JS bundle or client-only hidden** — full paywalled text must never enter the build-time prerender pass or ship in the initial bundle; it is fetched only from an authenticated, entitlement-checked `/api/content/*` endpoint post-hydration.
+1. iOS Safari overflow hidden does not lock background scroll - background page rubber-bands behind open modals; fix with a position fixed body-lock technique in one shared useScrollLock hook, verified on a real iPhone (not DevTools emulation)
+2. Pointer-based drag-scroll fights native touch scrolling on strip elements - causes jitter/snap-back on real touchscreens; fix by gating useDragScroll off for touch pointer type (native scroll already handles it) or adding touch-action pan-x
+3. 100vh does not account for mobile toolbar collapse - hero, lightbox, and nav dropdown heights visibly jump as the address bar shows/hides; fix by layering 100dvh/100svh after a 100vh fallback on the three affected selectors
+4. Modal focus-traps are Tab-key-only - invisible to VoiceOver/TalkBack swipe navigation, letting screen-reader users swipe past the modal into background content; fix with inert or aria-hidden on sibling content, not a keydown-only trap
+5. No fetch timeout plus Stripe redirect/bfcache staleness - /account's combined loading gate can hang indefinitely on a flaky mobile connection (no timeout in useSafeFetch), and mobile back-gesture navigation after Stripe Checkout/portal can restore a bfcache-frozen pre-purchase page; fix with a shared-hook timeout plus retry and pageshow/persisted refetch listeners
 
 ## Implications for Roadmap
 
 Based on research, suggested phase structure:
 
-### Phase 1: Environment/config layer + secrets boundary
-**Rationale:** Per `CONCERNS.md` and PITFALLS.md Pitfall 6, this project currently has no env/config layer and no `.env*` exclusion in `.gitignore` — establishing the client/server secrets boundary (`VITE_`-prefixed = public only; secrets are server-only `process.env`) before any OAuth or Stripe code exists prevents the single highest-cost pitfall (a leaked secret in a shipped bundle) from ever becoming possible.
-**Delivers:** `.gitignore` updated, env var conventions documented, Vercel project env vars scaffolded (placeholders), a release check (grep `dist/` for secret substrings).
-**Addresses:** Foundational prerequisite for all P1 features in FEATURES.md.
-**Avoids:** Pitfall 6 (secrets in Vite bundle).
+### Phase 1: Shared Foundation (tokens, breakpoints, touch-input decision)
+**Rationale:** Every other phase depends on this; a token/tier change made later forces re-verification of already-fixed pages (Architecture Anti-Pattern 3)
+**Delivers:** Documented breakpoint-tier comment block plus fluid-spacing/type custom properties in eclat.css; useDragScroll pointer-coarse gate in motion.js, verified on real/emulated touch
+**Uses:** CSS Custom Properties, clamp(), Pointer Events pointerType check, touch-action
+**Avoids:** Pitfall 3 (breakpoint mismatch), Pitfall 2 (drag-scroll vs native touch conflict)
 
-### Phase 2: Google sign-in + server-side session
-**Rationale:** FEATURES.md and PITFALLS.md both identify this as the single foundational dependency — nothing else (checkout, entitlement, account management) can be built until we know who this request is from. Server-initiated OAuth Authorization Code flow (per Reconciliation above) is used specifically to avoid CSP script-src/frame-src changes.
-**Delivers:** `/api/auth/google/login.js`, `/api/auth/google/callback.js`, `/api/auth/logout.js`, `iron-session`-based identity cookie, `users` table (keyed on Google `sub`), CSRF `state` validation, post-login session regeneration.
-**Uses:** `google-auth-library`, `iron-session`, Neon/Drizzle `users` table.
-**Implements:** Auth functions + Session layer components from ARCHITECTURE.md.
-**Avoids:** Pitfall 5 (OAuth CSRF/session fixation).
+### Phase 2: Global Chrome (Header/Nav/Footer)
+**Rationale:** Touches every page transitively; a header/nav regression is visible everywhere, so fix early
+**Delivers:** Safe-area-inset handling on the nav drawer, tap-target sizing on nav links and auth avatar/menu, verified no regression to sign-in/sign-out flow at 375px
+**Addresses:** Global nav drawer table-stakes item from FEATURES.md
+**Avoids:** Pitfall 5 (100vh jump on the mobile nav dropdown's max-height), Pitfall 8 (hydration mismatch if any new JS-conditional nav rendering is added)
 
-### Phase 3: Stripe Checkout + webhook handling (designed as one unit)
-**Rationale:** PITFALLS.md explicitly warns these must be planned together, not sequentially — the success-redirect-vs-webhook race is a structural property of Stripe Checkout, not an edge case, and idempotent webhook handling is the load-bearing mechanism the whole entitlement system depends on.
-**Delivers:** `/api/checkout.js` (Checkout Session creation for the 4 real product/price IDs), `/api/stripe/webhook.js` (raw-body signature verification, `processed_stripe_events` idempotency table, handlers for `checkout.session.completed`, `customer.subscription.updated/deleted`, `invoice.payment_failed`), `subscriptions`/`stripe_customers` tables, success-page reconciliation via server-side re-fetch of the Checkout Session.
-**Addresses:** Stripe Checkout for all 4 products and the webhook-driven entitlement sync feature from FEATURES.md.
-**Avoids:** Pitfalls 2, 3, 4 (success/webhook race, broken signature verification, missing idempotency).
+### Phase 3: Content Pages (Home, Archive, Edition, Books, Writings)
+**Rationale:** Shares grid-covers/strip/writing CSS patterns already partially addressed; can be parallelized across pages once Phase 1 tokens exist since each page's CSS selectors are independent
+**Delivers:** Horizontal strip scroll-snap tuning (peek-width, scroll-snap-stop), no-unintended-horizontal-scroll sweep at 375px, hero fan animation verified against the reconciled breakpoint, Edition's three-branch gated-content layout (loading/locked/entitled) each verified independently
+**Addresses:** Strip/carousel table-stakes item, horizontal-scroll-elimination table-stakes item
+**Avoids:** Pitfall 3 (fan-animation breakpoint discontinuity), Pitfall 2 (drag-scroll jitter, first exercised here)
 
-### Phase 4: Content gating — replace `subscribed` flag, split prerendering
-**Rationale:** This is the Core Value the whole milestone exists to deliver, and PITFALLS.md flags it as needing explicit architectural design (which routes stay prerendered vs. become dynamic) before touching `prerender.js`, not a reactive patch after the fact.
-**Delivers:** Single entitlement-check function/module (`api/_lib/entitlements.js`, `api/content/[type]/[slug].js`) reused across `Edition.jsx`, `Archive.jsx`, `Books.jsx`; `src/data/content.js` split so full gated text no longer ships in the public bundle; `prerender.js` route list audited to exclude gated content from the static build.
-**Uses:** `subscriptions` table from Phase 3, session from Phase 2.
-**Implements:** Entitlement/content functions + the Prerendering Split from ARCHITECTURE.md.
-**Avoids:** Pitfalls 1, 7 (stale-cookie-as-entitlement, gated content leaking via prerendered HTML/bundle).
+### Phase 4: Modal Overlays (Lightbox, MagazinePreview)
+**Rationale:** Depends on Phase 1's touch-input decision and benefits from Phase 3's page-level fixes being stable (both modals are triggered from cover grids); both modals share a lightbox base class and duplicate scroll-lock/focus-trap code - fix once, apply to both
+**Delivers:** Extracted shared scroll-lock hook (with iOS-safe position fixed technique), inert or aria-hidden sibling-content trap replacing the Tab-only trap, touch-aware hint copy, 44px minimum tap targets on Prev/Next/close buttons
+**Addresses:** Lightbox/MagazinePreview touch-microcopy and tap-target table-stakes item
+**Avoids:** Pitfall 1 (iOS scroll-behind-modal), Pitfall 6 (keyboard-only focus trap), Pitfall 5 (lightbox 100vh/dvh)
 
-### Phase 5: Account page — real status, self-serve cancel, Billing Portal
-**Rationale:** FEATURES.md notes this enhances but does not block gating — sequence gating correctness (Phase 4) before UI polish. This phase replaces the currently-mocked Account page invoices/plan data with real Stripe-backed state.
-**Delivers:** `/api/billing-portal.js`, Account page reading real subscription status/renewal date, cancel action (via Billing Portal redirect), past-due/payment-failed messaging.
-**Addresses:** View current subscription status, self-serve cancellation, payment failure handling features from FEATURES.md.
+### Phase 5: Subscribe/Account (Stripe redirect surfaces)
+**Rationale:** Lowest shared-CSS overlap with other phases, no drag-scroll/modal touch concerns - can run last or in parallel with Phase 4; carries the two entitlement-adjacent pitfalls that most directly touch Core Value (real, server-verified paid access)
+**Delivers:** Pricing-tile/account-panel tap-target and spacing pass at 375-430px; shared useSafeFetch timeout plus retry affordance; pageshow/persisted refetch listeners on Subscribe/Account to defeat bfcache staleness after Stripe Checkout/portal round-trips
+**Addresses:** Pricing picker and account panel table-stakes items
+**Avoids:** Pitfall 4 (indefinite loading hang), Pitfall 7 (stale post-redirect state on mobile back-gesture)
 
 ### Phase Ordering Rationale
 
-- Config/secrets (Phase 1) must precede any code that could accidentally leak a secret — cheapest to fix before it exists, most expensive after a real key is ever committed or bundled.
-- Identity (Phase 2) is a hard dependency for every other phase per FEATURES.md's dependency graph — checkout, webhooks, and gating all need to know who is asking first.
-- Checkout + webhook (Phase 3) are grouped as one phase per PITFALLS.md's explicit guidance that treating them as sequential/unrelated is itself a common source of the success/webhook race bug.
-- Content gating (Phase 4) depends on Phase 3's `subscriptions` table existing and being correctly synced — building gating against fake/absent entitlement data would just recreate the current flaw with extra steps.
-- Account/Portal UI (Phase 5) is explicitly the lowest-risk, most deferrable phase per both FEATURES.md and PITFALLS.md — correctness of gating matters more than UI polish if time-constrained.
+- Foundation-first ordering directly follows Architecture's Anti-Pattern 3 warning: fixing breakpoints per-page before consolidating the tier/token layer recreates and worsens today's three-literal drift problem
+- Global chrome before content pages because nav/header issues are visible on every subsequent page's screenshot/UAT
+- Modals sequenced after content pages because they're triggered from content-page cover grids and share Phase 1's touch-input decision
+- Subscribe/Account sequenced last because it has the least CSS/component overlap with the other phases and its two critical pitfalls (fetch timeout, Stripe bfcache) are independent, additive fixes to a shared hook and two route files respectively - no dependency on modal or content-page work
 
 ### Research Flags
 
 Phases likely needing deeper research during planning:
-- **Phase 3 (Checkout + webhook):** Exact current Stripe API shapes/field names for the 4 real products, `apiVersion` pinning, and the precise idempotency/reconciliation code pattern should be verified against `docs.stripe.com` at implementation time — PITFALLS.md notes this research session had no live Stripe docs API access.
-- **Phase 4 (Content gating + prerendering split):** No existing reference architecture combines this project's specific prerender pipeline (`prerender.js` + `entry-server.jsx`) with per-user runtime gating; the split needs to be verified against the actual current route list in the codebase, not assumed from research alone.
+- Phase 4 (Modal Overlays): VoiceOver/TalkBack inert migration and real-iOS scroll-lock behavior are genuinely device-dependent; if the planner isn't confident about inert browser support or the exact position-fixed scroll-restoration sequence, a focused research pass may help avoid regressions
+- Phase 5 (Subscribe/Account): bfcache/pageshow interaction with the existing Stripe redirect flow (window.location.assign, success/portal return URLs) touches security-adjacent entitlement state - worth a research-phase pass to confirm the exact redirect/history sequence doesn't reintroduce a stale-state or redirect-loop bug
 
 Phases with standard patterns (skip research-phase):
-- **Phase 1 (env/config):** Well-documented Vite/Vercel env-var conventions, no ambiguity.
-- **Phase 2 (Google sign-in):** Google's official Authorization Code flow + `google-auth-library` is a standard, well-documented server-side OAuth pattern.
-- **Phase 5 (Account/Billing Portal):** Stripe Billing Portal is a documented, low-custom-code integration once Phase 3's Stripe plumbing exists.
+- Phase 1 (Foundation): Pure CSS custom properties/clamp()/touch-action - well-documented, standard web-platform features, HIGH confidence from STACK.md
+- Phase 2 (Global Chrome): Extends an already-working, already-implemented top-drawer nav pattern - no new pattern being introduced
+- Phase 3 (Content Pages): Extends existing scroll-snap CSS and reconciles one JS constant - standard, low-risk
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | MEDIUM | Cross-checked against official Vercel/Google/Stripe/Neon/Drizzle docs; some package version specifics should be re-verified at install time since they drift quickly |
-| Features | MEDIUM-HIGH | Stripe/Google official-doc-backed findings are HIGH confidence; general paywall UX pattern findings are MEDIUM (community/industry sources) |
-| Architecture | MEDIUM | No single canonical prerendered-SPA + Vercel Functions + billing reference architecture exists; synthesized from verified component-level facts rather than one authoritative source |
-| Pitfalls | MEDIUM | Cross-checked web sources; no live Stripe/Google docs API access during this research session — exact API signatures should be verified against current docs at implementation time |
+| Stack | HIGH | Verified directly against repo source (eclat.css, motion.js, verify-hero.mjs, package.json) plus cross-referenced browser-support data for dvh/svh/container queries |
+| Features | HIGH (general UX patterns) / MEDIUM (Eclat-specific recommendations) | Corroborated by Smashing Magazine, WCAG 2.5.8, Apple HIG, Material Design; Eclat-specific claims verified directly against src source rather than inferred |
+| Architecture | HIGH | Grounded entirely in current source inspection (eclat.css, motion.js, vite.config.js, prerender.js, Header.jsx) - an integration question about existing code, not an external ecosystem lookup |
+| Pitfalls | HIGH | Codebase-verified against actual source (Lightbox.jsx, MagazinePreview.jsx, Subscribe.jsx, Account.jsx, useSafeFetch.js) with platform-behavior claims corroborated by MDN, web.dev, and independent practitioner sources |
 
-**Overall confidence:** MEDIUM
+**Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Format-aware gating (Hard Copy → also grants Online access):** Explicitly flagged by FEATURES.md as a business decision, not a research finding — must be decided by the user before the entitlement schema (1 product = 1 entitlement vs. 1 product = N entitlements) is finalized. Raise this during roadmap/requirements review, not silently default it.
-- **Exact current Stripe product/price IDs and their real prices:** STACK.md notes the current `/subscribe` page has placeholder pricing ($9/mo, $84/yr) that must be reconciled against the actual 4 live Stripe products before Phase 3 is planned in detail.
-- **Client-side Google/Stripe SDK question (resolved above but worth re-confirming at planning time):** If product later wants Google One Tap or embedded Stripe Elements, that requires revisiting the CSP diff decided here — treat as an explicit, scoped follow-up, not an assumed default.
-- **Package version pinning:** Several stack versions (`drizzle-orm`, `@neondatabase/serverless`, `stripe`) should be re-checked via `npm view <pkg> version` at actual install time rather than trusting the versions recorded in STACK.md, since this research is a point-in-time snapshot (2026-09-08).
+- inert attribute browser support edge cases: research assumes "broadly supported" but the planner should double check current Safari/iOS support at implementation time before committing Phase 4's focus-trap fix to it exclusively
+- In-app/webview OAuth redirect behavior: PITFALLS.md flags that social-app embedded webviews may sandbox the Google OAuth redirect differently than mobile Safari/Chrome - this wasn't deeply researched (noted as an integration gotcha only) and should be spot-checked if marketing traffic via social links is expected
+- Exact peek-width/snap-stop values at 375px vs 430px: FEATURES.md notes the existing 86vw peek should work at 375px but flags it needs re-verification specifically at that width, not just at the existing 720px breakpoint - treat as a verification task in Phase 3, not a settled fact
+- Whether swipe-to-turn/swipe-to-dismiss (v1.x differentiators) get scheduled in the same milestone: PITFALLS/FEATURES both flag a real gesture-conflict risk between pinch-zoom and swipe-down-dismiss if both are ever pursued - no phase in the v1 plan should combine both without an explicit gesture-priority decision
 
 ## Sources
 
 ### Primary (HIGH confidence)
-- https://developers.google.com/identity/gsi/web/guides/verify-google-id-token — server-side ID token verification (Google official)
-- https://developers.google.com/identity/sign-in/web/backend-auth — backend auth pattern for GIS (Google official)
-- https://docs.stripe.com/billing/subscriptions/build-subscriptions — Stripe subscriptions build guide (official)
-- https://docs.stripe.com/webhooks/signature — webhook signature verification (Stripe official)
-- https://docs.stripe.com/webhooks — receiving Stripe events (official)
-- https://docs.stripe.com/customer-management — Stripe Customer Portal (official)
-- https://vercel.com/docs/functions/runtimes/node-js — Vercel Functions Node.js runtime (official)
-- https://vercel.com/support/articles/how-do-i-get-the-raw-body-of-a-serverless-function — raw body handling (official Vercel)
-- https://neon.com/docs/serverless/serverless-driver — Neon HTTP serverless driver (official)
-- https://orm.drizzle.team/docs/connect-neon — Drizzle + Neon adapter (official)
+- Direct repository inspection: src/styles/eclat.css, src/lib/motion.js, src/components/Header.jsx, src/components/Lightbox.jsx, src/components/MagazinePreview.jsx, src/routes/Subscribe.jsx, src/routes/Account.jsx, src/lib/useSafeFetch.js, src/entry-client.jsx, index.html, vite.config.js, prerender.js, verify-hero.mjs, package.json, .planning/PROJECT.md, .planning/codebase/ARCHITECTURE.md
+- touch-action - MDN
+- The Large, Small, and Dynamic Viewports - Bram.us
+- Back/forward cache - web.dev
+- Accessible Target Sizes Cheatsheet - Smashing Magazine (WCAG 2.5.8)
 
 ### Secondary (MEDIUM confidence)
-- https://github.com/googleapis/google-auth-library-nodejs — google-auth-library package/samples
-- https://arcticjs.dev/ , https://pilcrowonpaper.com/blog/18 — Arctic OAuth library deprecation (July 2026)
-- Drizzle vs Prisma cold-start comparisons — cross-checked across multiple 2026 comparison articles
-- https://auth0.com/docs/secure/attack-protection/state-parameters — OAuth CSRF/state parameter guidance
-- https://reintech.io/blog/vite-environment-variables-configuration-security — Vite env var security model
-- https://www.sprocketsecurity.com/blog/hunting-secrets-in-javascript-at-scale-how-a-vite-misconfiguration-lead-to-full-ci-cd-compromise — real-world Vite secret leak case study
-- Multiple Stripe webhook race-condition/idempotency writeups (GembaPay, DEV Community, The Road to Enterprise) — cross-checked, consistent findings
+- Sizzy/Savvy/TestMu/LambdaTest/csstoolkit.net - dvh/svh browser support corroboration
+- caniuse.com / LogRocket - CSS container query baseline status
+- CXL / tutsplus - mobile pricing-page stacking-vs-carousel usage data
+- Webflow/Squarespace/WordPress community forums - lightbox pinch-zoom gesture-conflict reports
+- UXmatters, UXPin, Acclaim - touch target and mobile nav pattern guidance
+- TIL Prefer h-dvh over h-screen on iOS Safari - Guide Fari
+- stripe-js issue 175 - Stripe redirect back-button history reports
 
 ### Tertiary (LOW confidence)
-- General paywall/publisher UX pattern comparisons (NYT/FT-style) — industry blog sources, directionally useful but not verified first-hand
+- None flagged - all research files corroborated findings against either primary source code or multiple independent secondary sources
 
 ---
-*Research completed: 2026-09-08*
+*Research completed: 2026-09-13*
 *Ready for roadmap: yes*

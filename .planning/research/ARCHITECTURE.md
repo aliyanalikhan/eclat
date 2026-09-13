@@ -1,311 +1,237 @@
 # Architecture Research
 
-**Domain:** Adding auth (Google OAuth) + sessions + database + Stripe billing to an existing prerendered Vite/React SPA, deployed on Vercel
-**Researched:** 2026-09-08
-**Confidence:** MEDIUM (patterns cross-checked against Vercel, Google, Stripe, and Neon official docs; no single canonical "prerendered-SPA-plus-Vercel-functions-plus-billing" reference architecture exists, so the synthesis below is reasoned from verified component-level facts rather than copied from one source)
+**Domain:** Mobile-responsive retrofit of an existing prerendered Vite + React SPA (no CSS framework, no preprocessor)
+**Researched:** 2026-09-13
+**Confidence:** HIGH (grounded directly in current source: `src/styles/eclat.css`, `src/lib/motion.js`, `vite.config.js`, `prerender.js`, `src/components/*`, `src/routes/*` — no external ecosystem lookup needed, this is an integration question about code already in the repo)
 
 ## Standard Architecture
 
 ### System Overview
 
+This is not a "pick a responsive framework" problem — the codebase already has a partial, ad-hoc responsive layer that this milestone must consolidate and extend, not replace.
+
 ```
-┌─────────────────────────────────────────────────────────────────────────┐
-│  BUILD TIME (unchanged) — npm run build                                 │
-│  vite build → vite build --ssr → prerender.js walks public routes only  │
-│  writes dist/<route>/index.html (public marketing pages + free excerpts)│
-└──────────────────────────────────┬────────────────────────────────────┘
-                                    ▼
-┌─────────────────────────────────────────────────────────────────────────┐
-│  VERCEL PROJECT (two artifact types, one deploy)                        │
-│  ┌───────────────────────────┐   ┌────────────────────────────────────┐│
-│  │ STATIC (dist/)             │   │ SERVERLESS FUNCTIONS (/api/*)      ││
-│  │ CDN-served, no per-request │   │ Node.js runtime, cold-started      ││
-│  │ compute. Prerendered HTML  │   │ per request. NEW in this milestone ││
-│  │ for /, /archive, /books,   │   │ — this is where all secrets,       ││
-│  │ /writings, /editions/:no   │   │ sessions, DB, and Stripe/Google    ││
-│  │ (excerpt shell only)       │   │ calls live.                        ││
-│  └───────────────────────────┘   └──────────────────┬─────────────────┘│
-│  vercel.json rewrite: everything except /api/* falls back to index.html │
-└──────────────────────────────────┬────────────────────┼────────────────┘
-                                    ▼                    ▼
-┌─────────────────────────────┐   ┌───────────────────────────────────────┐
-│ BROWSER                       │   │ EXTERNAL SERVICES                    │
-│ Hydrates prerendered shell    │   │ - Google OAuth (Authorization Code)  │
-│ (unchanged). Post-hydration,  │──▶│ - Stripe (Checkout, Billing Portal,  │
-│ gated regions fetch from       │   │   Webhooks)                          │
-│ /api/* with credentials        │   └───────────────────────────────────────┘
-│ (session cookie) to render     │
-│ real per-user state.           │              ┌──────────────────────────┐
-└─────────────────────────────┘              │ DATABASE (Neon Postgres) │
-                                               │ users, stripe_customers, │
-                                               │ subscriptions,           │
-                                               │ processed_stripe_events  │
-                                               └──────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│  src/styles/eclat.css  (single file, 2243 lines, no preprocessor)│
+│  ┌───────────────┐   ┌──────────────────────────────────────┐   │
+│  │ :root tokens  │   │ 5 hand-rolled @media blocks, bottom   │   │
+│  │ (line 8-37)   │   │ of file: 1080 / 900 / 720 / 460 / PRM │   │
+│  │ NO breakpoint │   │ Mixes layout, nav, and one-off tweaks │   │
+│  │ vars today    │   │ per component in each block           │   │
+│  └───────────────┘   └──────────────────────────────────────┘   │
+└───────────────────────────────┬───────────────────────────────────┘
+                                 │ single bundle (cssCodeSplit:false)
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  vite.config.js build → ONE .css asset, referenced by every      │
+│  prerendered HTML file identically — CSS is route-agnostic       │
+└───────────────────────────────┬───────────────────────────────────┘
+                                 ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  src/lib/motion.js — imperative DOM/JS layer that duplicates     │
+│  layout knowledge CSS should own:                                │
+│  - useScrollFx: hardcodes `mobile = innerWidth < 720` (its own   │
+│    breakpoint, independent of CSS's 720px block — coincidentally │
+│    matches today, but not sourced from one place)                │
+│  - Header.jsx: hardcodes `matchMedia('(max-width: 900px)')`      │
+│    for its own mobile-nav toggle — a THIRD independent 900px     │
+│    literal, coincidentally matching CSS's nav breakpoint          │
+│  - useDragScroll: already Pointer Events (not mouse-only) —      │
+│    see Pattern 2 below, this is further along than it looks      │
+└─────────────────────────────────────────────────────────────────┘
 ```
 
-### Component Responsibilities
-
-| Component | Responsibility | Typical Implementation |
-|-----------|----------------|------------------------|
-| Static prerendered shell | Public marketing pages + free excerpts, SEO, first paint | Unchanged `prerender.js` + `src/entry-server.jsx` output in `dist/` |
-| Frontend SPA (post-hydration) | Renders gated/dynamic regions by calling `/api/*` with the session cookie; owns "am I signed in / what do I see" client state | React Router SPA (existing) + new `src/api/*.js` fetch wrapper replacing `store.jsx`'s fake `subscribed` flag |
-| Auth functions | Google Authorization Code exchange, ID token verification, session cookie issuance | `/api/auth/google/login`, `/api/auth/google/callback`, `/api/auth/logout` — `google-auth-library` OAuth2Client |
-| Session layer | Stateless, signed httpOnly cookie carrying only a user id (no entitlement baked in) | `iron-session` (or equivalent signed-cookie helper), shared `_lib/session.js` |
-| Billing functions | Create Stripe Checkout Sessions and Billing Portal Sessions for the signed-in user | `/api/checkout`, `/api/billing-portal` — `stripe` Node SDK, server-side secret key only |
-| Webhook function | Signature-verified, idempotent ingestion of Stripe subscription lifecycle events into the DB | `/api/stripe/webhook` — raw-body read + `stripe.webhooks.constructEvent` |
-| Entitlement/content functions | Per-request, server-side resolution of "does this session's user have an active subscription that unlocks this content" | `/api/me`, `/api/content/:type/:slug` — DB read of `subscriptions`, never trusts client or cookie payload |
-| Database | Source of truth for identity + a *cache* of Stripe's subscription state (Stripe itself remains authoritative for billing facts) | Neon Postgres, accessed via `@neondatabase/serverless` HTTP driver from serverless functions |
+**Key existing facts that shape this milestone:**
+- There is **no** breakpoint variable system — every `@media (max-width: …)` and every JS `matchMedia`/`innerWidth` check is a hardcoded literal, scattered across `eclat.css` and `motion.js`/`Header.jsx`. Three independent sources of "what is mobile" exist today (720px in `useScrollFx`, 900px in `Header.jsx`'s `matchMedia`, and CSS's own 900/720/460 tiers) and they are not guaranteed to agree as fixes are made.
+- A **mobile-nav pattern already exists and works**: `Header.jsx` (`isMobile` state + `nav__toggle` button + `.nav[hidden]`) and its CSS counterpart at `eclat.css:2004-2039` (`.nav` becomes `position: fixed` full-width dropdown under 900px). This is the reusable pattern to extend, not invent.
+- `useDragScroll` (`src/lib/motion.js:254-306`) is **already built on Pointer Events** (`pointerdown/pointermove/pointerup/pointerleave/pointercancel`), which natively unify mouse, touch, and pen — this is not a "mouse events only" problem in the way the question assumes. The real touch gap is narrower and subtler (see Pattern 2).
+- `vite.config.js` sets `cssCodeSplit: false` — the whole app ships one CSS file, included identically in every prerendered route's `<head>`. There is no per-route or conditional CSS today.
 
 ## Recommended Project Structure
 
+No new build tooling, no CSS preprocessor, no CSS-in-JS — stay inside the existing "plain CSS in `src/styles/`" convention. The fix is organizational (extend the one file with disciplined sections and real tokens), not a new pipeline.
+
 ```
-Éclat/
-├── src/
-│   ├── api/                    # NEW — thin fetch wrappers the SPA calls at runtime
-│   │   ├── auth.js             # getSession(), signOut()
-│   │   ├── checkout.js         # startCheckout(priceId), openBillingPortal()
-│   │   └── content.js          # fetchGatedContent(type, slug)
-│   ├── routes/                 # existing — Edition/Books/Account now fetch from src/api/
-│   ├── store.jsx               # existing — subscribed/plan fields replaced by
-│   │                           #   { user, entitlements, loading } populated from /api/me
-│   ├── data/content.js         # existing — keeps ONLY public metadata + free excerpts;
-│   │                           #   full gated text moves out of this bundled file
-│   └── ...                     # entry-client/server, prerender.js unchanged
-├── api/                        # NEW — Vercel serverless functions (repo root, per Vercel convention)
-│   ├── auth/
-│   │   ├── google/
-│   │   │   ├── login.js        # redirects to Google's OAuth consent URL
-│   │   │   └── callback.js     # exchanges code, verifies, upserts user, sets session cookie
-│   │   └── logout.js           # clears session cookie
-│   ├── checkout.js             # creates a Stripe Checkout Session for one of the 4 products
-│   ├── billing-portal.js       # creates a Stripe Billing Portal Session
-│   ├── stripe/
-│   │   └── webhook.js          # signature-verified, idempotent event handler
-│   ├── me.js                   # returns { user, entitlements } for the current session
-│   ├── content/
-│   │   └── [type]/[slug].js    # returns full content only if entitled, else 403/teaser
-│   └── _lib/                   # shared, not deployed as routes (Vercel ignores `_`-prefixed dirs)
-│       ├── db.js                # Neon client singleton (HTTP driver)
-│       ├── session.js            # iron-session config + get/set helpers
-│       ├── stripe.js               # stripe-node client singleton
-│       ├── google.js                # OAuth2Client singleton
-│       └── entitlements.js           # PRODUCT_ID → content-scope mapping (the 4 known product IDs)
-├── prerender.js                # unchanged — still only walks public/free routes
-└── vercel.json                 # updated: rewrite so /api/* bypasses SPA fallback; CSP updates (minimal — see below)
+src/
+├── styles/
+│   └── eclat.css          # UNCHANGED single entry point, but internally reorganized:
+│                           #   1. :root tokens        — ADD breakpoint + fluid-scale custom properties here
+│                           #   2. reset                — unchanged
+│                           #   3. component rules      — unchanged authoring location (rules stay colocated
+│                           #      with the component selector they style, as today — do NOT split into
+│                           #      per-component .css files; Vite/PostCSS-less pipeline has no import-merge
+│                           #      step configured, and cssCodeSplit:false already forces one bundle anyway)
+│                           #   4. @media blocks (bottom) — CONSOLIDATE into a fixed, named tier order that
+│                           #      mirrors the new --bp-* tokens (see Pattern 1), replacing today's ad hoc
+│                           #      1080/900/720/460 literals
+├── lib/
+│   ├── motion.js           # MODIFIED: useDragScroll gets a pointer-type/coarse-pointer branch (Pattern 2);
+│   │                       #   useScrollFx's hardcoded `< 720` reads from the same breakpoint source as CSS
+│   └── useBreakpoint.js    # NEW (optional, only if JS needs to react to breakpoint changes beyond Header's
+│                           #   existing matchMedia — see Pattern 3): single hook wrapping matchMedia against
+│                           #   the same pixel values the CSS tokens use, so JS and CSS can never disagree
 ```
 
 ### Structure Rationale
 
-- **`api/` at repo root, not `src/api/`:** Vercel's zero-config convention deploys anything under root-level `api/` as serverless functions; this is a hard platform requirement, not a style choice. `src/api/` is a separate, client-side concern (fetch wrappers bundled into the SPA) and must not be confused with the server-side `api/` directory.
-- **`api/_lib/`:** Vercel does not deploy directories/files prefixed with `_` as routes, making it the idiomatic place for shared server-only modules (DB client, session helpers, SDK singletons) reused across multiple function files without each becoming its own route.
-- **`src/data/content.js` split:** keeps its current role for anything that must be public (titles, dates, cover art, free excerpts, SEO copy) so `prerender.js` and public routes need no structural change. Full paywalled text/pages move to the database and are served exclusively through `api/content/[type]/[slug].js` — this directly fixes the existing anti-pattern where the full excerpt already ships in the bundle regardless of subscription state.
+- **No preprocessor is being introduced.** CSS custom properties (`:root { --bp-sm: …; }`) are the correct "variable" mechanism here since the project explicitly has no Sass/PostCSS/Tailwind and the constraint is "don't rewrite the build." Custom properties can't be used *inside* `@media` query conditions (media queries can't reference `var()` — this is a real CSS limitation, not a project gap), so breakpoint values must additionally exist as plain numbers wherever a `@media` query needs them and wherever JS needs them (see Pattern 1 for how to keep these from drifting apart).
+- **Stay with one CSS file.** Splitting into `base.css` / `layout.css` / `components.css` etc. would require either a manual `@import` chain (which Vite passes through file-by-file at dev time and concatenates at build time — works, but is a bigger structural change than this milestone needs) or a PostCSS bundler config that doesn't exist today. Given `cssCodeSplit: false` already merges everything into one asset regardless, splitting source files buys organization but not performance — reserve that refactor for if `eclat.css` becomes unwieldy, not as a prerequisite for mobile fixes.
+- **Motion/JS breakpoint literals get pulled toward the CSS tokens, not replaced with a JS framework.** `useScrollFx`'s `mobile = window.innerWidth < 720` and `Header.jsx`'s `matchMedia('(max-width: 900px)')` are two of three sources of truth for "is this mobile" today; a mobile-responsive milestone that touches breakpoints without reconciling these will silently reintroduce the exact drift bug class this research flags.
 
 ## Architectural Patterns
 
-### Pattern 1: Server-initiated redirect flows for both OAuth and billing (no client-side Google/Stripe SDKs)
+### Pattern 1: CSS custom-property tokens for spacing/type scale + duplicated-literal breakpoint constants
 
-**What:** Use the Google OAuth **Authorization Code** flow (link/redirect to Google's consent screen → server-side callback exchanges the code) instead of Google Identity Services' client-side token/One Tap flow. Similarly, create Stripe Checkout Sessions and Billing Portal Sessions server-side and simply navigate the browser to the returned `url` — never load `js.stripe.com` client-side.
-**When to use:** Always, for this project. There is no product requirement for One Tap or embedded Stripe Elements (Checkout is Stripe-hosted).
-**Trade-offs:** Slightly more clicks (full-page redirect instead of an in-page popup/button), but it means **no new script-src/frame-src CSP entries are required for either provider** — a plain top-level navigation (`window.location.href = ...` or an `<a href>`) is not governed by CSP script-src at all. This directly de-risks the "CSP will need loosening" concern flagged in the existing codebase architecture doc — with this pattern, that loosening becomes near-zero instead of a wholesale relaxation.
+**What:** Add fluid-spacing and fluid-type tokens as `:root` custom properties (these work fine referenced anywhere in a rule body, including inside `clamp()`), but breakpoints themselves must exist as literal numbers repeated at each `@media` call site — CSS has no way to parameterize a media query condition with a custom property. The fix for drift is a documented single source of truth (a comment block at the top of `eclat.css` naming the tiers) that both the CSS media queries and any JS `matchMedia`/`innerWidth` checks are written to match, not a technical mechanism that enforces it (none exists in plain CSS).
+
+**When to use:** Any new spacing/type value introduced during the mobile-fix work (do not hardcode new magic numbers; add a token). Any new `@media` breakpoint must reuse one of the documented tiers, not a new arbitrary width.
+
+**Trade-offs:** No compile-time guarantee that CSS and JS breakpoints stay in sync (unlike Sass `$breakpoint` variables shared via a JS-readable config) — this is a real limitation of the "no preprocessor" constraint, mitigated only by convention + a single documented tier list + (optionally) `useBreakpoint.js` (Pattern 3) as the one JS-side reader.
 
 **Example:**
-```js
-// api/auth/google/login.js
-export default function handler(req, res) {
-  const url = new URL('https://accounts.google.com/o/oauth2/v2/auth');
-  url.searchParams.set('client_id', process.env.GOOGLE_CLIENT_ID);
-  url.searchParams.set('redirect_uri', `${process.env.SITE_URL}/api/auth/google/callback`);
-  url.searchParams.set('response_type', 'code');
-  url.searchParams.set('scope', 'openid email profile');
-  url.searchParams.set('state', generateAndStoreCsrfState(req, res)); // double-submit cookie
-  res.writeHead(302, { Location: url.toString() });
-  res.end();
+```css
+:root {
+  /* --- breakpoint tiers (documented source of truth; keep in sync with any
+     JS matchMedia/innerWidth check — see src/lib/motion.js useScrollFx and
+     Header.jsx's isMobile) --- */
+  /* --bp-phone: 460px   — small-phone tier, matches existing @media (max-width: 460px) */
+  /* --bp-mobile: 720px  — phone-portrait tier, matches existing @media (max-width: 720px) */
+  /* --bp-nav: 900px     — nav-collapse tier, matches Header.jsx isMobile + existing 900px block */
+  /* --bp-tablet: 1080px — matches existing @media (max-width: 1080px) */
+
+  /* fluid type/spacing — usable directly since these ARE custom properties */
+  --space-fluid-md: clamp(16px, 4vw, 32px);
+  --type-fluid-h1: clamp(28px, 6vw + 1rem, 56px);
 }
 ```
 
-### Pattern 2: Stateless identity cookie, live DB entitlement check per gated request
+### Pattern 2: Pointer Events already unify touch/mouse — the real gap is native-scroll conflict, not missing touch handlers
 
-**What:** The session cookie (via `iron-session` or equivalent) carries only a stable user id — never subscription status. Every request for gated content re-reads current entitlement from the `subscriptions` table.
-**When to use:** Always, for any route/endpoint serving paid content or billing data.
-**Trade-offs:** One extra DB read per gated request vs. a JWT with baked-in claims — but it is the only way to satisfy the explicit requirement "losing/cancelling a subscription immediately revokes access to gated content on the next request." A cached/TTL'd claim in a cookie would mean up to TTL minutes of stale access after cancellation.
+**What:** `useDragScroll` in `src/lib/motion.js` listens for `pointerdown/pointermove/pointerup/pointerleave/pointercancel` — these fire uniformly for mouse, touch, and pen in every browser this project targets (`es2020`/"defaults and supports es6-module"), so there is no need to add parallel `touchstart/touchmove/touchend` handlers. The actual mobile risk is that `.strip` (`eclat.css:1229-1238`) already has native `overflow-x: auto` + `scroll-snap-type: x proximity`, and on a touchscreen the browser's own touch-panning and the JS `strip.scrollLeft = startLeft - dx` assignment can both be live at once (the handlers never call `preventDefault()`), which can produce double-handled/jankier scrolling on real touch devices than the desktop mouse-drag experience suggests.
+
+**When to use:** Any phase-4-equivalent fix to `Edition.jsx`'s preview strip or `Home.jsx`'s drag-scroll usage. Verify on a real touch device (or Chrome DevTools touch emulation, which does dispatch Pointer Events with `pointerType: 'touch'`) before assuming it "just works" because Pointer Events are already wired up.
+
+**Trade-offs:** The safest fix if jank is observed is to gate the JS drag path off for coarse pointers (`window.matchMedia('(pointer: coarse)')` — true on touchscreens, false for mouse/trackpad) and let native `overflow-x: auto` touch-scrolling handle it alone, rather than adding `preventDefault()`/`touch-action` fighting to make both systems cooperate. This keeps desktop mouse-drag behavior (the `is-dragging`/click-swallow logic) completely untouched.
 
 **Example:**
 ```js
-// api/_lib/entitlements.js
-export async function hasActiveEntitlement(userId, contentType) {
-  const rows = await sql`
-    SELECT s.status, s.stripe_product_id FROM subscriptions s
-    WHERE s.user_id = ${userId} AND s.status IN ('active', 'trialing')`;
-  return rows.some(r => PRODUCT_SCOPE[r.stripe_product_id] === contentType);
+const onDown = (e) => {
+  if (window.matchMedia('(pointer: coarse)').matches) return // let native touch scroll own it
+  down = true
+  // ...unchanged desktop mouse/pen drag logic
 }
 ```
 
-### Pattern 3: Stripe webhook as the single writer of subscription state, idempotent by event id
+### Pattern 3: Optional shared `useBreakpoint` hook, only if a third JS consumer appears
 
-**What:** `api/stripe/webhook.js` is the *only* code path that writes to `subscriptions`. Client-triggered flows (`checkout.js`, `billing-portal.js`) only ever *read* or *initiate* — they never optimistically write subscription status themselves. Every processed event id is inserted into `processed_stripe_events` under a unique constraint; a constraint violation means "already handled," and the handler returns `200` immediately without reprocessing.
-**When to use:** All Stripe subscription lifecycle events (`checkout.session.completed`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_failed`, etc.).
-**Trade-offs:** Slight latency between a Stripe action and DB reflecting it (webhook delivery time, typically sub-second to a few seconds) — acceptable for a subscription product; the alternative (trusting client-side "payment succeeded" callbacks) is exactly the class of bug this milestone exists to eliminate.
+**What:** `Header.jsx` already has a correct, self-contained `matchMedia('(max-width: 900px)')` `useEffect` pattern for reacting to breakpoint crossings in JS. `useScrollFx` has its own `innerWidth < 720` one-shot check. If the mobile-fix work needs a *third* place to branch on viewport width in JS (e.g., MagazinePreview or Lightbox needing different behavior on phone widths), extract a tiny shared hook instead of writing a fourth ad hoc literal.
+
+**When to use:** Only when a genuine third/fourth JS breakpoint consumer appears. Do not preemptively refactor `Header.jsx`'s working `isMobile` state or `useScrollFx`'s working `mobile` flag just to use a shared hook — that's churn on working code outside this milestone's stated scope (phone-portrait fixes only, not a JS architecture refactor).
+
+**Trade-offs:** Keeps JS/CSS breakpoint values one step further from drifting, at the cost of one more file. Skip it if only Header and useScrollFx ever need JS-side breakpoint awareness — two independent literals that are individually simple and well-commented is an acceptable, honest trade-off given the "no preprocessor" constraint already accepted for CSS.
 
 ## Data Flow
 
-### Sign-in flow
+### Request Flow — confirms prerender.js has zero interaction with responsive CSS
 
 ```
-[User clicks "Sign in with Google"]
-    ↓ full-page navigation, no CSP impact
-[api/auth/google/login.js] → redirect to accounts.google.com consent screen
-    ↓ user approves
-[Google redirects to api/auth/google/callback.js?code=...&state=...]
-    ↓ verify CSRF state, exchange code for tokens (google-auth-library OAuth2Client)
-    ↓ verify ID token, extract `sub` (never email) as stable identity
-[DB] upsert users row keyed on google_sub
-    ↓
-[Set httpOnly, secure, sameSite session cookie] (iron-session; payload = { userId })
-    ↓ redirect back into the SPA
-[Browser] SPA calls GET /api/me on mount → populates store.jsx with real user/entitlement state
+npm run build
+  → vite build            (client bundle: JS + ONE eclat.css asset, hashed filename)
+  → vite build --ssr      (SSR render function only, no CSS involved)
+  → prerender.js           for each route in allRoutes():
+                              renders route to HTML string via SSR bundle
+                              injects <head> tags from src/data/seo.js
+                              writes dist/<route>/index.html
+                            ↑ the <link rel="stylesheet" href="/assets/eclat-<hash>.css">
+                              tag is identical across every single prerendered HTML file —
+                              prerender.js never reads, filters, or varies CSS per route
+  → deletes dist/server (SSR artifact only)
 ```
 
-### Checkout flow
+**Confirmed: no interaction to design around.** CSS is fully static and route-agnostic by construction (`cssCodeSplit: false`), and `prerender.js` only ever manipulates `<head>` SEO tags (title/meta/JSON-LD via `src/data/seo.js`) and body markup — it has no code path that touches stylesheet content or linkage at all. A phone-portrait media query added to `eclat.css` applies identically whether the page was reached via the prerendered static HTML (first paint) or via client-side React Router navigation post-hydration, with no prerender-side changes required. The one thing to actually verify (not a prerender concern, but adjacent): confirm no route-specific `<meta name="viewport">` override exists in `src/data/seo.js` that could fight a global `width=device-width, initial-scale=1` set in `index.html` — check this once, not per-phase.
 
-```
-[Signed-in user clicks "Subscribe" on one of the 4 products]
-    ↓
-[POST /api/checkout { priceId }] — requires valid session
-    ↓ server creates/reuses stripe_customers row, calls stripe.checkout.sessions.create()
-[Stripe] returns Checkout Session URL
-    ↓
-[Browser navigates to Stripe-hosted checkout] → user pays
-    ↓
-[Stripe redirects to success_url on the SPA] (UI shows "processing" — NOT "subscribed",
-    since the webhook, not this redirect, is what confirms and persists entitlement)
-```
+### State Management
 
-### Webhook-driven entitlement sync (the authoritative path)
-
-```
-[Stripe] checkout.session.completed / customer.subscription.updated / .deleted
-    ↓ POST to api/stripe/webhook.js (raw body preserved — see Anti-Pattern 4)
-[Verify signature] stripe.webhooks.constructEvent(rawBody, sig, webhookSecret)
-    ↓
-[INSERT processed_stripe_events(event_id) ON CONFLICT DO NOTHING]
-    → conflict? already processed → return 200 immediately
-    → inserted? continue
-    ↓
-[Resolve stripe_customer_id → user_id] (from stripe_customers table)
-[UPSERT subscriptions row] status/product/price/current_period_end from the (re-fetched,
-    not payload-trusted) live Stripe subscription object
-    ↓ return 200 within Stripe's timeout window
-```
-
-### Entitlement check (every gated request, the enforcement point)
-
-```
-[Browser] fetch('/api/content/editions/12', { credentials: 'include' })
-    ↓
-[api/content/[type]/[slug].js] read session cookie → userId
-    ↓ hasActiveEntitlement(userId, 'edition') — live DB read, every time
-    → true  → return full content JSON
-    → false → return teaser/excerpt + 200 (or 403 if the route is strictly gated)
-```
+Not applicable to this milestone in the traditional sense — there is no new state library. The one relevant existing state-adjacent detail: gated-content routes (`Edition.jsx`, `Account.jsx`) render distinct branches (loading skeleton / locked-teaser / entitled-full-content) driven by `useEntitlements`/`useGatedContent`/`useSession` (from the completed auth/billing milestone). Each of those branches is a **separate DOM subtree with its own layout**, so a mobile-portrait fix to `Edition.jsx` must be verified in all three states (a phone-width fix to the "entitled" branch does not automatically fix the "locked" teaser branch's markup) — this is a real per-component checklist item, not a data-flow risk.
 
 ### Key Data Flows
 
-1. **Identity is established once (sign-in), entitlement is checked on every gated request** — these are deliberately separate concerns with separate data: the session cookie never expresses "what am I allowed to see," only "who am I."
-2. **Stripe webhooks are the only path that mutates `subscriptions`** — Checkout/Billing Portal redirects only *initiate* state changes at Stripe; the DB only reflects those changes once Stripe's webhook confirms them, closing the loop the current `localStorage` demo (`Subscribe.jsx` setting `subscribed=true` on submit) fakes today.
+1. **CSS delivery:** Build-time-only, single static asset, identical for every route and every auth/entitlement state — no runtime CSS logic exists or is needed for this milestone.
+2. **JS breakpoint reads:** Currently two independent runtime reads (`Header.jsx` via `matchMedia` listener, `useScrollFx` via one-time `innerWidth` check at effect-mount/resize) — both client-only (`window`-guarded), never touched during SSR/prerender since `prerender.js`'s `renderToString()` pass has no `window`.
 
 ## Scaling Considerations
 
-| Scale | Architecture Adjustments |
+Not a traffic/user-scale concern (this is a layout-correctness milestone, not an infra one). "Scaling" here means how the fix effort compounds across pages:
+
+| Scope | Architecture Adjustments |
 |-------|--------------------------|
-| 0–1k subscribers (realistic near-term for this project) | Single Neon Postgres project, `@neondatabase/serverless` HTTP driver (one query per function invocation, no pooling infra needed). No caching layer required. |
-| 1k–100k subscribers | Add indexes on `subscriptions.user_id` and `stripe_customers.stripe_customer_id`; consider Vercel Fluid Compute + a warm `pg` connection pool (`attachDatabasePool`) if function cold-start/HTTP-driver latency becomes measurable; add a short-lived in-memory cache of entitlement lookups per warm function instance (not a cookie/JWT cache) if DB read latency becomes a bottleneck on gated-content-heavy pages. |
-| 100k+ subscribers | Move webhook processing off the synchronous request path (enqueue to a queue/worker, ack Stripe fast) if event volume causes handler timeouts; consider a read replica for entitlement reads if write contention from webhooks grows. |
+| Token/pattern layer (this milestone's Phase 0) | Establish breakpoint-tier documentation + fluid-spacing/type tokens once in `eclat.css:8-37`; touch-input decision for `useDragScroll` once in `motion.js`. Everything downstream reuses these — get them right before touching per-page CSS. |
+| Per-page fixes (Home, Archive/Edition/Books/Writings, modals, Subscribe/Account) | Each page's existing `@media` rules get consolidated onto the shared tiers; new phone-specific rules are added under the same tiers rather than new arbitrary widths. No shared risk across pages once tokens exist — pages are independent CSS selector scopes today, so parallelizing per-page fixes across separate plan tasks is safe. |
+| Global chrome (Header/Footer) | Touches every page transitively — fix and verify this early alongside the token work, not deferred to "last," since a header/nav regression is visible on every other page's screenshot/UAT. |
 
 ### Scaling Priorities
 
-1. **First bottleneck:** DB connection overhead per serverless invocation if a traditional pooled `pg` client is used without Fluid Compute — mitigated from day one by choosing the Neon HTTP driver (Pattern in Sources below), so this is a non-issue at this project's realistic scale.
-2. **Second bottleneck (much further out):** Webhook handler synchronous processing time if Stripe event volume grows — not a concern for a single-brand magazine subscriber base; flagged only for completeness.
+1. **First risk:** Breakpoint/token drift (three independent "what is mobile" literals today) compounding into inconsistent behavior as more phone-width `@media` rules are added ad hoc. Mitigate by documenting the tier list in `eclat.css` *before* any per-page fix work starts (Pattern 1).
+2. **Second risk:** Touch-vs-native-scroll double-handling in `useDragScroll` (Pattern 2) being discovered late, after several pages' drag-strips have already been visually verified only on desktop mouse emulation. Mitigate by testing the strip on a real touch device (or DevTools touch emulation) as part of the *first* page that uses it (Home or Edition), not deferred to a final cross-device pass.
 
 ## Anti-Patterns
 
-### Anti-Pattern 1: Baking entitlement/subscription status into the session cookie or a JWT claim
+### Anti-Pattern 1: Introducing a CSS preprocessor or CSS-in-JS "just for this milestone"
 
-**What people do:** Put `{ userId, subscribed: true, plan: 'premium' }` into a signed cookie or JWT so every request can check entitlement without a DB round-trip.
-**Why it's wrong:** Violates the explicit requirement that cancelling immediately re-locks content — the cookie stays valid (and "subscribed") until it expires or is reissued, even after Stripe reports the cancellation via webhook.
-**Do this instead:** Cookie carries identity only (`userId`). Entitlement is always a live DB read at request time, sourced from the webhook-maintained `subscriptions` table.
+**What people do:** Reach for Sass/PostCSS/Tailwind/styled-components to get real breakpoint variables and nesting, since plain CSS custom properties can't parameterize `@media` conditions.
+**Why it's wrong:** Violates the stated constraint ("existing Vite + React SPA... design, routing, and content model stay as-is") and adds a build-tooling dependency change to what should be a pure layout/CSS milestone — `vite.config.js` has zero PostCSS config today, and introducing one is an unrelated, higher-risk change to bundle behind mobile fixes.
+**Do this instead:** Custom properties for anything that's a *value* (spacing, type scale, colors — already the pattern at `eclat.css:8-37`), plain repeated numeric literals for anything that's a *media query condition*, disciplined by a documented tier comment block (Pattern 1).
 
-### Anti-Pattern 2: Trusting the Stripe Checkout success-page redirect as proof of payment
+### Anti-Pattern 2: Adding parallel `touchstart`/`touchmove` handlers alongside the existing Pointer Events in `useDragScroll`
 
-**What people do:** On landing at the `success_url` after Checkout, immediately set `subscribed = true` client-side (this is exactly what `Subscribe.jsx` does today with its fake `completeDemo()`).
-**Why it's wrong:** The redirect only proves the browser was sent back to that URL — it proves nothing about payment success server-side, and is trivially fakeable by visiting the URL directly.
-**Do this instead:** The success page shows a "confirming your subscription…" state and polls `GET /api/me` (or the page simply re-fetches on next real navigation) until the webhook-driven DB write lands; the webhook is the only source of truth for "did this actually succeed."
+**What people do:** See "drag scroll doesn't feel right on my phone" and assume Pointer Events don't cover touch, then bolt on a second, separate touch-event listener path.
+**Why it's wrong:** Pointer Events already fire for touch input in every target browser here; adding a second handler set creates two competing sources of `scrollLeft` mutation and duplicate `is-dragging` class churn, making the bug harder to diagnose, not easier.
+**Do this instead:** Diagnose first (is it native-scroll-vs-JS-scrollLeft conflict, Pattern 2), then fix with a `pointer: coarse` gate on the *existing* single handler set, not a second one.
 
-### Anti-Pattern 3: Using a pooled `pg` TCP client from classic (non-Fluid) Vercel serverless functions
+### Anti-Pattern 3: Fixing breakpoints per-page without touching the shared tier/token layer first
 
-**What people do:** `new Pool()` from `node-postgres` at module scope, assuming it behaves like a long-lived server process.
-**Why it's wrong:** Each classic serverless invocation may be a fresh, short-lived execution environment; TCP connections accumulate and exhaust Postgres's connection limit under concurrent traffic instead of being reused.
-**Do this instead:** Use `@neondatabase/serverless` in HTTP mode (`neon()` function, one query per call) for typical request/response functions; only reach for pooled TCP + Fluid Compute's `attachDatabasePool` if functions are explicitly configured to stay warm.
-
-### Anti-Pattern 4: Letting the platform auto-parse the Stripe webhook request body
-
-**What people do:** Read `req.body` (already JSON-parsed by the platform) inside the webhook handler and pass it to `stripe.webhooks.constructEvent`.
-**Why it's wrong:** Stripe's signature verification requires the exact raw bytes of the request body; a re-serialized parsed-then-stringified body will not match the signature, and verification will fail (or, worse, someone "fixes" this by skipping verification entirely, which removes all protection against forged webhook calls).
-**Do this instead:** In the webhook function specifically, read the raw body directly from the Node request stream (or use the Web API `request.text()` handler style) before any parsing occurs, and pass that untouched buffer/string to `constructEvent`.
+**What people do:** Jump straight into "make Home look right on an iPhone," ship a `@media (max-width: 400px)` rule scoped to Home only, then repeat with a slightly different arbitrary width on Archive, Books, Writings.
+**Why it's wrong:** Recreates and worsens the exact drift problem already present (three literals today) — by the time all pages are "fixed" independently, the codebase could have five or six near-duplicate but not-quite-matching breakpoint values, worse than the current three.
+**Do this instead:** Land the tier-documentation + token pass (Pattern 1) as an explicit first phase/plan, referenced by every subsequent per-page plan, per the Build Order below.
 
 ## Integration Points
 
 ### External Services
 
-| Service | Integration Pattern | Notes |
-|---------|---------------------|-------|
-| Google OAuth | Authorization Code flow: redirect to consent screen → `api/auth/google/callback` exchanges code via `google-auth-library` `OAuth2Client`, verifies ID token, extracts `sub` | No client-side Google script needed with this flow choice — avoids CSP script-src changes entirely (Pattern 1) |
-| Stripe (Checkout) | Server creates a Checkout Session (`mode: 'subscription'`, one of the 4 known price IDs), returns `session.url`, browser navigates there | No Stripe.js needed client-side with server-redirect approach |
-| Stripe (Billing Portal) | Server creates a Billing Portal Session for the user's `stripe_customer_id`, browser navigates there for cancel/manage | Replaces the current mocked Account page cancel/manage UI with Stripe's own hosted flow |
-| Stripe (Webhooks) | `api/stripe/webhook.js`, raw body + signature verification, idempotent via `processed_stripe_events` unique constraint | Must be registered in the Stripe dashboard against the deployed `/api/stripe/webhook` URL; webhook signing secret is a separate env var from the API secret key |
-| Neon Postgres | `@neondatabase/serverless` HTTP driver, one query per invocation, no persistent connection state | Avoids the classic serverless connection-exhaustion problem (Anti-Pattern 3) without needing PgBouncer or Fluid Compute at this project's scale |
+None. This milestone has no external-service dependency — it is pure client-side CSS/JS layout work on an already-complete backend (auth/billing milestone is separate and finished per `PROJECT.md`).
 
 ### Internal Boundaries
 
 | Boundary | Communication | Notes |
 |----------|---------------|-------|
-| Frontend SPA ↔ `/api/*` functions | Same-origin `fetch(..., { credentials: 'include' })`, JSON in/out | No CORS configuration needed (same Vercel deployment/origin); session cookie travels automatically |
-| `/api/*` functions ↔ Neon Postgres | `@neondatabase/serverless` HTTP driver, parameterized SQL (or a thin query builder — Drizzle is a reasonable fit given the schema's small surface) | Each function imports a shared singleton from `api/_lib/db.js` |
-| `/api/*` functions ↔ Stripe | `stripe` Node SDK, secret key from env, never exposed to `src/` (client bundle) | Webhook secret and API secret key are two distinct env vars, both server-only |
-| `/api/*` functions ↔ Google | `google-auth-library` `OAuth2Client`, client secret from env, never exposed to `src/` | Client ID (not secret) is safe to reference from the login-redirect URL construction, which can live server-side or client-side equally |
-| Static prerendered pages ↔ dynamic gated regions (same page) | Post-hydration `fetch()` calls from route components (e.g. `Edition.jsx`) into `/api/content/...` | The prerendered HTML for a gated route contains only the free excerpt/shell; the "full content" DOM region is populated client-side after hydration, gated by the live entitlement check server-side |
+| `src/styles/eclat.css` ↔ every route/component | Global CSS class selectors, no scoping/CSS-modules | Single shared file — a token/tier change here is felt everywhere simultaneously; this is why the token pass must land first and be treated as a shared-contract change, reviewed once, not re-litigated per page. |
+| `src/lib/motion.js` ↔ `Home.jsx`, `Edition.jsx` (drag-scroll), all routes with `[data-rev]`/`[data-par]`/`[data-cta]` (reveal/parallax), `Home.jsx` hero (`useScrollFx`) | Hooks called directly from route components; DOM attribute selectors (`data-*`) as the coupling mechanism, not props | Touch-input changes to `useDragScroll` are isolated to that one function — `useScrollFx`, `useReveal`, `runFlip` are untouched by the touch-input question and don't need modification for this milestone unless their own mobile visual behavior (already partially handled via the `mobile` flag and the 720px CSS block) needs adjustment. |
+| `Header.jsx` (mobile nav) ↔ `eclat.css` `.nav`/`.nav__toggle` rules | Component renders `hidden` attribute + class names; CSS owns all visual state (fixed-position dropdown, animation) | This is the reusable mobile-nav pattern — any new mobile-only overlay/menu (if the milestone surfaces one, e.g., a MagazinePreview mobile control layout) should follow this same shape: JS owns open/closed boolean + a11y attributes, CSS owns the presentation, not the other way around. |
+| `prerender.js`/`entry-server.jsx` ↔ CSS | None (confirmed) | CSS is a single static build asset, identical across all prerendered routes and all auth/entitlement states; no prerender-time branching on viewport/CSS is possible or needed. |
+| `MagazinePreview.jsx` / `Lightbox.jsx` ↔ `eclat.css` `.lightbox`/`.magazine-preview__*` rules | Shared `.lightbox` base class + component-specific modifier classes | Both modals already share the same accessibility contract (focus trap, Esc, scroll-lock) and the same base CSS class — a phone-width fix to `.lightbox`'s frame sizing/close-button hit-target benefits both components at once; fix the shared `.lightbox` rules before the modal-specific `.magazine-preview__nav`/`__frame` overrides. |
 
-## The Prerendering Split — Explicit Guidance
+## Suggested Build Order
 
-**Stays exactly as-is (build-time prerendered, unchanged pipeline):**
-- `/`, `/archive`, `/books`, `/writings` — pure listing/marketing pages, identical for every visitor, no reason to touch `prerender.js` for these.
-- `/editions/:no`, individual book/writing detail pages — **the public shell only**: title, cover, metadata, free excerpt, JSON-LD/SEO tags. This is unchanged from today's build-time rendering *except* that the data source for what counts as "the excerpt" must now be genuinely public data (already the case for `src/data/content.js` metadata), not the currently-bundled full text that CSS merely blurs.
-- `/subscribe` (plan-selection view) — public, no auth required to see pricing/plan options.
-- `/404` and any other route with no per-user variation.
+Given the constraint that tablet/desktop are out of scope and only phone-portrait (~375–430px) matters, and given the dependency shape above:
 
-**Must become dynamic (post-hydration, runtime `/api/*` fetch — never prerendered with real data):**
-- The **full-text/full-issue region** within `/editions/:no` and equivalent book/writing pages — fetched via `api/content/[type]/[slug].js`, gated by live entitlement check. The prerendered page still exists and is still crawlable/indexable for its public shell; only this specific DOM region is populated dynamically.
-- `/account` — subscription status, plan, invoices, cancel/manage. Prerender only a generic "sign in to view your account" shell (or skip prerendering this route's content entirely and let the SPA render a loading state, then populate from `GET /api/me` + `GET /api/subscription` after hydration). There is no public/SEO value in this route, so minimal-shell prerendering is purely for consistency with the rest of the build pipeline, not necessity.
-- Sign-in state anywhere it appears (header "Sign in" vs. avatar/menu) — resolved client-side from `/api/me` after hydration; the prerendered HTML should render a neutral/signed-out-looking default (never guess a signed-in state at build time, since prerendering happens once per deploy with no viewer context).
-
-**Why this split and not a framework migration:** The existing `prerender.js` + `src/entry-server.jsx` mechanism already correctly separates "render once at build time" from "hydrate and behave as SPA thereafter." Nothing about adding per-user dynamic content requires replacing this with a per-request SSR framework (e.g., migrating to Next.js) — it only requires adding a runtime data-fetching layer (the new `/api/*` functions + `src/api/*.js` client wrappers) for the specific regions that are genuinely per-user. This keeps the milestone scoped to additive changes rather than a rewrite, consistent with the project's stated constraint to build on the existing Vite + React Router SPA.
-
-**CSP consequence of this split + Pattern 1:** Because both Google sign-in and Stripe checkout/billing-portal use server-initiated full-page redirects rather than embedded client-side SDKs, the CSP change needed is minimal — essentially none for `script-src` (no new third-party script origins to load), and no `frame-src` changes for either provider under this flow (Stripe Checkout/Billing Portal and Google's consent screen are top-level navigations, not iframes). The only CSP consideration is ensuring `connect-src`/`form-action` don't unnecessarily block the redirect targets — full-page navigations are generally unaffected by `connect-src`, so this is a smaller, more surgical change than "loosen CSP for Google + Stripe," directly addressing the concern flagged in the existing codebase architecture doc.
+1. **Phase A — Shared foundation (tokens + breakpoint documentation + touch-input decision).** Land in `eclat.css` (tier comment block + fluid-spacing/type custom properties) and `src/lib/motion.js` (`useDragScroll` pointer-coarse gate, verified on a real/emulated touch device) before any per-page visual work. This is the one phase every other phase depends on — a token/tier change made later forces re-verification of every page already "fixed."
+2. **Phase B — Global chrome (Header/Footer).** Already has a working mobile-nav pattern (`Header.jsx` + `.nav` CSS at 900px); this phase is about verifying/tightening it at true phone-portrait widths (375-430px, narrower than the existing 900px collapse point suggests was tested) and doing the same for `Footer.jsx`. High leverage — every other page inherits whatever chrome bugs exist here.
+3. **Phase C — Content pages (Home, Archive, Edition, Books, Writings).** These share `.grid-covers`/`.newest__grid`/`.writing` CSS patterns already partially addressed in the existing 900/720/460 blocks — consolidate onto the Phase A tiers and extend for true phone-portrait. Home is highest-risk (hero fan carousel via `useScrollFx`, already has a `mobile` branch — verify it against real phone widths, not just the `< 720` boundary) and Edition carries the drag-scroll strip (Pattern 2) plus the three-branch gated-content layout (loading/locked/entitled) that must each be checked. Can be parallelized across pages once Phase A tokens exist, since each page's CSS selectors are independent.
+4. **Phase D — Modals (MagazinePreview, Lightbox).** Depends on Phase A's touch-input decision (both may gain touch-swipe-to-navigate expectations on phone, even though `MagazinePreview`'s Previous/Next buttons already work via tap) and benefits from Phase C's page-level fixes being stable (they're triggered from Edition/Archive/Books cover grids). Shared `.lightbox` base class means fixing frame/close-button sizing once helps both components.
+5. **Phase E — Subscribe/Account.** Lowest shared-CSS overlap with the other phases (`.plans`, `.panel`, `.field-pair`, `.invoice` already have some 720/900 handling) and no drag-scroll/modal touch concerns — can run last or in parallel with Phase D since it doesn't share components with the modal work, only the Phase A token/chrome foundation.
 
 ## Sources
 
-- [How do I get the raw body of a Serverless Function? — Vercel Knowledge Base](https://vercel.com/support/articles/how-do-i-get-the-raw-body-of-a-serverless-function) — MEDIUM confidence (official Vercel docs)
-- [Connection Pooling with Vercel Functions — Vercel Knowledge Base](https://vercel.com/kb/guide/connection-pooling-with-functions) — MEDIUM confidence (official Vercel docs)
-- [Neon serverless driver — Neon Docs](https://neon.com/docs/serverless/serverless-driver) — MEDIUM confidence (official Neon docs)
-- [Connecting to Neon from Vercel — Neon Docs](https://neon.com/docs/guides/vercel-connection-methods) — MEDIUM confidence (official Neon docs)
-- [Verify the Google ID token on your server side — Google for Developers](https://developers.google.com/identity/gsi/web/guides/verify-google-id-token) — MEDIUM confidence (official Google docs)
-- [Authenticate with a backend server — Google for Developers](https://developers.google.com/identity/sign-in/web/backend-auth) — MEDIUM confidence (official Google docs)
-- [google-auth-library-nodejs verifyGoogleIdToken.js sample — googleapis/GitHub](https://github.com/googleapis/google-auth-library-nodejs/blob/main/samples/verifyGoogleIdToken.js) — MEDIUM confidence (official Google client library repo)
-- [iron-session README — vvo/GitHub](https://github.com/vvo/iron-session/blob/main/README.md) — MEDIUM confidence (canonical library docs, widely adopted)
-- [Rewrites on Vercel — Vercel Docs](https://vercel.com/docs/routing/rewrites) — MEDIUM confidence (official Vercel docs)
-- [Static Configuration with vercel.json — Vercel Docs](https://vercel.com/docs/project-configuration/vercel-json) — MEDIUM confidence (official Vercel docs)
-- [Resolve webhook signature verification errors — Stripe Documentation](https://docs.stripe.com/webhooks/signature) — MEDIUM confidence (official Stripe docs)
-- [Stripe subscriptions webhooks documentation — docs.stripe.com](https://docs.stripe.com/subscriptions/webhooks) — MEDIUM confidence (official Stripe docs)
+- Direct inspection of current repository source (primary/authoritative — this is an integration question about code that already exists, not an external ecosystem question):
+  - `src/styles/eclat.css` (2243 lines — tokens at 1-37, existing `@media` blocks at 1994-2244)
+  - `src/lib/motion.js` (full file — `useScrollFx`, `useDragScroll`, `runFlip`, `useReveal`, `useScrolled`)
+  - `src/components/Header.jsx` (existing mobile-nav pattern, `isMobile`/`matchMedia` usage)
+  - `src/components/Lightbox.jsx`, `src/components/MagazinePreview.jsx` (shared `.lightbox` modal contract)
+  - `vite.config.js` (`cssCodeSplit: false`, no PostCSS/preprocessor config, `target: 'es2020'`)
+  - `prerender.js` (confirmed: no CSS-related logic, only `<head>` tag injection from `src/data/seo.js`)
+  - `.planning/PROJECT.md` (v1.1 milestone scope: phone-portrait only, tablet/desktop explicitly out of scope)
+  - `.planning/codebase/ARCHITECTURE.md` (prior codebase map, 2026-09-08, confirms no test framework/no CSS tooling beyond Vite defaults)
 
 ---
-*Architecture research for: Auth + billing backend integration into an existing prerendered React SPA*
-*Researched: 2026-09-08*
+*Architecture research for: mobile-responsive retrofit, Éclat v1.1 milestone*
+*Researched: 2026-09-13*
