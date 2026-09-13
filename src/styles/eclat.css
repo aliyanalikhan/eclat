@@ -2035,6 +2035,9 @@ a:hover .cover--book {
     background: var(--bg);
     border-bottom: 1px solid var(--line);
     padding: 8px var(--gut) 22px;
+    padding-left: max(var(--gut), env(safe-area-inset-left));
+    padding-right: max(var(--gut), env(safe-area-inset-right));
+    padding-bottom: max(22px, env(safe-area-inset-bottom));
     box-shadow: 0 18px 40px rgba(22, 19, 15, 0.12);
     max-height: calc(100vh - var(--nav-h));
     max-height: calc(100svh - var(--nav-h));
