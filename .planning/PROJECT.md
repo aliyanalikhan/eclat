@@ -8,6 +8,17 @@
 
 A signed-in subscriber's paid access is real and enforced server-side — no page, download, or API response leaks paid content to someone who hasn't actually paid for it.
 
+## Current Milestone: v1.1 Mobile Responsive Design
+
+**Goal:** Every page and interactive overlay on the site is fully usable and visually correct at phone-portrait widths (~375–430px), replacing the current desktop-first layout that breaks on real mobile devices.
+
+**Target features:**
+- Home page (hero fan carousel, Cultural Icons section, Videos section, drag-scroll strips) renders correctly on phone widths
+- Archive / Edition / Books / Writings listing grids and detail pages are usable on phone widths — no horizontal scroll, readable text, tappable controls
+- Magazine preview page-flip modal and Lightbox zoom overlay work correctly on phone-width touch screens
+- Subscribe pricing picker, sign-in, Account panels, and Stripe billing portal redirect are usable on phone widths
+- Global chrome (header/nav, footer) works correctly on phone widths across all of the above
+
 ## Business Context
 
 - **Customer**: Individual readers/subscribers of ÉCLAT magazine and the LaDidiér children's books — not businesses or other publishers (this is a single-brand, multi-*user* product, not a multi-tenant/white-label platform)
@@ -30,12 +41,17 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 - ✓ User's subscription status is kept in sync via verified Stripe webhooks (signature-checked), not by trusting the client — Phase 3
 - ✓ No Stripe secret key, webhook secret, or Google OAuth client secret is ever exposed to client-side code — enforced by `scripts/check-secrets.js` gating every `npm run build`; verified Phase 3
 - ✓ All money-related actions (checkout session creation, webhook handling, entitlement checks) happen server-side only — Phase 3
+- ✓ Gated content (edition excerpt paragraphs, paywalled writings) is served/rendered based on the user's real, server-verified entitlement — replacing the `subscribed` localStorage flag entirely — Phase 4 (code-complete; human UAT still pending, see STATE.md Blockers)
+- ✓ User can manage their subscription (view status, cancel) from the Account page, backed by real Stripe data instead of mocked invoices/plan — Phase 5 (code-complete; human UAT still pending, see STATE.md Blockers)
+- ✓ Losing/cancelling a subscription revokes access to gated content on the next request — Phase 4/5 (code-complete; human UAT still pending, see STATE.md Blockers)
 
 ### Active
 
-- [ ] Gated content (edition full issues, book full spreads, paywalled writings) is served/rendered based on the user's real, server-verified entitlement — replacing the current `subscribed` localStorage flag entirely
-- [ ] User can manage their subscription (view status, cancel) from the Account page, backed by real Stripe data instead of the current mocked invoices/plan
-- [ ] Losing/cancelling a subscription immediately revokes access to gated content on the next request
+- [ ] Home page (hero fan, Cultural Icons, Videos, drag-scroll strips) is fully usable and visually correct at phone-portrait widths
+- [ ] Archive / Edition / Books / Writings listing and detail pages are fully usable at phone-portrait widths (no horizontal scroll, readable text, tappable controls)
+- [ ] Magazine preview page-flip modal and Lightbox zoom overlay work correctly on phone-width touch screens
+- [ ] Subscribe pricing picker, sign-in, Account panels, and Stripe billing portal redirect are usable at phone-portrait widths
+- [ ] Header/nav and footer render and function correctly at phone-portrait widths across every page
 
 ### Out of Scope
 
@@ -43,6 +59,7 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 - Email/password sign-in — Google-only by deliberate choice, avoids password storage/reset/leak surface entirely
 - New pricing or new Stripe products — reusing the 4 products that already exist in the live Stripe account
 - Building/rotating Google OAuth or Stripe credentials — both already exist and will be supplied as environment variables during implementation, never pasted into chat or committed to the repo
+- Tablet/desktop layout changes — this milestone targets phone-portrait widths (~375–430px) only; tablet and landscape are not in scope unless a phone-portrait fix requires touching a shared breakpoint
 
 ## Context
 
@@ -103,4 +120,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-09 after Phase 3 completion*
+*Last updated: 2026-09-13 after starting milestone v1.1 (Mobile Responsive Design)*
