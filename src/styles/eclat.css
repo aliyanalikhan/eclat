@@ -4,6 +4,19 @@
    breakpoints, focus states and mobile navigation it did not have.
    ========================================================================== */
 
+/* --- breakpoint tiers ----------------------------------------------------
+   The 4 tiers below are the site's entire "what is mobile" surface. CSS
+   custom properties cannot be referenced inside an @media condition, so
+   these are repeated literals kept in sync by convention, not enforcement —
+   if you change one call site, update this block and the others.
+   --bp-tablet : 1080px — @media (max-width: 1080px), eclat.css:1996
+   --bp-nav    :  900px — @media (max-width: 900px), eclat.css:2006;
+                          Header.jsx matchMedia('(max-width: 900px)'), Header.jsx:38
+   --bp-mobile :  720px — @media (max-width: 720px), eclat.css:2094;
+                          motion.js window.innerWidth < 720, motion.js:76
+   --bp-phone  :  460px — @media (max-width: 460px), eclat.css:2178
+   ------------------------------------------------------------------------- */
+
 /* --- tokens ------------------------------------------------------------- */
 :root {
   --bg: #f7f3ec;
@@ -34,6 +47,7 @@
   --shell: 1360px;
   --gut: 32px;
   --nav-h: 70px;
+  --wordmark-fs: clamp(20px, 5.4vw, 26px);
 }
 
 /* --- reset -------------------------------------------------------------- */
@@ -356,7 +370,7 @@ a:hover {
 
 .wordmark {
   font-family: var(--serif);
-  font-size: 26px;
+  font-size: var(--wordmark-fs);
   letter-spacing: 0.22em;
   font-weight: 500;
   line-height: 1;
@@ -2175,7 +2189,6 @@ a:hover .cover--book {
 
 @media (max-width: 460px) {
   .wordmark {
-    font-size: 21px;
     letter-spacing: 0.18em;
   }
 

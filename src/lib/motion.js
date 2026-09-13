@@ -73,6 +73,7 @@ export function useScrolled(threshold = 30) {
 export function useScrollFx(key) {
   useEffect(() => {
     const reduced = prefersReducedMotion()
+    // --bp-mobile: 720px — matches eclat.css's breakpoint-tier doc block above :root (eclat.css:7); keep this literal in sync with that block.
     const mobile = window.innerWidth < 720
     let raf = 0
 

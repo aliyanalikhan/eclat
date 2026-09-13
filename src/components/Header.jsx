@@ -34,6 +34,7 @@ export default function Header() {
   const authSlotRef = useRef(null)
   const authTriggerRef = useRef(null)
 
+  // --bp-nav: 900px — matches eclat.css's breakpoint-tier doc block above :root (eclat.css:7); keep this literal in sync with that block.
   useEffect(() => {
     const mq = window.matchMedia('(max-width: 900px)')
     const sync = () => {
