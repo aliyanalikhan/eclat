@@ -74,7 +74,7 @@ export function useScrollFx(key) {
   useEffect(() => {
     const reduced = prefersReducedMotion()
     // --bp-mobile: 720px — matches eclat.css's breakpoint-tier doc block above :root (eclat.css:7); keep this literal in sync with that block.
-    const mobile = window.innerWidth < 720
+    const mobile = window.innerWidth < 720 // bp:mobile
     let raf = 0
 
     // Resting spread of the fan. It opens from here to 1.0 as the hero scrolls.

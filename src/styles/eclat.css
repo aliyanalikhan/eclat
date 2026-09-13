@@ -8,13 +8,17 @@
    The 4 tiers below are the site's entire "what is mobile" surface. CSS
    custom properties cannot be referenced inside an @media condition, so
    these are repeated literals kept in sync by convention, not enforcement —
-   if you change one call site, update this block and the others.
-   --bp-tablet : 1080px — @media (max-width: 1080px), eclat.css:1996
-   --bp-nav    :  900px — @media (max-width: 900px), eclat.css:2006;
-                          Header.jsx matchMedia('(max-width: 900px)'), Header.jsx:38
-   --bp-mobile :  720px — @media (max-width: 720px), eclat.css:2094;
-                          motion.js window.innerWidth < 720, motion.js:76
-   --bp-phone  :  460px — @media (max-width: 460px), eclat.css:2178
+   if you change one call site, update this block and the others. Call
+   sites are tagged with a grep-able anchor comment instead of a line
+   number because line numbers drift on any unrelated edit above them —
+   run `grep -rn "bp:tablet\|bp:nav\|bp:mobile\|bp:phone" src` to find the
+   exact current call site regardless of file length.
+   --bp-tablet : 1080px — @media (max-width: 1080px) [anchor: bp:tablet]
+   --bp-nav    :  900px — @media (max-width: 900px) [anchor: bp:nav];
+                          Header.jsx matchMedia('(max-width: 900px)') [anchor: bp:nav]
+   --bp-mobile :  720px — @media (max-width: 720px) [anchor: bp:mobile];
+                          motion.js window.innerWidth < 720 [anchor: bp:mobile]
+   --bp-phone  :  460px — @media (max-width: 460px) [anchor: bp:phone]
    ------------------------------------------------------------------------- */
 
 /* --- tokens ------------------------------------------------------------- */
@@ -2011,7 +2015,7 @@ a:hover .cover--book {
 }
 
 /* --- responsive --------------------------------------------------------- */
-@media (max-width: 1080px) {
+@media (max-width: 1080px) { /* bp:tablet */
   .newest__grid {
     gap: 48px;
   }
@@ -2021,7 +2025,7 @@ a:hover .cover--book {
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 900px) { /* bp:nav */
   :root {
     --gut: 22px;
   }
@@ -2131,7 +2135,7 @@ a:hover .cover--book {
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 720px) { /* bp:mobile */
 
   .page,
   .page--narrow {
@@ -2215,7 +2219,7 @@ a:hover .cover--book {
   }
 }
 
-@media (max-width: 460px) {
+@media (max-width: 460px) { /* bp:phone */
   .wordmark {
     letter-spacing: 0.18em;
   }
