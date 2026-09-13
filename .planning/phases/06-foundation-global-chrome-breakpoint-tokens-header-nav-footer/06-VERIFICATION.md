@@ -1,67 +1,26 @@
 ---
 phase: 06-foundation-global-chrome-breakpoint-tokens-header-nav-footer
 verified: 2026-09-13T00:00:00Z
-status: gaps_found
-score: 7/10 must-haves verified
+status: human_needed
+score: 9/10 must-haves verified
 behavior_unverified: 0
 overrides_applied: 0
-gaps:
-  - truth: "The header's nav drawer opens and closes correctly at phone-portrait widths (CHROME-01 / ROADMAP Phase 6 Success Criterion 4)"
-    status: failed
-    reason: >
-      Header.jsx initializes `isMobile` to `useState(false)` (line 24) and only corrects it inside a
-      post-mount `useEffect` (lines 38-47). `navHidden = isMobile && !open` (line 112) therefore
-      evaluates to `false` on every server-rendered/prerendered/first-painted page, so the `hidden`
-      attribute is never present on `<nav>` at first paint. Verified independently (not just via
-      06-REVIEW.md's claim): built the SSR bundle (`vite build --ssr src/entry-server.jsx`) and called
-      `render('/')` directly — the emitted markup is `<nav id="..." class="nav" aria-label="Primary">`
-      with no `hidden` attribute at all. At <=900px `.nav` is `position: fixed; inset: var(--nav-h) 0 auto 0`
-      (eclat.css:2029-2045), a full-width column dropdown containing every nav link, the auth slot, and
-      the Subscribe CTA, whose only closed-state mechanism is `.nav[hidden] { display: none }`
-      (eclat.css:2047-2049). Net effect: every mobile visitor sees the full nav flyout rendered open over
-      the page on first paint (prerendered HTML + the pre-hydration window), until JS hydrates and the
-      effect finally runs. This is present-day behavior, not a corner case.
-    artifacts:
-      - path: "src/components/Header.jsx"
-        issue: "isMobile useState(false) initial value + effect-only correction (lines 24, 38-47, 112) produces an incorrect pre-hydration DOM state on every mobile page load"
-      - path: "src/styles/eclat.css"
-        issue: ".nav's closed state at <=900px depends entirely on the `hidden` attribute (lines 2029-2049) with no CSS-only default-closed fallback for the pre-hydration window"
-    missing:
-      - "A CSS-only default-closed state for .nav at <=900px (e.g. `display: none` by default, with a JS-added `is-open` class switching to `display: flex`) so 'closed' is the safe default at every render stage — SSR, pre-hydration paint, and post-hydration. 06-REVIEW.md's CR-01 includes a concrete fix sketch."
-    note: >
-      This exact defect (isMobile defaulting false, corrected only post-mount) was introduced in Phase 2
-      (commit 9f82841, "auth-aware header with three states...") — it predates Phase 6 and Phase 6's diff
-      to Header.jsx is a single added comment line, not a behavioral change. It is flagged here regardless
-      of origin because ROADMAP Phase 6's stated goal and Success Criterion 4 explicitly require "the nav
-      drawer opens and closes correctly at phone widths," and the current codebase fails that criterion.
-  - truth: "eclat.css's breakpoint-tier doc block names all 4 tiers and their exact call sites in eclat.css, Header.jsx, and motion.js (06-01-PLAN.md must_haves truth #1)"
-    status: partial
-    reason: >
-      The doc block's own self-reference (eclat.css:7, cited from both Header.jsx's and motion.js's
-      cross-reference comments) is accurate. However every body line-number citation inside the block is
-      stale, confirmed by direct grep against the current file: `--bp-tablet` cites eclat.css:1996, actual
-      `@media (max-width: 1080px)` is at line 2014; `--bp-nav` cites eclat.css:2006, actual
-      `@media (max-width: 900px)` is at line 2024; `--bp-mobile` cites eclat.css:2094, actual
-      `@media (max-width: 720px)` is at line 2125; `--bp-phone` cites eclat.css:2178, actual
-      `@media (max-width: 460px)` is at line 2209; the "Header.jsx:38" and "motion.js:76" cross-references
-      both point at the comment line in each file, not the actual `matchMedia`/`window.innerWidth` call
-      (lines 39 and 77 respectively). The must-have explicitly requires "exact call sites" — these are not
-      exact. The 4 breakpoint *values* themselves (1080/900/720/460) are still consistent and correct
-      across every call site, so this does not break FOUND-01's functional intent, only its documentation
-      accuracy (06-REVIEW.md WR-01).
-    artifacts:
-      - path: "src/styles/eclat.css"
-        issue: "Doc block (lines 12-17) cites line numbers that no longer match the file's current @media block locations"
-    missing:
-      - "Correct the 6 stale line-number citations, or replace them with grep-able anchor comments (e.g. `// bp:tablet`) at each call site so they cannot drift silently again — 06-REVIEW.md WR-01 has the exact corrected values."
+re_verification:
+  previous_status: gaps_found
+  previous_score: 7/10
+  gaps_closed:
+    - "The header's nav drawer opens and closes correctly at phone-portrait widths (CHROME-01 / ROADMAP Phase 6 Success Criterion 4) — CR-01"
+    - "eclat.css's breakpoint-tier doc block names all 4 tiers and their exact call sites (06-01-PLAN.md must_haves truth #1) — WR-01"
+  gaps_remaining: []
+  regressions: []
 ---
 
 # Phase 6: Foundation & Global Chrome — Breakpoint Tokens, Header, Nav & Footer Verification Report
 
 **Phase Goal:** The site's shared visual/layout foundation — a single breakpoint tier, fluid typography/spacing tokens, stable full-height sections, and native touch scrolling — is established once, and the global header/nav/footer that appear on every page work correctly at phone-portrait widths.
 **Verified:** 2026-09-13
-**Status:** gaps_found
-**Re-verification:** No — initial verification
+**Status:** human_needed
+**Re-verification:** Yes — after gap closure (plan 06-03)
 
 ## Goal Achievement
 
@@ -69,76 +28,78 @@ gaps:
 
 | # | Truth | Status | Evidence |
 |---|-------|--------|----------|
-| 1 | FOUND-01: Breakpoint doc block exists naming all 4 tiers; literals unchanged in Header.jsx/motion.js | ✓ VERIFIED | `grep` confirms doc block present (eclat.css:7-18); Header.jsx:39 `matchMedia('(max-width: 900px)')` and motion.js:77 `window.innerWidth < 720` are byte-identical to pre-phase (confirmed via `git diff 378e1e6 HEAD`); all 4 literal values consistent across CSS `@media` blocks and JS |
-| 2 | FOUND-01: Doc block's call-site line references are exact | ✗ FAILED | 6 of the doc block's citations are stale (off by 1-31 lines) — see Gaps |
-| 3 | FOUND-02: `--wordmark-fs`/`--footer-pad-y` clamp() tokens wired end-to-end, scaling continuously 375-430px | ✓ VERIFIED | `.wordmark` consumes `var(--wordmark-fs)` (eclat.css:374), `.footer` consumes `var(--footer-pad-y)` (eclat.css:1752); dead 460px 21px override removed; clamp math independently verified: `clamp(20px,5.4vw,26px)` reaches its 26px ceiling only above ~481px viewport width, `clamp(40px,10vw,56px)` reaches 56px only above 560px — matches must-have's stated floor/ceiling boundaries |
-| 4 | FOUND-03: `svh` companions on `.hero`, `.lightbox`/`.lightbox__frame` (x2), mobile `.nav`; `.magazine-preview`'s 78vh untouched | ✓ VERIFIED | All 5 `vh`→`svh` pairs confirmed present with `vh` first, `svh` second, never reordered (eclat.css:515-516, 1792-1793, 1801-1802, 1805-1806, 2042-2043); `.magazine-preview__img`'s `max-height: 78vh` (line 1931) unchanged, no `78svh` companion added |
-| 5 | FOUND-04: Touch pointers cede horizontal strip-scrolling to native scroll; desktop mouse path unchanged | ✓ VERIFIED (primary target) | `motion.js:266` gates `onDown` with `matchMedia('(pointer: coarse)')` before any drag-state mutation; `.strip` carries `touch-action: pan-x` (eclat.css:1254); no parallel `touchstart`/`touchmove` listeners added. Correct for the milestone's actual target (phone-primary touch devices). See Anti-Patterns for a real but out-of-target-scope edge case (WR-03). |
-| 6 | CHROME-01: Safe-area insets wired via `viewport-fit=cover` + `env()` overrides | ✓ VERIFIED | `index.html:5` carries `viewport-fit=cover`; eclat.css:2038-2040 adds `max(var(--gut)\|22px, env(safe-area-inset-*))` for left/right/bottom, additive after the unchanged original shorthand (line 2037) |
-| 7 | CHROME-01: No regression to sign-in/sign-out logic | ✓ VERIFIED | `git diff <pre-phase> HEAD -- src/components/Header.jsx` shows exactly 1 line added (a comment); `handleSignOut`, `toggleAuthMenu`, auth-slot JSX are byte-identical |
-| 8 | CHROME-01: Nav drawer opens and closes correctly at phone widths | ✗ FAILED | Confirmed via direct SSR render (`entry-server.js`'s `render('/')`): emitted `<nav>` has no `hidden` attribute — nav renders open on every mobile first paint until hydration. See Gaps (CR-01). |
-| 9 | CHROME-02: All nav/menu/auth tap targets meet 44px minimum | ✓ VERIFIED | `.nav>.btn` (min-height:44px + inline-flex centering, eclat.css:2056-2063), `.nav .auth-trigger` (min-height:44px, eclat.css:2065-2068), `.auth-menu__item` (padding:14px 16px, eclat.css:480-484) all confirmed in source; `.nav__toggle`/`.nav>a` confirmed unchanged; SUMMARY's CDP-measured real box-model heights (44-53px) corroborate |
-| 10 | CHROME-03: Footer renders legibly, 3 distinct non-overlapping rows at 375px/430px | ? UNCERTAIN (backstop) | Footer CSS structure (`.footer__inner` flex+wrap, `.footer__nav` flex+wrap) is consistent with correct rendering, but this must-have is explicitly marked `verification: backstop` in 06-02-PLAN.md and its claimed proof (real screenshots) was captured by a throwaway script kept in the execution sandbox's scratchpad, not committed to the repo — no independently-checkable evidence exists in the codebase. Routed to human verification. |
+| 1 | FOUND-01: Breakpoint doc block exists naming all 4 tiers; literals unchanged in Header.jsx/motion.js | ✓ VERIFIED | Unchanged from initial verification — doc block present (eclat.css:7-22); breakpoint pixel values (1080/900/720/460) unchanged by 06-03 |
+| 2 | FOUND-01: Doc block's call-site line references are exact | ✓ VERIFIED (re-verified, was FAILED) | Independently confirmed the 6 originally-stale citations (`--bp-tablet`, `--bp-nav`, `--bp-mobile`, `--bp-phone`, `Header.jsx:38`, `motion.js:76`) are now grep-able anchor tags: `grep -c "bp:tablet\|bp:nav\|bp:mobile\|bp:phone" src/styles/eclat.css` confirms anchors at doc block (eclat.css:16-21) and at all 4 `@media` call sites (eclat.css:2028 `/* bp:nav */`, plus tablet/mobile/phone sites); `Header.jsx:39` carries `// bp:nav` on the actual `matchMedia` line; `motion.js:76` carries `// bp:mobile` on the actual `window.innerWidth < 720` line. Zero of the 6 originally-cited stale line numbers remain in the doc block. See Anti-Patterns for a new, non-blocking finding (WR-01-recurrence). |
+| 3 | FOUND-02: `--wordmark-fs`/`--footer-pad-y` clamp() tokens wired end-to-end, scaling continuously 375-430px | ✓ VERIFIED | Unchanged from initial verification — not touched by 06-03 |
+| 4 | FOUND-03: `svh` companions on `.hero`, `.lightbox`/`.lightbox__frame` (x2), mobile `.nav`; `.magazine-preview`'s 78vh untouched | ✓ VERIFIED | Unchanged from initial verification — not touched by 06-03 |
+| 5 | FOUND-04: Touch pointers cede horizontal strip-scrolling to native scroll; desktop mouse path unchanged | ✓ VERIFIED (primary target) | Unchanged from initial verification — not touched by 06-03 |
+| 6 | CHROME-01: Safe-area insets wired via `viewport-fit=cover` + `env()` overrides | ✓ VERIFIED | Unchanged from initial verification — not touched by 06-03 |
+| 7 | CHROME-01: No regression to sign-in/sign-out logic | ✓ VERIFIED | Independently confirmed via `git diff 5eb6f9d..HEAD -- src/components/Header.jsx`: exactly 2 changed lines across all of 06-03 (the `<nav>` className expression, and a trailing `// bp:nav` comment on the `matchMedia` line) — `toggleAuthMenu`, `handleSignOut`, `isMobile`/`open` state initialization, the `matchMedia` `useEffect` body, `navHidden`'s computation, and all auth-slot JSX are byte-identical to before 06-03 |
+| 8 | CHROME-01: Nav drawer opens and closes correctly at phone widths | ✓ VERIFIED (re-verified, was FAILED) | Independently re-ran the SAME method the prior verification used: rebuilt the SSR bundle (`npx vite build --ssr src/entry-server.jsx --outDir dist/server`) and called `render('/')` directly. Emitted markup is unchanged in shape — `<nav id=":R3:" class="nav" aria-label="Primary">`, still no `hidden`/`is-open` attribute — but this is now CORRECT: `eclat.css`'s `<=900px` `.nav` rule (eclat.css:2033-2054) now has `display: none;` as its first declaration, with `.nav.is-open { display: flex; }` (eclat.css:2056-2058) as the only override, and `.nav[hidden] { display: none; }` (eclat.css:2060-2062) preserved unchanged as a redundant-but-harmless reinforcement. Since neither `hidden` nor `is-open` is present in the SSR/pre-hydration markup, the nav now renders CLOSED by default at every render stage (SSR, pre-hydration paint, post-hydration) instead of the pre-fix full-width open dropdown. Confirmed in Header.jsx source: `<nav id={navId} className={\`nav${open ? ' is-open' : ''}\`} hidden={navHidden} aria-label="Primary">` — `open` defaults `false`, so no `is-open` class on first paint, consistent with the CSS-default-closed fix. `npx vite build` exits 0. |
+| 9 | CHROME-02: All nav/menu/auth tap targets meet 44px minimum | ✓ VERIFIED | Unchanged from initial verification — not touched by 06-03 |
+| 10 | CHROME-03: Footer renders legibly, 3 distinct non-overlapping rows at 375px/430px | ? UNCERTAIN (backstop) | Unchanged from initial verification — this must-have is explicitly marked `verification: backstop` in 06-02-PLAN.md; still routed to human verification, not touched by 06-03 |
 
-**Score:** 7/10 truths verified (2 failed, 1 requires human confirmation — see Human Verification)
+**Score:** 9/10 truths verified (0 failed, 1 requires human confirmation — see Human Verification)
 
 ### Required Artifacts
 
 | Artifact | Expected | Status | Details |
 |----------|----------|--------|---------|
-| `src/styles/eclat.css` | Breakpoint doc block, `--wordmark-fs`/`--footer-pad-y`, svh companions, `touch-action: pan-x`, safe-area padding, 44px tap targets | ✓ VERIFIED (content) / ⚠️ partial (doc accuracy) | All CSS additions present and correctly scoped; doc block content itself has stale line-number citations (see gap #2) |
-| `src/lib/motion.js` | Cross-reference comment + pointer-coarse gate in `useDragScroll` | ✓ VERIFIED | Comment present (line 76); gate present as first line of `onDown` (line 266); rest of `onDown`/`onMove`/`onUp`/`onClick` unchanged |
-| `src/components/Header.jsx` | Cross-reference comment only, zero behavior change | ✓ VERIFIED (as scoped) / ✗ underlying defect | Comment added exactly as planned; but the plan's "zero behavior change" scope left CR-01's pre-existing pre-hydration nav-open defect unaddressed, and that defect blocks CHROME-01 |
-| `index.html` | `viewport-fit=cover` on viewport meta | ✓ VERIFIED | Confirmed present, no other changes to the file |
+| `src/styles/eclat.css` | `.nav.is-open` override + `display: none` default inside `@media (max-width: 900px) .nav`; breakpoint doc block converted to anchor comments | ✓ VERIFIED | Confirmed both new rules present at eclat.css:2033-2062 in the exact order specified (default-closed, `.is-open` override, then unchanged `.nav[hidden]`); doc block anchors confirmed at eclat.css:7-22 |
+| `src/components/Header.jsx` | `<nav>` className template literal appending `is-open`; inline `bp:nav` anchor; zero other changes | ✓ VERIFIED | Confirmed via `git diff --numstat` (2 lines changed total across 06-03) and direct source read |
+| `src/lib/motion.js` | Inline `bp:mobile` anchor on the actual `window.innerWidth < 720` line; no logic change | ✓ VERIFIED | Confirmed via `git diff --numstat` (1 line changed) and direct source read |
+| `index.html` | `viewport-fit=cover` on viewport meta | ✓ VERIFIED | Unchanged from initial verification |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 |------|-----|-----|--------|---------|
-| `eclat.css :root` tokens | `.wordmark`/`.footer` selectors | `var(--wordmark-fs)`/`var(--footer-pad-y)` | ✓ WIRED | Both selectors consume the tokens directly |
-| `motion.js useDragScroll onDown` | `eclat.css .strip touch-action: pan-x` | pointer-coarse early return handing off to native scroll | ✓ WIRED | Gate present; CSS `touch-action` present; consistent handoff |
-| `index.html viewport-fit=cover` | `eclat.css env(safe-area-inset-*)` calls | browser safe-area resolution | ✓ WIRED | Prerequisite meta attribute present; `env()` calls present in `.nav` |
-| `eclat.css` breakpoint-tier doc block | `Header.jsx:39` / `motion.js:77` | matching literal-value comments | ⚠️ PARTIAL | Comments present and literals match, but cited line numbers are stale (gap #2) |
-| Header.jsx auth-slot state | `eclat.css .nav .auth-trigger`/`.auth-menu__item` | className-only styling | ✓ WIRED | New CSS rules target the existing, unchanged class names |
+| Header.jsx `open` state | eclat.css `.nav.is-open` rule | className template literal appending `' is-open'` only when `open === true` | ✓ WIRED | Confirmed: `className={\`nav${open ? ' is-open' : ''}\`}` in Header.jsx; `.nav.is-open { display: flex; }` in eclat.css with higher specificity than the plain `.nav` default |
+| eclat.css breakpoint-tier doc block | the 4 `@media` call sites, `Header.jsx:39`, `motion.js:76` | shared grep-able anchor comments (`bp:tablet`/`bp:nav`/`bp:mobile`/`bp:phone`) | ✓ WIRED (re-verified, was PARTIAL) | Confirmed every anchor's grep hit lands on the real code line — `@media (max-width: 900px) { /* bp:nav */`, `const mq = window.matchMedia('(max-width: 900px)') // bp:nav`, `const mobile = window.innerWidth < 720 // bp:mobile` |
+| `eclat.css :root` tokens | `.wordmark`/`.footer` selectors | `var(--wordmark-fs)`/`var(--footer-pad-y)` | ✓ WIRED | Unchanged from initial verification |
+| `motion.js useDragScroll onDown` | `eclat.css .strip touch-action: pan-x` | pointer-coarse early return | ✓ WIRED | Unchanged from initial verification |
+| `index.html viewport-fit=cover` | `eclat.css env(safe-area-inset-*)` calls | browser safe-area resolution | ✓ WIRED | Unchanged from initial verification |
+| Header.jsx auth-slot state | `eclat.css .nav .auth-trigger`/`.auth-menu__item` | className-only styling | ✓ WIRED | Unchanged from initial verification |
 
 ### Data-Flow Trace (Level 4)
 
-Not applicable — this phase is CSS/JS-token/markup-attribute work with no dynamic data rendering (no API calls, no DB queries, no props flowing from a data source to a render).
+Not applicable — this phase is CSS/JS-token/markup-attribute work with no dynamic data rendering.
 
 ### Behavioral Spot-Checks
 
 | Behavior | Command | Result | Status |
 |----------|---------|--------|--------|
-| CSS/JS build pipeline compiles cleanly with all phase changes | `npx vite build` | "63 modules transformed... built in 947ms", 0 errors | ✓ PASS |
-| SSR entry renders the Home route without throwing | `vite build --ssr src/entry-server.jsx` then `render('/')` | Rendered successfully; used to inspect the emitted `<nav>` markup | ✓ PASS (used as evidence for gap #1) |
-| Prerendered `<nav>` carries no `hidden` attribute at first paint | Direct SSR render inspection (see above) | `<nav id="..." class="nav" aria-label="Primary">` — no `hidden` attribute | ✗ FAIL (confirms CR-01) |
-| Full `npm run build` (migrate + vite + prerender + secrets check) | not run | Requires `POSTGRES_URL`/live DB, unavailable in this environment (consistent with both plans' own noted limitation) | ? SKIP |
+| CSS/JS build pipeline compiles cleanly with 06-03's changes | `npx vite build` | "63 modules transformed... built in 933ms", 0 errors | ✓ PASS |
+| SSR entry renders the Home route without throwing | `npx vite build --ssr src/entry-server.jsx --outDir dist/server` then `render('/')` | Rendered successfully | ✓ PASS |
+| Prerendered `<nav>` correctly represents CLOSED at first paint (re-verification of CR-01 fix) | Direct SSR render inspection (same method as initial verification) | `<nav id=":R3:" class="nav" aria-label="Primary">` — no `hidden`/`is-open`, but new CSS default (`display: none` at <=900px) now makes this mean CLOSED | ✓ PASS (confirms gap #1 closed) |
+| `git diff --numstat` confirms Header.jsx/motion.js diffs are minimal and scoped | `git diff --numstat 5eb6f9d..HEAD -- src/components/Header.jsx src/lib/motion.js` | `2 2 src/components/Header.jsx`, `1 1 src/lib/motion.js` | ✓ PASS |
+| Full `npm run build` (migrate + vite + prerender + secrets check) | not run | Requires `POSTGRES_URL`/live DB, unavailable in this environment | ? SKIP |
 
 ### Requirements Coverage
 
 | Requirement | Source Plan | Description | Status | Evidence |
 |-------------|-------------|-------------|--------|----------|
-| FOUND-01 | 06-01 | Single documented breakpoint tier used consistently | ⚠️ PARTIALLY SATISFIED | Values consistent (SATISFIED); doc block's own "exact call sites" claim is inaccurate (gap #2) |
-| FOUND-02 | 06-01 | Fluid clamp()-based typography/spacing tokens | ✓ SATISFIED | Tokens wired end-to-end, floor/ceiling math verified |
-| FOUND-03 | 06-01 | svh/dvh with vh fallback on full-height sections | ✓ SATISFIED | All 3 named spots fixed additively; magazine-preview correctly excluded |
-| FOUND-04 | 06-01 | Touch input scrolls natively, not via JS drag handler | ✓ SATISFIED (for phone-primary touch devices, the milestone's target) | Pointer-coarse gate + touch-action present; WR-02/WR-03 are real but out-of-target-scope edge cases |
-| CHROME-01 | 06-02 | Nav fully usable at phone widths: drawer opens/closes, safe-area respected, no sign-in/out regression | ✗ BLOCKED | Safe-area and sign-in/out regression clauses pass; "opens/closes correctly" clause fails (CR-01, gap #1) |
-| CHROME-02 | 06-02 | All header/nav tap targets meet 44px minimum | ✓ SATISFIED | All 3 targeted selectors bumped; unaffected selectors confirmed already-passing |
-| CHROME-03 | 06-02 | Footer renders correctly/legibly at phone widths | ? NEEDS HUMAN | CSS structure consistent with correct rendering; claimed screenshot proof not present in the repo to independently confirm (backstop must-have) |
+| FOUND-01 | 06-01, 06-03 | Single documented breakpoint tier used consistently | ✓ SATISFIED (re-verified, was PARTIAL) | Values consistent; doc block's call-site citations now anchor-tagged and confirmed to resolve to the exact current call sites |
+| FOUND-02 | 06-01 | Fluid clamp()-based typography/spacing tokens | ✓ SATISFIED | Unchanged |
+| FOUND-03 | 06-01 | svh/dvh with vh fallback on full-height sections | ✓ SATISFIED | Unchanged |
+| FOUND-04 | 06-01 | Touch input scrolls natively, not via JS drag handler | ✓ SATISFIED (for phone-primary touch devices, the milestone's target) | Unchanged |
+| CHROME-01 | 06-02, 06-03 | Nav fully usable at phone widths: drawer opens/closes, safe-area respected, no sign-in/out regression | ✓ SATISFIED (re-verified, was BLOCKED) | All 3 clauses now pass: safe-area (unchanged), no sign-in/out regression (confirmed via minimal diff), drawer opens/closes correctly (CSS-default-closed fix confirmed via independent SSR render) |
+| CHROME-02 | 06-02 | All header/nav tap targets meet 44px minimum | ✓ SATISFIED | Unchanged |
+| CHROME-03 | 06-02 | Footer renders correctly/legibly at phone widths | ? NEEDS HUMAN | Unchanged — backstop must-have, no independently-checkable evidence in the repo |
 
-No orphaned requirements — FOUND-01..04 and CHROME-01..03 are the complete set mapped to Phase 6 in REQUIREMENTS.md's traceability table, and both plans' frontmatter `requirements:` fields together cover exactly this set.
+No orphaned requirements — FOUND-01..04 and CHROME-01..03 are the complete set mapped to Phase 6 in REQUIREMENTS.md's traceability table; plan frontmatter `requirements:` fields across 06-01 ([FOUND-01..04]), 06-02 ([CHROME-01..03]), and 06-03 ([FOUND-01, CHROME-01]) together cover exactly this set with no gaps.
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 |------|------|---------|----------|--------|
-| `src/components/Header.jsx` | 24, 38-47, 112 | `isMobile` defaults `false`, corrected only in a post-mount effect | 🛑 Blocker | Nav renders open on every mobile first paint (CR-01) — blocks CHROME-01 |
-| `src/styles/eclat.css` | 12-17 | Breakpoint-tier doc block cites stale line numbers | ⚠️ Warning | Misleads future maintainers trying to find call sites; doesn't affect current runtime behavior (WR-01) |
-| `src/lib/motion.js` | 77, 113, 202-205 | `useScrollFx`'s `mobile` flag computed once, never recomputed on resize | ⚠️ Warning | Hero fan-effect logic can use a stale mobile/desktop decision after an in-session resize across 720px without a route change (WR-02) — orientation-change/foldable edge case |
-| `src/lib/motion.js` | 266 | Touch/mouse gate uses device-level `matchMedia('(pointer: coarse)')` instead of per-event `PointerEvent.pointerType` | ⚠️ Warning | Misfires only on hybrid-input devices (touchscreen laptops) — outside this milestone's phone-portrait-only target scope, but a real correctness gap (WR-03) |
-| `src/components/Header.jsx` | 15-19 | `truncateName` slices by UTF-16 code unit, not grapheme | ℹ️ Info | Could cut a surrogate-pair character (e.g. emoji) mid-glyph in a display name (IN-01) — low probability |
+| `src/components/Header.jsx`, `src/lib/motion.js`, `src/styles/eclat.css` | Header.jsx:37, motion.js:76, eclat.css:2037 | WR-01-recurrence: 3 comments still cite the doc block's own location by raw line number (`eclat.css:7`) instead of a grep-able anchor — one of these (`eclat.css:2037`) was newly authored as part of 06-03's own CR-01 fix | ⚠️ Warning (non-blocking) | Currently accurate (line 7 is confirmed to still be the doc block's opening line) and won't break from any edit below it, but is fragile against a future edit to the file-header comment block above it, and reintroduces the citation style WR-01 was meant to eliminate. Not part of the specific 6 citations 06-VERIFICATION.md's original gap #2 and 06-03-PLAN.md's must-have truth #3 targeted (those were the 4 breakpoint tiers' call sites, not the doc block's own self-reference) — does not block FOUND-01's satisfaction. Judged non-blocking: leave as a tracked follow-up rather than a new gap. |
+| `src/components/Header.jsx` | 16-19, 186 (renumbered from IN-01 in the initial verification to WR-02 in the post-gap-closure review) | `truncateName`/avatar-initial slice by UTF-16 code unit, not grapheme | ⚠️ Warning | Same pre-existing issue identified in the initial verification (there rated ℹ️ Info); explicitly out of scope for 06-03 per its prohibitions list; low-probability, real text-corruption edge case for names with astral-plane characters. Not a Phase 6 must-have; tracked for a future pass. |
+| `src/lib/motion.js` | 77 (shifted), 113, 202-205 | `useScrollFx`'s `mobile` flag computed once, never recomputed on resize (WR-02 in initial verification) | ⚠️ Warning | Unchanged, explicitly out of scope for 06-03 |
+| `src/lib/motion.js` | 266 | Touch/mouse gate uses device-level `matchMedia('(pointer: coarse)')` (WR-03 in initial verification) | ⚠️ Warning | Unchanged, explicitly out of scope for 06-03; outside milestone's phone-portrait-only target |
+| `src/lib/motion.js` | 110-199 | `useScrollFx`'s `tick` closure has high branching complexity (IN-02 in latest review) | ℹ️ Info | Pre-existing, unrelated to Phase 6's scope |
 
-No TBD/FIXME/XXX debt markers found in any file modified by this phase.
+No TBD/FIXME/XXX debt markers found in any file modified by this phase or by 06-03.
 
 ## Human Verification Required
 
@@ -170,22 +131,30 @@ No TBD/FIXME/XXX debt markers found in any file modified by this phase.
 
 **Test:** At exactly 375px and 430px, screenshot the footer and confirm the wordmark, nav-links row, and full copyright sentence each render on distinct, non-overlapping, non-clipped rows.
 **Expected:** 3 clean rows at both widths, full sentence wraps without clipping.
-**Why human:** This must-have is explicitly marked `verification: backstop` in the plan; the SUMMARY's claimed screenshot evidence was produced by a script kept outside the repository and is not available for this report to inspect directly.
+**Why human:** This must-have is explicitly marked `verification: backstop` in the plan; no independently-checkable evidence exists in the repo.
 
 ### 6. Live signed-in auth-menu round trip
 
 **Test:** In an environment with real Google OAuth credentials and a live database, sign in, open the auth menu, and sign out.
-**Expected:** Avatar/name render correctly sized (already proven via synthetic-DOM CSS measurement per 06-02-SUMMARY.md); sign-out completes and clears the session with no regression.
-**Why human:** No live OAuth/DB backend was available in the execution or verification environment; this was already flagged as deferred by the executor.
+**Expected:** Avatar/name render correctly sized; sign-out completes and clears the session with no regression.
+**Why human:** No live OAuth/DB backend was available in the execution or verification environment.
+
+### 7. Mobile nav paint confirmation with JavaScript disabled (new, from 06-03's own plan)
+
+**Test:** With Chrome DevTools' "Disable JavaScript" setting enabled, load `/` at a viewport width <=900px and observe the header/nav region.
+**Expected:** Only the header bar (wordmark + hamburger icon) is visible; the nav links/auth-slot/Subscribe button do not render as an open full-width dropdown over the page.
+**Why human:** Confirms the actual browser paint matches the CSS-cascade reasoning verified above (grep/SSR-string checks confirm markup/CSS shape, not the final rendered/painted result).
 
 ## Gaps Summary
 
-Two gaps block full goal achievement:
+No gaps remain. Both gaps from the initial verification are closed and independently re-confirmed:
 
-1. **CR-01 (blocker):** The global mobile nav renders open on first paint on every phone-width page load, before JS hydrates — confirmed by directly rendering the SSR entry and inspecting the emitted markup (no `hidden` attribute present). This directly fails CHROME-01's "the nav drawer opens/closes correctly" clause and ROADMAP Phase 6's Success Criterion 4. The defect itself was introduced in an earlier phase (Phase 2's auth-aware header work) and Phase 6 did not touch this logic — but Phase 6's explicit job is to make the global nav "work correctly at phone-portrait widths," and it currently does not. This needs a fix (CSS-default-closed pattern, sketched in 06-REVIEW.md) before the phase goal can be considered achieved.
-2. **Stale doc-block line numbers (non-blocking but a genuine must-have miss):** 06-01-PLAN.md's own must-have text requires the breakpoint doc block to name "exact call sites" — 6 of its line-number citations are wrong as of the current file state. The documented breakpoint *values* are correct and consistent, so this does not affect runtime behavior, only the documentation's trustworthiness for future maintainers.
+1. **CR-01 (previously blocker, now closed):** Rebuilt the SSR bundle and re-ran `render('/')` — the same method the initial verification used. The emitted `<nav>` markup is unchanged in shape (no `hidden`/`is-open` attribute), but this is now correct: `eclat.css`'s `<=900px` `.nav` rule defaults to `display: none`, with `.nav.is-open { display: flex; }` as the sole override, activated only by the user's own click setting React's `open` state true. The nav now renders closed at every stage — SSR, pre-hydration paint, and post-hydration.
+2. **Stale doc-block line numbers (previously non-blocking miss, now closed):** All 6 originally-cited stale numeric citations are replaced with grep-able anchor comments (`bp:tablet`/`bp:nav`/`bp:mobile`/`bp:phone`), each confirmed to land on the real call-site line.
 
-Three additional non-blocking code-quality issues were found during review and remain unaddressed (WR-02, WR-03, IN-01) — none of them fail an explicit must-have for this milestone's phone-portrait-only target scope, but are worth tracking for a future pass.
+One new non-blocking finding surfaced during the post-fix code review (WR-01-recurrence: 3 remaining raw-line-number self-references to the doc block's own location, `eclat.css:7`) — judged non-blocking because these citations are currently accurate, were not part of the original gap's specific scope, and don't affect FOUND-01's functional satisfaction. Tracked as a follow-up, not a new gap.
+
+Status is `human_needed` rather than `passed` because one must-have (CHROME-03 footer legibility) remains an explicit `backstop`-verification item with no independently-checkable repo evidence, and 6 other items require real-device/real-browser confirmation that cannot be established via source inspection.
 
 ---
 
