@@ -11,7 +11,7 @@
 
 | File | Change |
 |------|--------|
-| [`src/data/content.js`](src/data/content.js:329) | Appended a new entry to the `videos` array: `slug: 'our-stories-our-voice-our-eclat'`, `youtubeId: 'U4jOI7N3qwo'` (parsed from `youtube.com/shorts/U4jOI7N3qwo`), kicker `Our Stories · Éclat`, title `Our Stories, Our Voice, Our Éclat`, dek `Come belong — the Éclat story in its own voice.`, source `Éclat`. |
+| [`src/data/content.js`](src/data/content.js:330) | Appended a new entry to the `videos` array: `slug: 'yemi-osinbajo-speech'`, `youtubeId: 'U4jOI7N3qwo'` (parsed from `youtube.com/shorts/U4jOI7N3qwo`), kicker `World Voices · Leadership`, title `This Prof. Yemi Osinbajo Speech Will Make You Stop and Think!`, dek describing the Osinbajo speech, source `ATILOYE GLOBAL TV`. Title and channel name fetched live from YouTube's oEmbed endpoint (`youtube.com/oembed`). |
 | [`src/routes/Home.jsx`](src/routes/Home.jsx:404) | Closing CTA `<h2 id="cta-h">` reworded to `Our stories, our voice, our Éclat.` + italic `Come belong.` (line 1 plain, line 2 in `<em>`, matching the prior two-line structure; brand styled with the accented `É` and both lines end-punctuated). |
 | [`Eclat.dc.html`](Eclat.dc.html:195) | Design-canvas mirror of the same closing CTA `<h2>` updated to the identical wording. |
 
@@ -19,6 +19,10 @@
 
 - The video ID `U4jOI7N3qwo` was extracted directly from the supplied Shorts URL
   (`https://youtube.com/shorts/U4jOI7N3qwo`). No URL query parameters were stored.
+- The card title and `source` credit are the real, fetched values from YouTube oEmbed
+  (`title: "This Prof. Yemi Osinbajo Speech Will Make You Stop and Think!"`,
+  `author_name: "ATILOYE GLOBAL TV"`), not placeholders. The `kicker`/`dek` remain Éclat's
+  own editorial framing around the real subject.
 - The new video card renders through the existing, unmodified [`Videos.jsx`](src/routes/Videos.jsx:105)
   map — thumbnail from `i.ytimg.com` and click-to-play `youtube-nocookie.com` modal — so no
   component, CSS, or CSP change was required.

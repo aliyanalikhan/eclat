@@ -326,12 +326,12 @@ export const videos = [
     source: 'ONE2ONE',
   },
   {
-    slug: 'our-stories-our-voice-our-eclat',
+    slug: 'yemi-osinbajo-speech',
     youtubeId: 'U4jOI7N3qwo',
-    kicker: 'Our Stories · Éclat',
-    title: 'Our Stories, Our Voice, Our Éclat',
-    dek: 'Come belong — the Éclat story in its own voice.',
-    source: 'Éclat',
+    kicker: 'World Voices · Leadership',
+    title: 'This Prof. Yemi Osinbajo Speech Will Make You Stop and Think!',
+    dek: 'Prof. Yemi Osinbajo — Nigeria’s Vice President from 2015 to 2023 — on leadership, service, and the work of building a nation.',
+    source: 'ATILOYE GLOBAL TV',
   },
 ]
 
