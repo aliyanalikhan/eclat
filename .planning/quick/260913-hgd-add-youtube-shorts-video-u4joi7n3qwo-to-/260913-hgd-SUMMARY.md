@@ -2,7 +2,7 @@
 
 **Description:** Add YouTube Shorts video (`U4jOI7N3qwo`) to the Videos section, and change the closing
 "One subscription" CTA heading from "Everything, always, / including what's next" to
-"Our stories, our voice, our eclate / Come belong".
+"Our stories, our voice, our Éclat. / Come belong."
 
 **Date:** 2026-09-13
 **Status:** complete
@@ -12,7 +12,7 @@
 | File | Change |
 |------|--------|
 | [`src/data/content.js`](src/data/content.js:329) | Appended a new entry to the `videos` array: `slug: 'our-stories-our-voice-our-eclat'`, `youtubeId: 'U4jOI7N3qwo'` (parsed from `youtube.com/shorts/U4jOI7N3qwo`), kicker `Our Stories · Éclat`, title `Our Stories, Our Voice, Our Éclat`, dek `Come belong — the Éclat story in its own voice.`, source `Éclat`. |
-| [`src/routes/Home.jsx`](src/routes/Home.jsx:404) | Closing CTA `<h2 id="cta-h">` reworded to `Our stories, our voice, our eclate` + italic `Come belong` (line 1 plain, line 2 in `<em>`, matching the prior two-line structure). |
+| [`src/routes/Home.jsx`](src/routes/Home.jsx:404) | Closing CTA `<h2 id="cta-h">` reworded to `Our stories, our voice, our Éclat.` + italic `Come belong.` (line 1 plain, line 2 in `<em>`, matching the prior two-line structure; brand styled with the accented `É` and both lines end-punctuated). |
 | [`Eclat.dc.html`](Eclat.dc.html:195) | Design-canvas mirror of the same closing CTA `<h2>` updated to the identical wording. |
 
 ## Notes

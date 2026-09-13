@@ -402,9 +402,9 @@ export default function Home() {
           <div className="cta__scale" data-cta="1">
             <p className="cta__eyebrow">One subscription</p>
             <h2 id="cta-h">
-              Our stories, our voice, our eclate
+              Our stories, our voice, our Éclat.
               <br />
-              <em style={{ fontStyle: 'italic' }}>Come belong</em>
+              <em style={{ fontStyle: 'italic' }}>Come belong.</em>
             </h2>
             <p className="cta__lede">
               Two issues, two children&rsquo;s books, every essay. New editions land bimonthly.
