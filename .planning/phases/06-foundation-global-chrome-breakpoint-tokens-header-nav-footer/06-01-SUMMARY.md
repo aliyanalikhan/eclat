@@ -136,6 +136,13 @@ None - no external service configuration required.
 - Plan 06-02 (Global Chrome — Header/Nav/Footer) can now build on the documented breakpoint tiers and the two new fluid tokens without redefining either.
 - No blockers. Full `npm run build` (with `POSTGRES_URL` set) should be re-run once in a DB-connected environment to close out the loop on the literal verification command this plan specifies.
 
+## Self-Check: PASSED
+
+- FOUND: `.planning/phases/06-foundation-global-chrome-breakpoint-tokens-header-nav-footer/06-01-SUMMARY.md`
+- FOUND: `a7db4ff` (Task 1 commit)
+- FOUND: `ec84c16` (Task 2 commit)
+- FOUND: `5981af9` (Task 3 commit)
+
 ---
 *Phase: 06-foundation-global-chrome-breakpoint-tokens-header-nav-footer*
 *Completed: 2026-09-13*
