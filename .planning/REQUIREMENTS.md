@@ -78,21 +78,21 @@ Explicitly excluded. Documented to prevent scope creep.
 | FOUND-02 | Phase 6 | Pending |
 | FOUND-03 | Phase 6 | Pending |
 | FOUND-04 | Phase 6 | Pending |
-| CHROME-01 | Phase 7 | Pending |
-| CHROME-02 | Phase 7 | Pending |
-| CHROME-03 | Phase 7 | Pending |
-| CONTENT-01 | Phase 8 | Pending |
-| CONTENT-02 | Phase 8 | Pending |
-| CONTENT-03 | Phase 8 | Pending |
-| CONTENT-04 | Phase 8 | Pending |
-| MODAL-01 | Phase 9 | Pending |
-| MODAL-02 | Phase 9 | Pending |
-| MODAL-03 | Phase 9 | Pending |
-| MODAL-04 | Phase 9 | Pending |
-| SUB-01 | Phase 10 | Pending |
-| SUB-02 | Phase 10 | Pending |
-| SUB-03 | Phase 10 | Pending |
-| SUB-04 | Phase 10 | Pending |
+| CHROME-01 | Phase 6 | Pending |
+| CHROME-02 | Phase 6 | Pending |
+| CHROME-03 | Phase 6 | Pending |
+| CONTENT-01 | Phase 7 | Pending |
+| CONTENT-02 | Phase 7 | Pending |
+| CONTENT-03 | Phase 7 | Pending |
+| CONTENT-04 | Phase 7 | Pending |
+| MODAL-01 | Phase 8 | Pending |
+| MODAL-02 | Phase 8 | Pending |
+| MODAL-03 | Phase 8 | Pending |
+| MODAL-04 | Phase 8 | Pending |
+| SUB-01 | Phase 9 | Pending |
+| SUB-02 | Phase 9 | Pending |
+| SUB-03 | Phase 9 | Pending |
+| SUB-04 | Phase 9 | Pending |
 
 **Coverage:**
 
@@ -100,8 +100,8 @@ Explicitly excluded. Documented to prevent scope creep.
 - Mapped to phases: 19
 - Unmapped: 0 ✓
 
-*Phase numbers above are provisional (continuing from v1.0's Phase 5) — confirmed/adjusted by the roadmapper.*
+*Phase numbers confirmed by the roadmapper (2026-09-13): 4 phases (6-9), continuing v1.0's numbering. Foundation (FOUND-01..04) was consolidated into Phase 6 alongside Global Chrome (CHROME-01..03) per the project's `coarse` granularity setting — Content Pages, Modal Overlays, and Subscribe/Account remain distinct phases (7, 8, 9) as research recommended. See `.planning/ROADMAP.md` for full phase details.*
 
 ---
 *Requirements defined: 2026-09-13*
-*Last updated: 2026-09-13 after v1.1 milestone research*
+*Last updated: 2026-09-13 after v1.1 roadmap creation*
