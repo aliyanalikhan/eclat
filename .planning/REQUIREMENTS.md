@@ -1,62 +1,60 @@
 # Requirements: Éclat
 
-**Defined:** 2026-09-08
+**Defined:** 2026-09-13
 **Core Value:** A signed-in subscriber's paid access is real and enforced server-side — no page, download, or API response leaks paid content to someone who hasn't actually paid for it.
+**Milestone:** v1.1 Mobile Responsive Design — every page and interactive overlay is fully usable and visually correct at phone-portrait widths (~375–430px)
 
 ## v1 Requirements
 
 Requirements for this milestone. Each maps to roadmap phases.
 
-### Environment & Secrets (ENV)
+### Shared Foundation (FOUND)
 
-- [x] **ENV-01**: All server-side secrets (Google OAuth client secret, Stripe secret key, Stripe webhook signing secret, session encryption key) live only in server-side environment variables — never in client-shipped code, never committed to the repo
-- [x] **ENV-02**: `.gitignore` excludes local env files so secrets can never be accidentally committed
+- [ ] **FOUND-01**: A single documented breakpoint tier for phone-portrait widths is used consistently across CSS media queries and JS viewport checks — replacing the three currently-drifting literals (CSS's 720/900px tiers, `useScrollFx`'s 720px JS check, `Header.jsx`'s 900px `matchMedia`)
+- [ ] **FOUND-02**: Fluid typography and spacing use `clamp()`-based tokens so text and layout scale smoothly across phone widths instead of jumping at fixed breakpoints
+- [ ] **FOUND-03**: Full-height sections (hero, modal, nav dropdown) use `svh`/`dvh` with a `vh` fallback so they don't visibly jump as the mobile browser's address bar collapses/expands
+- [ ] **FOUND-04**: The horizontal drag-scroll strip (`useDragScroll`) doesn't fight native touch scrolling on phones — touch input scrolls smoothly via native scrolling, not via the JS pointer-drag handler
 
-### Authentication (AUTH)
+### Global Chrome (CHROME)
 
-- [x] **AUTH-01**: User can sign in with their Google account via a single "Sign in with Google" action
-- [x] **AUTH-02**: Server verifies the Google ID token's signature, audience, expiry, and issuer before creating a session — never trusts an unverified client-supplied identity
-- [x] **AUTH-03**: User is identified internally by Google's stable `sub` claim, not by email address
-- [x] **AUTH-04**: User's signed-in session persists across page reloads without re-authenticating with Google each time
-- [x] **AUTH-05**: User can sign out, which clears their server session
-- [x] **AUTH-06**: No email/password sign-in option exists anywhere on the site
+- [ ] **CHROME-01**: The site header/nav is fully usable at phone-portrait widths — the nav drawer opens/closes correctly, safe-area insets are respected on notched devices, and there's no regression to sign-in/sign-out
+- [ ] **CHROME-02**: All header/nav tap targets (menu button, nav links, auth avatar/menu) meet a 44px minimum touch target size
+- [ ] **CHROME-03**: The footer renders correctly and legibly at phone-portrait widths with no overlapping or cut-off content
 
-### Billing & Checkout (BILL)
+### Content Pages (CONTENT)
 
-- [x] **BILL-01**: User can start a Stripe Checkout session for any of the 4 existing products (Éclat Online, Éclat Hard Copy, Children's Book Online, Children's Book Hard Copy) from the relevant page
-- [x] **BILL-02**: Checkout shows the real Stripe price for the selected product, not the current placeholder copy
-- [x] **BILL-03**: Stripe webhook events are verified via signature (`constructEvent` + webhook signing secret) before being trusted
-- [x] **BILL-04**: Stripe webhook handler is idempotent — processing the same event twice has no duplicate effect
-- [x] **BILL-05**: Subscription created/updated/deleted events from Stripe are synced into the database as the single source of truth for entitlement — the Checkout success redirect never grants access on its own
-- [x] **BILL-06**: A failed renewal payment (`invoice.payment_failed`) is reflected in the user's account as "past due," not silently ignored
+- [ ] **CONTENT-01**: No page produces unintended horizontal scrolling at phone-portrait widths (375–430px)
+- [ ] **CONTENT-02**: Horizontal drag-scroll strips (hero fan, Cultural Icons, Videos) scroll smoothly via touch with correct peek-width and snap behavior at 375px
+- [ ] **CONTENT-03**: Archive / Edition / Books / Writings listing grids reflow to a usable narrow-column layout at phone widths with readable text and tappable cards
+- [ ] **CONTENT-04**: Edition's three content-access states (loading / not-entitled / entitled) each render correctly and legibly at phone-portrait widths
 
-### Content Gating (GATE)
+### Modal Overlays (MODAL)
 
-- [x] **GATE-01**: Every gated page/route (edition full issues, book full spreads, paywalled writings) checks the signed-in user's real entitlement from the database on each request — no client-side-only gating remains
-- [x] **GATE-02**: The existing `subscribed` localStorage flag and all its read sites (`Edition.jsx`, `Archive.jsx`, `Books.jsx`, `Account.jsx`) are removed and replaced by the real server-side check
-- [x] **GATE-03**: A Hard Copy subscription does not grant Online/digital access to the same product — Online and Hard Copy are separate, independent entitlements (decided 2026-09-08)
-- [x] **GATE-04**: When a subscription is canceled or lapses, the user's access to that product's gated content is revoked on their very next request — no stale cached access
-- [x] **GATE-05**: Publicly-intended content (covers, previews, marketing pages) continues to render exactly as it does today, unaffected by the new gating
+- [ ] **MODAL-01**: Opening the Lightbox or MagazinePreview modal locks background scroll correctly on iOS Safari (not just `overflow:hidden`, which doesn't prevent background rubber-band scrolling)
+- [ ] **MODAL-02**: Modal hint text doesn't reference keyboard-only interactions (e.g. "Press Esc", arrow-key hints) on touch devices — touch users see touch-appropriate instructions or none
+- [ ] **MODAL-03**: Modal close/prev/next controls meet a 44px minimum tap target size
+- [ ] **MODAL-04**: Modal focus-trapping is not keyboard-only — screen-reader users (VoiceOver/TalkBack) using swipe navigation cannot swipe past the modal into background content
 
-### Account Management (ACCT)
+### Subscribe / Account (SUB)
 
-- [x] **ACCT-01**: User can view their real subscription status (active / canceled / past due) and renewal date on the Account page, replacing today's mocked data
-- [x] **ACCT-02**: User can cancel a subscription from the Account page, via Stripe's hosted Customer Portal
-- [x] **ACCT-03**: User can view their real invoice history on the Account page, replacing today's mocked invoice table
-- [ ] **ACCT-04**: User sees a clear "payment failed, update your card" notice on the Account page when a subscription is past due
+- [ ] **SUB-01**: The 4-tile pricing picker on `/subscribe` stacks to a usable single-column layout at phone widths with legible pricing and tappable CTAs
+- [ ] **SUB-02**: Account page's per-product panels, status, and billing-portal CTA are usable and legible at phone widths
+- [ ] **SUB-03**: A stalled network request on sign-in/session/account checks doesn't leave the user on an infinite loading state — a timeout surfaces a retry affordance
+- [ ] **SUB-04**: Returning to `/subscribe` or `/account` via mobile back-gesture navigation after a Stripe Checkout/portal redirect never shows stale pre-purchase/pre-cancel state (bfcache staleness)
 
 ## v2 Requirements
 
 Deferred to a future milestone. Tracked but not in this roadmap.
 
-### Content Gating
+### Modal Overlays
 
-- **GATE-06**: Graceful degraded preview of gated content (e.g. first pages of an edition) instead of a hard wall — requires a content-model change not present today
+- **MODAL-05**: Swipe-left/right to turn pages in the MagazinePreview modal (additive to existing Prev/Next buttons)
+- **MODAL-06**: Swipe-down-to-dismiss on Lightbox/MagazinePreview
+- **MODAL-07**: Pinch/double-tap zoom in Lightbox/MagazinePreview — deferred due to a genuine gesture-conflict risk against swipe-to-dismiss/swipe-to-turn; requires an explicit gesture-priority decision before being combined with MODAL-05/06
 
-### Account Management
+### Global Chrome
 
-- **ACCT-05**: Unified "your subscriptions" view bundling all of a user's active products together
-- **ACCT-06**: Self-serve plan upgrade/downgrade between products
+- **CHROME-04**: Bottom tab-bar navigation redesign — a legitimate mobile pattern, but a structural nav redesign that's out of this milestone's "fix, don't rebuild" scope
 
 ## Out of Scope
 
@@ -64,48 +62,46 @@ Explicitly excluded. Documented to prevent scope creep.
 
 | Feature | Reason |
 |---------|--------|
-| Email/password sign-in | Reintroduces password storage, reset flows, and credential-stuffing/breach-liability surface the project deliberately avoids by going Google-only |
-| Multi-tenant / white-label platform (separate branded sites for other publishers) | Not what was actually requested — this is a single-brand product with many individual user accounts, not a B2B platform |
-| Custom-built payment form (raw Stripe Elements) | Stripe Checkout (hosted) already covers this with far less PCI scope and edge-case handling |
-| New/custom pricing tiers | 4 real products/prices already exist in the live Stripe account; reuse them as-is |
-| Client-trusted access flags (localStorage/cookie booleans) | This is the exact flaw the milestone exists to fix |
-| Real-time WebSocket "subscription activated" push | Unnecessary — webhook-to-DB sync plus a redirect/poll on Checkout success covers the real UX need |
-| Metered/soft paywall (free-article counting) | Doesn't match this product's fixed-catalog (not continuous-stream) content model |
+| Tablet/desktop layout changes | This milestone targets phone-portrait widths (~375–430px) only |
+| CSS framework adoption (Tailwind, Bootstrap) | Every capability needed is a native CSS/browser feature already within this project's target — adding a framework is unjustified dependency weight for a plain-CSS codebase |
+| CSS-in-JS or a preprocessor (Sass/Less/PostCSS) | Project deliberately has zero CSS build tooling beyond Vite's default pipeline; `clamp()`/custom properties cover the need without one |
+| Gesture libraries (Hammer.js, react-swipeable, use-gesture) | The existing Pointer Events API already covers what's needed; a gesture library is unneeded dependency weight for this milestone's table-stakes scope |
+| Automated visual-regression testing (Playwright/Cypress) | No test framework exists in this project; the existing zero-dependency `verify-hero.mjs` CDP script is extended instead, per research |
+| CSS Container Queries | Available and viable, but unnecessary for this milestone's single-viewport-band scope; flagged as a future option only |
+| Device-detection / UA-sniffing | Feature detection (`matchMedia`, `pointer: coarse`) is the correct tool; UA-sniffing is brittle and explicitly rejected by research |
 
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| ENV-01 | Phase 1 | Complete |
-| ENV-02 | Phase 1 | Complete |
-| AUTH-01 | Phase 2 | Complete |
-| AUTH-02 | Phase 2 | Complete |
-| AUTH-03 | Phase 2 | Complete |
-| AUTH-04 | Phase 2 | Complete |
-| AUTH-05 | Phase 2 | Complete |
-| AUTH-06 | Phase 2 | Complete |
-| BILL-01 | Phase 3 | Complete |
-| BILL-02 | Phase 3 | Complete |
-| BILL-03 | Phase 3 | Complete |
-| BILL-04 | Phase 3 | Complete |
-| BILL-05 | Phase 3 | Complete |
-| BILL-06 | Phase 3 | Complete |
-| GATE-01 | Phase 4 | Complete |
-| GATE-02 | Phase 4 | Complete |
-| GATE-03 | Phase 4 | Complete |
-| GATE-04 | Phase 4 | Complete |
-| GATE-05 | Phase 4 | Complete |
-| ACCT-01 | Phase 5 | Complete |
-| ACCT-02 | Phase 5 | Complete |
-| ACCT-03 | Phase 5 | Complete |
-| ACCT-04 | Phase 5 | Pending |
+| FOUND-01 | Phase 6 | Pending |
+| FOUND-02 | Phase 6 | Pending |
+| FOUND-03 | Phase 6 | Pending |
+| FOUND-04 | Phase 6 | Pending |
+| CHROME-01 | Phase 7 | Pending |
+| CHROME-02 | Phase 7 | Pending |
+| CHROME-03 | Phase 7 | Pending |
+| CONTENT-01 | Phase 8 | Pending |
+| CONTENT-02 | Phase 8 | Pending |
+| CONTENT-03 | Phase 8 | Pending |
+| CONTENT-04 | Phase 8 | Pending |
+| MODAL-01 | Phase 9 | Pending |
+| MODAL-02 | Phase 9 | Pending |
+| MODAL-03 | Phase 9 | Pending |
+| MODAL-04 | Phase 9 | Pending |
+| SUB-01 | Phase 10 | Pending |
+| SUB-02 | Phase 10 | Pending |
+| SUB-03 | Phase 10 | Pending |
+| SUB-04 | Phase 10 | Pending |
 
 **Coverage:**
 
-- v1 requirements: 23 total
-- Mapped to phases: 23
+- v1 requirements: 19 total
+- Mapped to phases: 19
 - Unmapped: 0 ✓
 
+*Phase numbers above are provisional (continuing from v1.0's Phase 5) — confirmed/adjusted by the roadmapper.*
+
 ---
-*Requirements defined: 2026-09-08*
-*Last updated: 2026-09-08 after roadmap creation*
+*Requirements defined: 2026-09-13*
+*Last updated: 2026-09-13 after v1.1 milestone research*
