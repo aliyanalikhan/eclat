@@ -177,20 +177,20 @@ export default function Subscribe() {
           </div>
         )}
 
-        <div className="plans" role="group" aria-label="Choose a product">
-          {PRODUCTS.map((product) => (
-            <ProductTile
-              key={product.key}
-              product={product}
-              priceInfo={prices[product.key]}
-              pricesLoading={pricesLoading}
-              subs={subs}
-              preselected={preselectKey === product.key}
-              setTileRef={(node) => {
-                tileRefs.current[product.key] = node
-              }}
-            />
-          ))}
+        <div className="plans" role="group" aria-label="Subscription status">
+          <div className="plan" style={{ position: 'relative', width: '100%', maxWidth: '600px' }}>
+            <span className="plan__row">
+              <span className="plan__name" style={{ fontSize: '1.2rem', marginBottom: '10px' }}>Éclat is free for now!</span>
+            </span>
+            <span className="plan__note" style={{ display: 'block', marginTop: '16px', lineHeight: 1.5 }}>
+              We've temporarily paused new subscriptions because all of our magazine editions are currently <strong>free to read for everyone</strong>.
+            </span>
+            <span className="plan__note" style={{ display: 'block', marginTop: '24px' }}>
+              <Link to="/archive" className="btn btn--accent">
+                Browse the Archive
+              </Link>
+            </span>
+          </div>
         </div>
       </div>
     </main>

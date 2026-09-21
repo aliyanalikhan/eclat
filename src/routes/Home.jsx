@@ -400,17 +400,17 @@ export default function Home() {
         <div className="cta__weave" data-par="10" aria-hidden="true" />
         <div className="cta__inner">
           <div className="cta__scale" data-cta="1">
-            <p className="cta__eyebrow">One subscription</p>
+            <p className="cta__eyebrow">Free for all readers</p>
             <h2 id="cta-h">
               Our stories, our voice, our Éclat.
               <br />
               <em style={{ fontStyle: 'italic' }}>Come belong.</em>
             </h2>
             <p className="cta__lede">
-              Two issues, two children&rsquo;s books, every essay. New editions land bimonthly.
+              Two issues, two children&rsquo;s books, every essay. Now available to read for free.
             </p>
-            <Link to="/subscribe" className="btn btn--light btn--lg">
-              Subscribe
+            <Link to="/archive" className="btn btn--light btn--lg">
+              Explore the Archive
             </Link>
           </div>
         </div>

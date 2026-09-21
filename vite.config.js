@@ -43,8 +43,36 @@ function previewStaticSemantics() {
   }
 }
 
+/**
+ * Mocks the Vercel API locally for the frontend to consume during `npm run dev`.
+ */
+function mockLocalApi() {
+  return {
+    name: 'mock-local-api',
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url.startsWith('/api/content/editions/')) {
+          const no = Number(req.url.split('/').pop())
+          try {
+            const { gatedParagraphsFor } = await import('./lib/gated-content.js')
+            const paragraphs = gatedParagraphsFor(no)
+            if (paragraphs) {
+              res.setHeader('Content-Type', 'application/json')
+              res.end(JSON.stringify({ entitled: true, content: { paragraphs } }))
+              return
+            }
+          } catch (err) {
+            console.error('Error in mock API:', err)
+          }
+        }
+        next()
+      })
+    }
+  }
+}
+
 export default defineConfig({
-  plugins: [react(), previewStaticSemantics()],
+  plugins: [react(), previewStaticSemantics(), mockLocalApi()],
   build: {
     target: 'es2020',
     cssCodeSplit: false,

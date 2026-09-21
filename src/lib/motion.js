@@ -73,8 +73,8 @@ export function useScrolled(threshold = 30) {
 export function useScrollFx(key) {
   useEffect(() => {
     const reduced = prefersReducedMotion()
-    // --bp-mobile: 720px — matches eclat.css's breakpoint-tier doc block above :root (eclat.css:7); keep this literal in sync with that block.
-    const mobile = window.innerWidth < 720 // bp:mobile
+    // --bp-tablet: 1080px
+    const mobile = window.innerWidth <= 1080 // bp:tablet
     let raf = 0
 
     // Resting spread of the fan. It opens from here to 1.0 as the hero scrolls.
@@ -110,7 +110,7 @@ export function useScrollFx(key) {
     const tick = (finalOnly) => {
       const vh = window.innerHeight
 
-      if (cards.length && !mobile) {
+      if (cards.length) {
         const raw = Math.min(1, Math.max(0, window.scrollY / (vh * 0.62)))
         const p = finalOnly ? 1 : 1 - Math.pow(1 - Math.min(1, raw + 0.12), 3)
         const fit = Math.min(1, (window.innerWidth - 48) / 1120)

@@ -128,12 +128,8 @@ export default function Account() {
               // Billing history section still renders below.
               <div className="upsell">
                 <p className="upsell__text">
-                  You don't have an active subscription yet. Subscribe to unlock full issues,
-                  books, and more.
+                  You don't have an active subscription, but that's okay! Éclat is currently <strong>free for all readers</strong>, so you can explore the entire archive without one.
                 </p>
-                <Link to="/subscribe" className="btn btn--sm btn--accent">
-                  Subscribe
-                </Link>
               </div>
             ) : (
               // Per-product panels in fixed D-16 order, held products only (§1).
