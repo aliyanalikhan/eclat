@@ -418,7 +418,7 @@ export default function Home() {
               </a>
             </div>
             <p className="cta__lede">
-              Two issues, two children&rsquo;s books, every essay. New editions land bimonthly.
+              New editions land bimonthly.
             </p>
             <Link to="/subscribe" className="btn btn--light btn--lg">
               Subscribe
