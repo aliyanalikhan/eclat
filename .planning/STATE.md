@@ -133,6 +133,7 @@ None yet.
 | 260922-rev | Reverse free read bypass and restore Stripe payments | 2026-09-22 | 550982a | N/A |
 | 260922-lad | Add direct complimentary copy link to LaDidiér reader in Home CTA section without using 'free' wording | 2026-09-22 | 7cb3188 | N/A |
 | 260922-cta | Remove 'Two issues, two children’s books, every essay.' from Home closing CTA section | 2026-09-22 | faa2037 | N/A |
+| 260922-hro | Add small 'COMPLIMENTARY COPY AVAILABLE HERE' button in Home hero section | 2026-09-22 | dc5e0d4 | N/A |
 
 ## Deferred Items
 
