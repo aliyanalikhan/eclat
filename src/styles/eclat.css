@@ -2023,10 +2023,6 @@ a:hover .cover--book {
   .ed-hero__grid {
     gap: 44px;
   }
-
-  .hero__scroll {
-    display: none;
-  }
 }
 
 @media (max-width: 900px) { /* bp:nav */
@@ -2144,6 +2140,42 @@ a:hover .cover--book {
   .page,
   .page--narrow {
     padding-top: 118px;
+  }
+
+  .hero {
+    min-height: 640px;
+    height: auto;
+    padding: 118px 0 60px;
+  }
+
+  .hero__copy {
+    position: static;
+    top: auto;
+  }
+
+  .fan-origin {
+    position: relative;
+    left: 0;
+    top: 0;
+    margin: 56px auto 0;
+    height: 300px;
+    display: grid;
+    place-items: center;
+  }
+
+  .fan-origin .fan-card {
+    display: none;
+  }
+
+  .fan-origin .fan-card--lead {
+    display: block;
+    position: relative;
+    margin: 0;
+    transform: none !important;
+  }
+
+  .hero__scroll {
+    display: none;
   }
 
   .cards {

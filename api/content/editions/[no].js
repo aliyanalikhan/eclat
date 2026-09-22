@@ -61,7 +61,7 @@ import { getSessionUser } from '../../../lib/session-user.js'
 // documented in the header contract above, with zero other edits required
 // anywhere in this file.
 // ============================================================================
-const TEMP_FREE_PREVIEW = true
+const TEMP_FREE_PREVIEW = false
 
 function notFound() {
   return Response.json(
