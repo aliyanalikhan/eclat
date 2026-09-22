@@ -5,7 +5,7 @@ const DEFAULT_OG = '/assets/images/og/eclat-default.webp'
 /** Per-route <head> metadata. Consumed at runtime by useSeo() and at build time by prerender.js. */
 export const staticSeo = {
   '/': {
-    title: 'Éclat — A quarterly magazine of paying attention',
+    title: 'Discover EcLat',
     description:
       'Two issues of Éclat by LaDidiér, two children’s books and every essay — one subscription, every edition, from No. 1 to whatever comes next.',
     og: DEFAULT_OG,

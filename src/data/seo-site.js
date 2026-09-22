@@ -4,7 +4,7 @@
  */
 export const SITE = {
   name: 'Éclat',
-  tagline: 'A quarterly magazine of paying attention',
+  tagline: 'Discover EcLat',
   url: 'https://eclat.example',
   locale: 'en',
 }
