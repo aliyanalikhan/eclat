@@ -134,6 +134,7 @@ None yet.
 | 260922-lad | Add direct complimentary copy link to LaDidiér reader in Home CTA section without using 'free' wording | 2026-09-22 | 7cb3188 | N/A |
 | 260922-cta | Remove 'Two issues, two children’s books, every essay.' from Home closing CTA section | 2026-09-22 | faa2037 | N/A |
 | 260922-hro | Add small 'COMPLIMENTARY COPY AVAILABLE HERE' button in Home hero section | 2026-09-22 | dc5e0d4 | N/A |
+| 260922-bim | Change 'Monthly' to 'Bi-monthly' on /subscribe and enable local dev billing endpoints in Vite | 2026-09-22 | 6dbda9a | N/A |
 
 ## Deferred Items
 
