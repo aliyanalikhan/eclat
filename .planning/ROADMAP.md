@@ -26,7 +26,7 @@ Milestone v1.2 builds directly upon the existing codebase and validated backend,
 
 - [x] **Phase 7: Breakpoint Architecture & Fluid Foundation** - Unified 4-tier breakpoint system, fluid clamp() typography and spacing tokens, and site-wide zero-horizontal-overflow guarantee (completed 2026-09-23)
 - [x] **Phase 8: Hero Animation Multi-Device Adaptation** - Preserve and adapt the signature scroll-driven fan carousel animation in `useScrollFx` to scale and fit gracefully across phone, tablet, desktop, and ultra-wide viewports (completed 2026-09-23)
-- [ ] **Phase 9: Content Pages & Responsive Multi-Device Grids** - Reflow listing grids (Editions, Books, Writings, Archive) and editorial reading pages across all 4 breakpoint tiers (GRID-01, GRID-02, GRID-03)
+- [x] **Phase 9: Content Pages & Responsive Multi-Device Grids** - Reflow listing grids (Editions, Books, Writings, Archive) and editorial reading pages across all 4 breakpoint tiers (completed 2026-09-23)
 - [ ] **Phase 10: Interactive Overlays & Global Chrome Refinement** - Fully responsive Magazine Preview flipbook modal, Lightbox zoom overlay, and header/footer refinement across all viewports (OVERLAY-01, OVERLAY-02, OVERLAY-03)
 
 ## Phase Details

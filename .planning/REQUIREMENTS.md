@@ -23,9 +23,9 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Content Pages & Multi-Device Grids (GRID)
 
-- [ ] **GRID-01**: Archive, Editions, Books, and Writings listing grids reflow cleanly across all 4 breakpoint tiers (1-col mobile, 2-col tablet, 3-col desktop, 4-col ultrawide).
-- [ ] **GRID-02**: Cultural Icons, Videos, and book drag-scroll strips support native smooth touch swipe on touch devices and pointer drag on desktop.
-- [ ] **GRID-03**: Editorial detail pages (Edition, Writings, Book detail) maintain optimal reading line-lengths and proportional media display across all screens.
+- [x] **GRID-01**: Archive, Editions, Books, and Writings listing grids reflow cleanly across all 4 breakpoint tiers (1-col mobile, 2-col tablet, 3-col desktop, 4-col ultrawide).
+- [x] **GRID-02**: Cultural Icons, Videos, and book drag-scroll strips support native smooth touch swipe on touch devices and pointer drag on desktop.
+- [x] **GRID-03**: Editorial detail pages (Edition, Writings, Book detail) maintain optimal reading line-lengths and proportional media display across all screens.
 
 ### Overlays & Chrome Adaptation (OVERLAY)
 
@@ -63,9 +63,9 @@ Explicitly excluded. Documented to prevent scope creep.
 | HERO-02 | Phase 8 | Complete |
 | HERO-03 | Phase 8 | Complete |
 | HERO-04 | Phase 8 | Complete |
-| GRID-01 | Phase 9 | Pending |
-| GRID-02 | Phase 9 | Pending |
-| GRID-03 | Phase 9 | Pending |
+| GRID-01 | Phase 9 | Complete |
+| GRID-02 | Phase 9 | Complete |
+| GRID-03 | Phase 9 | Complete |
 | OVERLAY-01 | Phase 10 | Pending |
 | OVERLAY-02 | Phase 10 | Pending |
 | OVERLAY-03 | Phase 10 | Pending |
