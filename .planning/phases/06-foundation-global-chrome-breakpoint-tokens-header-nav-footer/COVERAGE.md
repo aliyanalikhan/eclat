@@ -1,1 +1,0 @@
-No external API integration: this phase is a pure CSS/JS layout retrofit (breakpoint tokens, fluid typography, svh fixes, touch-scroll gating, nav/footer tap-target fixes) — zero external API/SDK/service calls.
