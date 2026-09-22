@@ -1265,7 +1265,7 @@ a:hover .cover--book {
 .grid-covers {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
-  gap: 46px 34px;
+  gap: 36px 24px;
 }
 
 .cover-meta {
@@ -1479,8 +1479,8 @@ a:hover .cover--book {
 /* --- books page --------------------------------------------------------- */
 .books-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 60px 40px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 44px 32px;
   margin-top: 80px;
 }
 
@@ -2151,6 +2151,17 @@ a:hover .cover--book {
   .ed-hero__grid {
     gap: 44px;
   }
+
+  .grid-covers {
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 28px 20px;
+  }
+
+  .books-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 36px 24px;
+    margin-top: 56px;
+  }
 }
 
 @media (max-width: 900px) { /* bp:nav */
@@ -2293,13 +2304,31 @@ a:hover .cover--book {
   }
 
   .grid-covers {
-    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-    gap: 32px 20px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 14px;
   }
 
   .books-grid {
-    margin-top: 52px;
-    gap: 44px 24px;
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 40px;
+    gap: 40px;
+  }
+
+  .writing {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    padding: 24px 0;
+  }
+
+  .writing > figure {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  .writing__aside {
+    grid-column: 1;
+    text-align: left;
+    margin-top: 8px;
   }
 
   .newest__cover .cover__plate {
@@ -2332,18 +2361,6 @@ a:hover .cover--book {
 @media (max-width: 460px) { /* bp:phone */
   .wordmark {
     letter-spacing: 0.18em;
-  }
-
-  .writing {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .writing>figure {
-    max-width: 140px;
-  }
-
-  .writing__aside {
-    grid-column: 1;
   }
 }
 
