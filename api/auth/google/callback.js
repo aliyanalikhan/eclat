@@ -77,6 +77,11 @@ export default {
       return redirectWithError(returnTo, headers)
     }
 
+    const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || url.host
+    const redirectUri = host.includes('eclat.lifestyle')
+      ? 'https://www.eclat.lifestyle/api/auth/google/callback'
+      : (process.env.GOOGLE_REDIRECT_URI || 'https://www.eclat.lifestyle/api/auth/google/callback')
+
     let idToken
     try {
       const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
@@ -86,7 +91,7 @@ export default {
           code,
           client_id: process.env.GOOGLE_CLIENT_ID,
           client_secret: process.env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: process.env.GOOGLE_REDIRECT_URI,
+          redirect_uri: redirectUri,
           grant_type: 'authorization_code',
         }),
       })

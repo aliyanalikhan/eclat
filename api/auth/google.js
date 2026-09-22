@@ -20,9 +20,14 @@ export default {
 
     const state = randomBytes(16).toString('base64url')
 
+    const host = request.headers.get('x-forwarded-host') || request.headers.get('host') || url.host
+    const redirectUri = host.includes('eclat.lifestyle')
+      ? 'https://www.eclat.lifestyle/api/auth/google/callback'
+      : (process.env.GOOGLE_REDIRECT_URI || 'https://www.eclat.lifestyle/api/auth/google/callback')
+
     const authUrl = new URL('https://accounts.google.com/o/oauth2/v2/auth')
     authUrl.searchParams.set('client_id', process.env.GOOGLE_CLIENT_ID)
-    authUrl.searchParams.set('redirect_uri', process.env.GOOGLE_REDIRECT_URI)
+    authUrl.searchParams.set('redirect_uri', redirectUri)
     authUrl.searchParams.set('response_type', 'code')
     authUrl.searchParams.set('scope', 'openid email profile')
     authUrl.searchParams.set('state', state)
