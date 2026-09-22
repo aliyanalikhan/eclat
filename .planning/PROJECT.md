@@ -8,16 +8,16 @@
 
 A signed-in subscriber's paid access is real and enforced server-side — no page, download, or API response leaks paid content to someone who hasn't actually paid for it.
 
-## Current Milestone: v1.1 Mobile Responsive Design
+## Current Milestone: v1.2 All-Screen Responsive & Hero Animation
 
-**Goal:** Every page and interactive overlay on the site is fully usable and visually correct at phone-portrait widths (~375–430px), replacing the current desktop-first layout that breaks on real mobile devices.
+**Goal:** Ensure every layout, component, and interactive page reflows seamlessly across all device screen sizes (phone, tablet, desktop, ultra-wide) and implement an engaging, high-fidelity hero animation.
 
 **Target features:**
-- Home page (hero fan carousel, Cultural Icons section, Videos section, drag-scroll strips) renders correctly on phone widths
-- Archive / Edition / Books / Writings listing grids and detail pages are usable on phone widths — no horizontal scroll, readable text, tappable controls
-- Magazine preview page-flip modal and Lightbox zoom overlay work correctly on phone-width touch screens
-- Subscribe pricing picker, sign-in, Account panels, and Stripe billing portal redirect are usable on phone widths
-- Global chrome (header/nav, footer) works correctly on phone widths across all of the above
+- Responsive layout across all screen tiers: Mobile (<768px), Tablet (768–1024px), Desktop (1024–1440px), and Large screens (>1440px)
+- Hero section animation: smooth entrance and fan carousel motion/transitions on all screen sizes
+- Fluid typography, spacing, and grid reflow preventing any unwanted horizontal overflow
+- Content pages (Home, Editions, Books, Writings, Archive) and overlays properly adapted across all screen sizes
+- Global chrome (header/nav, footer) works flawlessly across all devices
 
 ## Business Context
 
@@ -44,14 +44,15 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 - ✓ Gated content (edition excerpt paragraphs, paywalled writings) is served/rendered based on the user's real, server-verified entitlement — replacing the `subscribed` localStorage flag entirely — Phase 4 (code-complete; human UAT still pending, see STATE.md Blockers)
 - ✓ User can manage their subscription (view status, cancel) from the Account page, backed by real Stripe data instead of mocked invoices/plan — Phase 5 (code-complete; human UAT still pending, see STATE.md Blockers)
 - ✓ Losing/cancelling a subscription revokes access to gated content on the next request — Phase 4/5 (code-complete; human UAT still pending, see STATE.md Blockers)
+- ✓ Mobile breakpoint tokens and global chrome touch optimization (Phase 6 foundation) — Phase 6
 
 ### Active
 
-- [ ] Home page (hero fan, Cultural Icons, Videos, drag-scroll strips) is fully usable and visually correct at phone-portrait widths
-- [ ] Archive / Edition / Books / Writings listing and detail pages are fully usable at phone-portrait widths (no horizontal scroll, readable text, tappable controls)
-- [ ] Magazine preview page-flip modal and Lightbox zoom overlay work correctly on phone-width touch screens
-- [ ] Subscribe pricing picker, sign-in, Account panels, and Stripe billing portal redirect are usable at phone-portrait widths
-- [ ] Header/nav and footer render and function correctly at phone-portrait widths across every page
+- [ ] Complete responsive layout reflow across Mobile (<768px), Tablet (768–1024px), Desktop (1024–1440px), and Large screens (>1440px)
+- [ ] High-fidelity hero animation (entrance reveal and interactive fan carousel transitions across all viewport sizes)
+- [ ] Content pages (Home, Archive, Edition, Books, Writings) fully responsive with zero horizontal overflow
+- [ ] Interactive overlays (Magazine preview flipbook modal, Lightbox zoom) fully responsive across touch and desktop
+- [ ] Subscribe, Account, and Checkout flows polished and responsive across all device tiers
 
 ### Out of Scope
 
@@ -59,7 +60,6 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 - Email/password sign-in — Google-only by deliberate choice, avoids password storage/reset/leak surface entirely
 - New pricing or new Stripe products — reusing the 4 products that already exist in the live Stripe account
 - Building/rotating Google OAuth or Stripe credentials — both already exist and will be supplied as environment variables during implementation, never pasted into chat or committed to the repo
-- Tablet/desktop layout changes — this milestone targets phone-portrait widths (~375–430px) only; tablet and landscape are not in scope unless a phone-portrait fix requires touching a shared breakpoint
 
 ## Context
 
@@ -120,4 +120,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-13 after starting milestone v1.1 (Mobile Responsive Design)*
+*Last updated: 2026-09-23 after starting milestone v1.2 (All-Screen Responsive & Hero Animation)*

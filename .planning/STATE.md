@@ -1,38 +1,39 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-milestone_name: Mobile Responsive Design
-current_phase: 06
-current_phase_name: Foundation & Global Chrome — Breakpoint Tokens, Header, Nav & Footer
-status: executing
-stopped_at: Phase 6 UI-SPEC approved
-last_updated: "2026-09-22T14:38:00.000Z"
-last_activity: 2026-09-22
-last_activity_desc: "Completed quick task 260922-r8s: Change site link message title to Discover EcLat"
+milestone: v1.2
+milestone_name: All-Screen Responsive & Hero Animation
+current_phase: null
+current_phase_name: null
+status: planning
+stopped_at: null
+last_updated: "2026-09-23T01:50:00.000Z"
+last_activity: 2026-09-23
+last_activity_desc: "Milestone v1.2 started"
 progress:
-  total_phases: 1
+  total_phases: 0
   completed_phases: 0
-  total_plans: 3
-  completed_plans: 2
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-09-13)
+See: .planning/PROJECT.md (updated 2026-09-23)
 
 **Core value:** A signed-in subscriber's paid access is real and enforced server-side — no page, download, or API response leaks paid content to someone who hasn't actually paid for it.
-**Current focus:** Phase 06 — Foundation & Global Chrome — Breakpoint Tokens, Header, Nav & Footer
+**Current focus:** Defining requirements and roadmap for v1.2
 
 ## Current Position
 
-Phase: 06 (Foundation & Global Chrome — Breakpoint Tokens, Header, Nav & Footer) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 06
-Last activity: 2026-09-13 — Phase 06 execution started
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-09-23 — Milestone v1.2 started
 
-Progress: [██████░░░░] 56% (5/9 phases complete; v1.1's 4 phases not started)
+Progress: [░░░░░░░░░░] 0%
+
 
 ## Performance Metrics
 
