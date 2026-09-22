@@ -82,7 +82,7 @@ export function useScrollFx(key) {
     const P_REST = 1 - Math.pow(1 - 0.12, 3)
     // Fraction of the opening to hold the side titles back for, so they never
     // appear while a neighbouring card would cut them mid-word.
-    const FADE_IN = 0.25
+    const FADE_IN = mobile ? 0.20 : 0.25
 
     // Card boxes come from CSS and only change on resize, so measure them once
     // instead of reading layout for all five every frame.
@@ -110,11 +110,22 @@ export function useScrollFx(key) {
 
     const tick = (finalOnly) => {
       const vh = window.innerHeight
+      const vw = window.innerWidth
+      const isPhone = vw <= 767
+      const isTablet = vw > 767 && vw <= 1023
 
-      if (cards.length && !mobile) {
-        const raw = Math.min(1, Math.max(0, window.scrollY / (vh * 0.62)))
+      if (cards.length) {
+        // Adaptive scroll travel: phone swipes complete in a shorter distance
+        const scrollDistance = isPhone ? vh * 0.48 : isTablet ? vh * 0.54 : vh * 0.62
+        const raw = Math.min(1, Math.max(0, window.scrollY / scrollDistance))
         const p = finalOnly ? 1 : 1 - Math.pow(1 - Math.min(1, raw + 0.12), 3)
-        const fit = Math.min(1, (window.innerWidth - 48) / 1120)
+
+        // Dynamic horizontal spread & rotation dampening for narrow screens
+        const fit = isPhone
+          ? Math.min(0.55, (vw - 32) / 720)
+          : Math.min(1, (vw - 48) / 1120)
+        const rotFactor = isPhone ? 0.65 : isTablet ? 0.85 : 1.0
+
         const hero = document.querySelector('[data-hero]')
         const origin = document.querySelector('[data-fan-origin]')
         const copy = document.querySelector('[data-copy-block]')
@@ -130,7 +141,7 @@ export function useScrollFx(key) {
         let cyUp = 0
         let cyDown = 0
         for (const c of cards) {
-          const a = (c.fr * p * Math.PI) / 180
+          const a = (c.fr * p * rotFactor * Math.PI) / 180
           const half = ((c.h * Math.abs(Math.cos(a)) + c.w * Math.abs(Math.sin(a))) / 2) * cs
           up = Math.max(up, half - c.fy * p)
           down = Math.max(down, half + c.fy * p)
@@ -138,20 +149,20 @@ export function useScrollFx(key) {
           cyDown = Math.max(cyDown, c.cy)
         }
 
-        let s = 0.72 + 0.28 * fit
+        let s = isPhone ? 0.60 + 0.20 * fit : 0.72 + 0.28 * fit
 
         if (hero && origin) {
           const H = hero.clientHeight
           const hTop = hero.getBoundingClientRect().top
           const copyBottom = copy ? copy.getBoundingClientRect().bottom - hTop : H * 0.42
-          const bandTop = copyBottom + 24
+          const bandTop = copyBottom + (isPhone ? 16 : 24)
           // The hero is `height:100vh; min-height:780px`, so on a viewport
           // shorter than 780 it runs past the fold. Seat the fan against the
           // fold rather than the hero's foot, or the stack opens off-screen.
           // (When the viewport is tall these are the same number.)
-          const bandBottom = Math.min(H, vh) - 52
+          const bandBottom = Math.min(H, vh) - (isPhone ? 28 : 52)
           // cy is unscaled, so withhold it before solving for s.
-          const band = Math.max(200, bandBottom - bandTop - cyUp - cyDown)
+          const band = Math.max(160, bandBottom - bandTop - cyUp - cyDown)
 
           // Solve for the scale that makes the fan fill the band exactly, then
           // seat it so its lowest card lands on bandBottom. Closed form — no
@@ -160,11 +171,11 @@ export function useScrollFx(key) {
           origin.style.top = `${(bandBottom - s * down - cyDown).toFixed(1)}px`
         }
 
-        const bound = window.innerWidth / 2 - 152
+        const bound = Math.max(80, vw / 2 - (isPhone ? 28 : 120))
         for (const c of cards) {
           const x = Math.max(-bound, Math.min(bound, c.fx * p * fit))
           const y = c.fy * p * s
-          const r = c.fr * p
+          const r = c.fr * p * rotFactor
           c.el.style.transform = `translate(${x.toFixed(1)}px,${y.toFixed(1)}px) rotate(${r.toFixed(2)}deg) scale(${(cs * s).toFixed(3)})`
         }
 
@@ -174,15 +185,17 @@ export function useScrollFx(key) {
         const veil = Math.max(0, Math.min(1, (opened - FADE_IN) / (1 - FADE_IN)))
         for (const el of titles) el.style.opacity = veil.toFixed(3)
 
+        const copyDrift = isPhone ? 24 : 40
+        const copyFadeMultiplier = isPhone ? 1.6 : 1.4
         document.querySelectorAll('[data-hero-copy]').forEach((el) => {
-          el.style.opacity = String(Math.max(0, 1 - raw * 1.4))
-          el.style.transform = `translateY(${(-raw * 40).toFixed(1)}px)`
+          el.style.opacity = String(Math.max(0, 1 - raw * copyFadeMultiplier))
+          el.style.transform = `translateY(${(-raw * copyDrift).toFixed(1)}px)`
         })
       }
 
       if (finalOnly) return
 
-      const k = mobile ? 0.4 : 1
+      const k = isPhone ? 0.4 : 1
       document.querySelectorAll('[data-par]').forEach((el) => {
         const amount = parseFloat(el.dataset.par) * k
         const r = el.getBoundingClientRect()
@@ -210,6 +223,11 @@ export function useScrollFx(key) {
       // The fit is closed-form now, so one settled pass is enough where the old
       // feedback loop needed to be run repeatedly to converge.
       tick(true)
+      for (const el of titles) el.style.opacity = '1'
+      document.querySelectorAll('[data-hero-copy]').forEach((el) => {
+        el.style.opacity = '1'
+        el.style.transform = 'none'
+      })
       document.querySelectorAll('[data-cta]').forEach((el) => {
         el.style.transform = 'none'
         el.style.opacity = '1'
