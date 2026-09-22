@@ -1374,24 +1374,52 @@ a:hover .cover--book {
   white-space: nowrap;
 }
 
+.strip-wrap {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0px,
+    black clamp(16px, 4vw, 36px),
+    black calc(100% - clamp(16px, 4vw, 36px)),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0px,
+    black clamp(16px, 4vw, 36px),
+    black calc(100% - clamp(16px, 4vw, 36px)),
+    transparent 100%
+  );
+}
+
 .strip {
   display: flex;
   gap: 22px;
   overflow-x: auto;
   padding: 44px 0 24px;
-  cursor: grab;
   scrollbar-width: none;
   scroll-snap-type: x proximity;
   overscroll-behavior-x: contain;
   touch-action: pan-x;
+  -webkit-overflow-scrolling: touch;
 }
 
 .strip::-webkit-scrollbar {
   display: none;
 }
 
-.strip.is-dragging {
-  cursor: grabbing;
+@media (pointer: fine) {
+  .strip {
+    cursor: grab;
+    user-select: none;
+  }
+
+  .strip.is-dragging {
+    cursor: grabbing;
+    scroll-behavior: auto;
+  }
 }
 
 .strip__item {
@@ -1450,8 +1478,11 @@ a:hover .cover--book {
 }
 
 .prose {
-  max-width: 62ch;
+  max-width: 68ch;
+  margin-inline: auto;
   color: var(--ink-soft);
+  font-size: var(--fs-body);
+  line-height: 1.75;
 }
 
 .prose__open {
@@ -2149,7 +2180,23 @@ a:hover .cover--book {
   }
 
   .ed-hero__grid {
-    gap: 44px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+    text-align: center;
+  }
+
+  .ed-hero__grid > figure,
+  .ed-hero__grid .cover {
+    max-width: 280px;
+    margin: 0 auto;
+  }
+
+  .ed-hero__meta {
+    justify-content: center;
+  }
+
+  .ed-hero__blurb {
+    margin-inline: auto;
   }
 
   .grid-covers {
@@ -2223,14 +2270,9 @@ a:hover .cover--book {
     display: block;
   }
 
-  .newest__grid,
-  .ed-hero__grid {
+  .newest__grid {
     grid-template-columns: minmax(0, 1fr);
     gap: 40px;
-  }
-
-  .ed-hero__grid>figure {
-    max-width: 300px;
   }
 
   .newest {

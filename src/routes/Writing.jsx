@@ -18,19 +18,22 @@ export default function Writing() {
   if (!w) return <NotFound />
 
   return (
-    <main className="page" id="main">
+    <main className="page page--narrow" id="main">
       <Link to="/writings" className="link-quiet">
         ← Writings
       </Link>
 
-      <Cover
-        tint={w.tint}
-        img={w.img}
-        alt={`Opening image for ${w.title}`}
-        ratio={w.ratio || '3/2'}
-        width={w.w || 1200}
-        height={w.h || 800}
-      />
+      <div style={{ margin: '28px 0 36px', overflow: 'hidden', borderRadius: 4 }}>
+        <Cover
+          tint={w.tint}
+          img={w.img}
+          alt={`Opening image for ${w.title}`}
+          ratio={w.ratio || '3/2'}
+          width={w.w || 1200}
+          height={w.h || 800}
+          style={{ maxHeight: 520, width: '100%', objectFit: 'cover' }}
+        />
+      </div>
 
       <p className="writing__type">
         {w.type} · {w.year}

@@ -106,36 +106,38 @@ export default function Edition() {
             <p className="section-head__meta">Drag to browse · click to zoom</p>
           </div>
 
-          <div className="strip" ref={stripRef}>
-            {editionArticles.map((a) => (
-              <button
-                key={a.slug}
-                type="button"
-                className="strip__item"
-                style={{ '--tint': a.tint, width: 360, aspectRatio: '4/3' }}
-                aria-label={`Zoom — ${a.title}`}
-                onClick={(e) =>
-                  openLightbox(
-                    { tint: a.tint, img: a.img, alt: a.alt, label: a.title, ratio: '4/3' },
-                    e.currentTarget.getBoundingClientRect(),
-                  )
-                }
-              >
-                {a.img && (
-                  <img
-                    src={a.img}
-                    alt={a.alt}
-                    className="cover__img is-loaded"
-                    loading="lazy"
-                    decoding="async"
-                    onError={(e) => {
-                      e.currentTarget.style.display = 'none'
-                    }}
-                  />
-                )}
-                <span className="strip__caption">{a.title}</span>
-              </button>
-            ))}
+          <div className="strip-wrap">
+            <div className="strip" ref={stripRef}>
+              {editionArticles.map((a) => (
+                <button
+                  key={a.slug}
+                  type="button"
+                  className="strip__item"
+                  style={{ '--tint': a.tint, width: 360, aspectRatio: '4/3' }}
+                  aria-label={`Zoom — ${a.title}`}
+                  onClick={(e) =>
+                    openLightbox(
+                      { tint: a.tint, img: a.img, alt: a.alt, label: a.title, ratio: '4/3' },
+                      e.currentTarget.getBoundingClientRect(),
+                    )
+                  }
+                >
+                  {a.img && (
+                    <img
+                      src={a.img}
+                      alt={a.alt}
+                      className="cover__img is-loaded"
+                      loading="lazy"
+                      decoding="async"
+                      onError={(e) => {
+                        e.currentTarget.style.display = 'none'
+                      }}
+                    />
+                  )}
+                  <span className="strip__caption">{a.title}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </section>
       )}
