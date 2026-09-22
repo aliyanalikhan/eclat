@@ -57,7 +57,7 @@ function ProductTile({ product, priceInfo, pricesLoading, subs, preselected, set
             aria-pressed={interval === 'monthly'}
             onClick={() => setInterval_('monthly')}
           >
-            Monthly
+            Bi-monthly
           </button>
           <button
             type="button"

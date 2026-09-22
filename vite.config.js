@@ -43,8 +43,58 @@ function previewStaticSemantics() {
   }
 }
 
+/**
+ * Executes serverless API endpoints locally during `npm run dev`.
+ */
+function localApiDev() {
+  return {
+    name: 'local-api-dev',
+    configureServer(server) {
+      server.middlewares.use(async (req, res, next) => {
+        if (req.url.startsWith('/api/billing/prices')) {
+          try {
+            if (!process.env.STRIPE_SECRET_KEY && existsSync('.env.local')) {
+              const envContent = readFileSync('.env.local', 'utf-8')
+              for (const line of envContent.split('\n')) {
+                const match = line.match(/^\s*([A-Za-z0-9_]+)\s*=\s*(.*)?\s*$/)
+                if (match && !process.env[match[1]]) {
+                  process.env[match[1]] = match[2]?.trim().replace(/^['"](.*)['"]$/, '$1')
+                }
+              }
+            }
+            const pricesHandler = await import('./api/billing/prices.js')
+            const response = await pricesHandler.default.fetch(
+              new Request(`http://${req.headers.host || 'localhost'}${req.url}`, {
+                method: req.method,
+                headers: req.headers,
+              })
+            )
+            res.statusCode = response.status
+            response.headers.forEach((val, key) => res.setHeader(key, val))
+            const body = await response.text()
+            res.end(body)
+            return
+          } catch (err) {
+            console.error('Local API dev error (/api/billing/prices):', err)
+          }
+        }
+
+        if (req.url.startsWith('/api/billing/status')) {
+          res.statusCode = 401
+          res.setHeader('Content-Type', 'application/json')
+          res.setHeader('Cache-Control', 'no-store')
+          res.end(JSON.stringify({ subscriptions: {} }))
+          return
+        }
+
+        next()
+      })
+    },
+  }
+}
+
 export default defineConfig({
-  plugins: [react(), previewStaticSemantics()],
+  plugins: [react(), previewStaticSemantics(), localApiDev()],
   build: {
     target: 'es2020',
     cssCodeSplit: false,
