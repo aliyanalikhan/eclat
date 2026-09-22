@@ -547,6 +547,29 @@ a:hover {
   background: radial-gradient(120% 80% at 50% 4%, #fffdf8 0%, #f2ece1 55%, #e7dfd1 100%);
 }
 
+/* --- hero entrance animations ------------------------------------------- */
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fanEntrance {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
 .fan-origin {
   position: absolute;
   left: 50%;
@@ -554,6 +577,7 @@ a:hover {
   width: 0;
   height: 0;
   z-index: 2;
+  animation: fanEntrance 0.70s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Scoped to .fan-origin deliberately: .cover (further down this file) also sets
@@ -711,6 +735,7 @@ a:hover {
   width: 100%;
   text-align: center;
   pointer-events: none;
+  animation: heroFadeUp 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .hero__copy a,
@@ -2246,35 +2271,17 @@ a:hover .cover--book {
   }
 
   .hero {
-    min-height: 640px;
-    height: auto;
-    padding: 118px 0 60px;
+    position: relative;
+    height: 100vh;
+    height: 100svh;
+    min-height: 600px;
+    overflow: hidden;
+    padding: 0;
   }
 
   .hero__copy {
-    position: static;
-    top: auto;
-  }
-
-  .fan-origin {
-    position: relative;
-    left: 0;
-    top: 0;
-    margin: 56px auto 0;
-    height: 300px;
-    display: grid;
-    place-items: center;
-  }
-
-  .fan-origin .fan-card {
-    display: none;
-  }
-
-  .fan-origin .fan-card--lead {
-    display: block;
-    position: relative;
-    margin: 0;
-    transform: none !important;
+    top: clamp(80px, 12vh, 120px);
+    padding: 0 var(--shell-pad);
   }
 
   .hero__scroll {
@@ -2368,6 +2375,12 @@ a:hover .cover--book {
      safety net if the rAF pass never runs at all. */
   .fan-card__veil {
     opacity: 1 !important;
+  }
+
+  .hero__copy,
+  .fan-origin {
+    animation: none !important;
+    transition: none !important;
   }
 }
 

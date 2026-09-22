@@ -16,10 +16,10 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Hero Animation & Multi-Device Adaptation (HERO)
 
-- [ ] **HERO-01**: Preserve existing rAF scroll-based fan animation mechanics while adapting geometry and card scaling smoothly across screen tiers.
-- [ ] **HERO-02**: Responsive fan bounding & fit logic in `useScrollFx`: dynamically calculate card spread, translation bounds, and scale so cards remain visible and unclipped on all viewports.
-- [ ] **HERO-03**: Preserve hero scroll reveal / fade transitions and side card title unveil timing matching desktop feel across all capable screen widths.
-- [ ] **HERO-04**: Maintain strict adherence to `prefers-reduced-motion: reduce` with single settled pass and zero animation jumps.
+- [x] **HERO-01**: Preserve existing rAF scroll-based fan animation mechanics while adapting geometry and card scaling smoothly across screen tiers.
+- [x] **HERO-02**: Responsive fan bounding & fit logic in `useScrollFx`: dynamically calculate card spread, translation bounds, and scale so cards remain visible and unclipped on all viewports.
+- [x] **HERO-03**: Preserve hero scroll reveal / fade transitions and side card title unveil timing matching desktop feel across all capable screen widths.
+- [x] **HERO-04**: Maintain strict adherence to `prefers-reduced-motion: reduce` with single settled pass and zero animation jumps.
 
 ### Content Pages & Multi-Device Grids (GRID)
 
@@ -59,10 +59,10 @@ Explicitly excluded. Documented to prevent scope creep.
 | RESP-01 | Phase 7 | Complete |
 | RESP-02 | Phase 7 | Complete |
 | RESP-03 | Phase 7 | Complete |
-| HERO-01 | Phase 8 | Pending |
-| HERO-02 | Phase 8 | Pending |
-| HERO-03 | Phase 8 | Pending |
-| HERO-04 | Phase 8 | Pending |
+| HERO-01 | Phase 8 | Complete |
+| HERO-02 | Phase 8 | Complete |
+| HERO-03 | Phase 8 | Complete |
+| HERO-04 | Phase 8 | Complete |
 | GRID-01 | Phase 9 | Pending |
 | GRID-02 | Phase 9 | Pending |
 | GRID-03 | Phase 9 | Pending |
