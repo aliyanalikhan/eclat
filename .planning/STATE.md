@@ -6,9 +6,9 @@ current_phase: 06
 current_phase_name: Foundation & Global Chrome — Breakpoint Tokens, Header, Nav & Footer
 status: executing
 stopped_at: Phase 6 UI-SPEC approved
-last_updated: "2026-09-22T14:28:00.000Z"
+last_updated: "2026-09-22T14:38:00.000Z"
 last_activity: 2026-09-22
-last_activity_desc: "Completed quick task 260922-r14: Update complimentary copy links to https://ladidier.com/read and https://ladidier.com/#read"
+last_activity_desc: "Completed quick task 260922-r8s: Change site link message title to Discover EcLat"
 progress:
   total_phases: 1
   completed_phases: 0
@@ -136,6 +136,7 @@ None yet.
 | 260922-hro | Add small 'COMPLIMENTARY COPY AVAILABLE HERE' button in Home hero section | 2026-09-22 | dc5e0d4 | N/A |
 | 260922-bim | Change 'Monthly' to 'Bi-monthly' on /subscribe and enable local dev billing endpoints in Vite | 2026-09-22 | 6dbda9a | N/A |
 | 260922-r14 | Update complimentary copy links in hero and CTA to https://ladidier.com/read and https://ladidier.com/#read | 2026-09-22 | 508a008 | [260922-r14-update-complimentary-copy-links](./quick/260922-r14-update-complimentary-copy-links/) |
+| 260922-r8s | Change site link message title to Discover EcLat | 2026-09-22 | d38e313 | [260922-r8s-change-site-link-message-title-to-discov](./quick/260922-r8s-change-site-link-message-title-to-discov/) |
 
 ## Deferred Items
 
