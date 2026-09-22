@@ -132,6 +132,7 @@ None yet.
 | 260913-hgd | Add YouTube Short `U4jOI7N3qwo` (real title/channel fetched via YouTube oEmbed: "This Prof. Yemi Osinbajo Speech Will Make You Stop and Think!" / ATILOYE GLOBAL TV) to the Videos section; reword the closing "One subscription" CTA heading to "Our stories, our voice, our Éclat. / Come belong." in both Home.jsx and the Eclat.dc.html design-canvas mirror | 2026-09-13 | 1e7824c, c64c1ae | [260913-hgd-add-youtube-shorts-video-u4joi7n3qwo-to-](./quick/260913-hgd-add-youtube-shorts-video-u4joi7n3qwo-to-/) |
 | 260922-rev | Reverse free read bypass and restore Stripe payments | 2026-09-22 | 550982a | N/A |
 | 260922-lad | Add direct complimentary copy link to LaDidiér reader in Home CTA section without using 'free' wording | 2026-09-22 | 7cb3188 | N/A |
+| 260922-cta | Remove 'Two issues, two children’s books, every essay.' from Home closing CTA section | 2026-09-22 | faa2037 | N/A |
 
 ## Deferred Items
 
