@@ -6,9 +6,9 @@ current_phase: 06
 current_phase_name: Foundation & Global Chrome — Breakpoint Tokens, Header, Nav & Footer
 status: executing
 stopped_at: Phase 6 UI-SPEC approved
-last_updated: "2026-09-13T15:29:38.554Z"
-last_activity: 2026-09-13
-last_activity_desc: "ROADMAP.md created for milestone v1.1: 4 phases (6-9), 19/19 requirements mapped"
+last_updated: "2026-09-22T14:28:00.000Z"
+last_activity: 2026-09-22
+last_activity_desc: "Completed quick task 260922-r14: Update complimentary copy links to https://ladidier.com/read and https://ladidier.com/#read"
 progress:
   total_phases: 1
   completed_phases: 0
@@ -135,6 +135,7 @@ None yet.
 | 260922-cta | Remove 'Two issues, two children’s books, every essay.' from Home closing CTA section | 2026-09-22 | faa2037 | N/A |
 | 260922-hro | Add small 'COMPLIMENTARY COPY AVAILABLE HERE' button in Home hero section | 2026-09-22 | dc5e0d4 | N/A |
 | 260922-bim | Change 'Monthly' to 'Bi-monthly' on /subscribe and enable local dev billing endpoints in Vite | 2026-09-22 | 6dbda9a | N/A |
+| 260922-r14 | Update complimentary copy links in hero and CTA to https://ladidier.com/read and https://ladidier.com/#read | 2026-09-22 | 508a008 | [260922-r14-update-complimentary-copy-links](./quick/260922-r14-update-complimentary-copy-links/) |
 
 ## Deferred Items
 
