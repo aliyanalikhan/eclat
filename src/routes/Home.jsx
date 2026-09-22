@@ -211,7 +211,7 @@ export default function Home() {
               Explore the Issue
             </Link>
             <a
-              href="https://ladidier.com"
+              href="https://ladidier.com/read"
               target="_blank"
               rel="noopener noreferrer"
               className="btn btn--sm hero__btn-complimentary"
@@ -419,7 +419,7 @@ export default function Home() {
             </h2>
             <div className="cta__complimentary">
               <a
-                href="https://ladidier.com"
+                href="https://ladidier.com/#read"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="cta__complimentary-link"
