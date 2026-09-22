@@ -406,6 +406,17 @@ export default function Home() {
               <br />
               <em style={{ fontStyle: 'italic' }}>Come belong.</em>
             </h2>
+            <div className="cta__complimentary">
+              <a
+                href="https://ladidier.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="cta__complimentary-link"
+              >
+                Complimentary copy available to read at LaDidiér
+                <span className="cta__complimentary-arrow" aria-hidden="true"> &rarr;</span>
+              </a>
+            </div>
             <p className="cta__lede">
               Two issues, two children&rsquo;s books, every essay. New editions land bimonthly.
             </p>
