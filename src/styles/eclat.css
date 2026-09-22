@@ -4,21 +4,14 @@
    breakpoints, focus states and mobile navigation it did not have.
    ========================================================================== */
 
-/* --- breakpoint tiers ----------------------------------------------------
-   The 4 tiers below are the site's entire "what is mobile" surface. CSS
-   custom properties cannot be referenced inside an @media condition, so
-   these are repeated literals kept in sync by convention, not enforcement —
-   if you change one call site, update this block and the others. Call
-   sites are tagged with a grep-able anchor comment instead of a line
-   number because line numbers drift on any unrelated edit above them —
-   run `grep -rn "bp:tablet\|bp:nav\|bp:mobile\|bp:phone" src` to find the
-   exact current call site regardless of file length.
-   --bp-tablet : 1080px — @media (max-width: 1080px) [anchor: bp:tablet]
-   --bp-nav    :  900px — @media (max-width: 900px) [anchor: bp:nav];
-                          Header.jsx matchMedia('(max-width: 900px)') [anchor: bp:nav]
-   --bp-mobile :  720px — @media (max-width: 720px) [anchor: bp:mobile];
-                          motion.js window.innerWidth < 720 [anchor: bp:mobile]
-   --bp-phone  :  460px — @media (max-width: 460px) [anchor: bp:phone]
+/* --- canonical breakpoint tiers (source of truth) -------------------------
+   The 4 canonical tiers below are the site's responsive design foundation,
+   synchronized between CSS media queries and src/lib/breakpoints.js:
+   Tier 1 (Phone)     : <= 767px  — @media (max-width: 767px)
+   Tier 2 (Tablet)    : 768px - 1023px — @media (min-width: 768px) and (max-width: 1023px)
+   Tier 3 (Desktop)   : 1024px - 1439px — @media (min-width: 1024px)
+   Tier 4 (Ultrawide) : >= 1440px — @media (min-width: 1440px)
+   Compact Phone sub-tier: <= 460px — @media (max-width: 460px)
    ------------------------------------------------------------------------- */
 
 /* --- tokens ------------------------------------------------------------- */
@@ -2099,7 +2092,7 @@ a:hover .cover--book {
 }
 
 /* --- responsive --------------------------------------------------------- */
-@media (max-width: 1080px) { /* bp:tablet */
+@media (max-width: 1023px) { /* bp:tablet */
   .newest__grid {
     gap: 48px;
   }
@@ -2219,7 +2212,7 @@ a:hover .cover--book {
   }
 }
 
-@media (max-width: 720px) { /* bp:mobile */
+@media (max-width: 767px) { /* bp:phone */
 
   .page,
   .page--narrow {

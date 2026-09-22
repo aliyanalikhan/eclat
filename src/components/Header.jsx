@@ -2,6 +2,7 @@ import { useEffect, useId, useRef, useState } from 'react'
 import { Link, NavLink, useLocation } from 'react-router-dom'
 import { useScrolled } from '../lib/motion.js'
 import { useSession } from '../lib/useSession.js'
+import { QUERIES } from '../lib/breakpoints.js'
 
 const LINKS = [
   { to: '/archive', label: 'Archive' },
@@ -34,9 +35,9 @@ export default function Header() {
   const authSlotRef = useRef(null)
   const authTriggerRef = useRef(null)
 
-  // --bp-nav: 900px — matches eclat.css's breakpoint-tier doc block above :root (eclat.css:7); keep this literal in sync with that block.
+  // Uses canonical nav breakpoint from src/lib/breakpoints.js
   useEffect(() => {
-    const mq = window.matchMedia('(max-width: 900px)') // bp:nav
+    const mq = window.matchMedia(QUERIES.nav) // bp:nav
     const sync = () => {
       setIsMobile(mq.matches)
       if (!mq.matches) setOpen(false)
