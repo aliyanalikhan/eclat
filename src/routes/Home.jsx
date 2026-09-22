@@ -206,9 +206,20 @@ export default function Home() {
             Éclat celebrates the visionaries, leaders, creators, and changemakers whose stories
             deserve to be told.
           </p>
-          <Link to={`/editions/${newest.no}`} className="btn">
-            Explore the Issue
-          </Link>
+          <div className="hero__actions" data-hero-copy="1">
+            <Link to={`/editions/${newest.no}`} className="btn">
+              Explore the Issue
+            </Link>
+            <a
+              href="https://ladidier.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn btn--sm hero__btn-complimentary"
+            >
+              Complimentary Copy Available Here
+              <span className="hero__btn-complimentary-arrow" aria-hidden="true"> &rarr;</span>
+            </a>
+          </div>
         </div>
 
         <p className="hero__scroll" data-hero-copy="1" aria-hidden="true">
