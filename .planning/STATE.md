@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-23)
 Phase: 10 (Interactive Overlays & Global Chrome Refinement) — COMPLETE
 Plan: 10-01, 10-02 (all complete)
 Status: Phase 10 verified & closed. Milestone v1.2 fully complete (4/4 phases, 13/13 requirements).
-Last activity: 2026-09-23 — Completed Phase 10 and validated all responsive requirements
+Last activity: 2026-09-23 - Completed quick task 260923-lhx: Add the Einstein-Szilard 1939 letter to Writings section
 
 Progress: [██████████] 100% (4/4 phases complete in v1.2)
 
@@ -140,6 +140,8 @@ None yet.
 | 260922-bim | Change 'Monthly' to 'Bi-monthly' on /subscribe and enable local dev billing endpoints in Vite | 2026-09-22 | 6dbda9a | N/A |
 | 260922-r14 | Update complimentary copy links in hero and CTA to https://ladidier.com/read and https://ladidier.com/#read | 2026-09-22 | 508a008 | [260922-r14-update-complimentary-copy-links](./quick/260922-r14-update-complimentary-copy-links/) |
 | 260922-r8s | Change site link message title to Discover EcLat | 2026-09-22 | d38e313 | [260922-r8s-change-site-link-message-title-to-discov](./quick/260922-r8s-change-site-link-message-title-to-discov/) |
+| 260923-og-logo | Replace OG link-preview image: magazine cover → ÉcLAT° logo (1200×630 WebP) | 2026-09-23 | ef3cb80 | [260922-r8s-change-site-link-message-title-to-discov](./quick/260922-r8s-change-site-link-message-title-to-discov/) |
+| 260923-lhx | Add the Einstein–Szilard 1939 letter to Writings (new 'Letter' type entry, transcribed from user-supplied archival-facsimile PDF) | 2026-09-23 | 6ed104a | [260923-lhx-add-the-einstein-szilard-1939-letter-to-](./quick/260923-lhx-add-the-einstein-szilard-1939-letter-to-/) |
 
 ## Deferred Items
 
