@@ -11,13 +11,29 @@ import { useEffect, useRef, useState } from 'react'
  */
 export default function MagazinePreview({ pages, title, open, onClose, startIndex = 0 }) {
   const [index, setIndex] = useState(startIndex)
+  const [slideDir, setSlideDir] = useState(null) // 'forward' | 'backward' | null
   const closeRef = useRef(null)
   const restoreTo = useRef(null)
+  const touchStartX = useRef(null)
+  const touchStartY = useRef(null)
 
   useEffect(() => {
     if (!open) return
     setIndex(startIndex)
+    setSlideDir(null)
   }, [open, startIndex])
+
+  // Preload adjacent magazine spread images to eliminate blank flashes on mobile
+  useEffect(() => {
+    if (!open || !pages || pages.length === 0) return
+    const toPreload = [index - 1, index + 1, index + 2].filter(
+      (i) => i >= 0 && i < pages.length
+    )
+    toPreload.forEach((i) => {
+      const img = new Image()
+      img.src = pages[i]
+    })
+  }, [open, index, pages])
 
   useEffect(() => {
     if (!open) return
@@ -38,11 +54,13 @@ export default function MagazinePreview({ pages, title, open, onClose, startInde
       }
       if (e.key === 'ArrowLeft') {
         e.preventDefault()
+        setSlideDir('backward')
         setIndex((i) => Math.max(0, i - 1))
         return
       }
       if (e.key === 'ArrowRight') {
         e.preventDefault()
+        setSlideDir('forward')
         setIndex((i) => Math.min(pages.length - 1, i + 1))
         return
       }
@@ -64,7 +82,38 @@ export default function MagazinePreview({ pages, title, open, onClose, startInde
     }
   }, [open, onClose, pages.length])
 
-  if (!open) return null
+  function handleTouchStart(e) {
+    if (!e.touches || e.touches.length === 0) return
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+  }
+
+  function handleTouchEnd(e) {
+    if (touchStartX.current === null || touchStartY.current === null) return
+    const touch = e.changedTouches[0]
+    const deltaX = touch.clientX - touchStartX.current
+    const deltaY = touch.clientY - touchStartY.current
+    touchStartX.current = null
+    touchStartY.current = null
+
+    // Require distinct horizontal swipe gesture (>40px and >1.5x vertical delta)
+    if (Math.abs(deltaX) > 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+      if (deltaX < 0 && index < pages.length - 1) {
+        setSlideDir('forward')
+        setIndex((i) => Math.min(pages.length - 1, i + 1))
+      } else if (deltaX > 0 && index > 0) {
+        setSlideDir('backward')
+        setIndex((i) => Math.max(0, i - 1))
+      }
+    }
+  }
+
+  const slideModifier =
+    slideDir === 'forward'
+      ? 'is-sliding-forward'
+      : slideDir === 'backward'
+        ? 'is-sliding-backward'
+        : ''
 
   return (
     <div
@@ -89,12 +138,19 @@ export default function MagazinePreview({ pages, title, open, onClose, startInde
         </svg>
       </button>
 
-      <div className="magazine-preview__frame" onClick={(e) => e.stopPropagation()}>
+      <div
+        className="magazine-preview__frame"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
         <img
+          key={index}
           src={pages[index]}
           alt={`${title} — page ${index + 1} of ${pages.length}`}
-          className="magazine-preview__img"
+          className={`magazine-preview__img ${slideModifier}`.trim()}
           decoding="async"
+          onAnimationEnd={() => setSlideDir(null)}
         />
 
         <div className="magazine-preview__nav">
@@ -102,7 +158,10 @@ export default function MagazinePreview({ pages, title, open, onClose, startInde
             type="button"
             className="btn btn--light btn--sm"
             disabled={index === 0}
-            onClick={() => setIndex((i) => Math.max(0, i - 1))}
+            onClick={() => {
+              setSlideDir('backward')
+              setIndex((i) => Math.max(0, i - 1))
+            }}
           >
             Previous
           </button>
@@ -113,7 +172,10 @@ export default function MagazinePreview({ pages, title, open, onClose, startInde
             type="button"
             className="btn btn--light btn--sm"
             disabled={index === pages.length - 1}
-            onClick={() => setIndex((i) => Math.min(pages.length - 1, i + 1))}
+            onClick={() => {
+              setSlideDir('forward')
+              setIndex((i) => Math.min(pages.length - 1, i + 1))
+            }}
           >
             Next
           </button>

@@ -1952,10 +1952,11 @@ a:hover .cover--book {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 6vh 6vw;
-  padding: 6svh 6vw;
+  padding: max(20px, env(safe-area-inset-top)) max(18px, env(safe-area-inset-right)) max(20px, env(safe-area-inset-bottom)) max(18px, env(safe-area-inset-left));
   border: 0;
   animation: fadeUp 0.3s ease-out both;
+  overscroll-behavior: contain;
+  touch-action: none;
 }
 
 .lightbox__frame {
@@ -1970,6 +1971,7 @@ a:hover .cover--book {
   background: var(--tint, var(--ink));
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
   overflow: hidden;
+  touch-action: pan-y;
 }
 
 .lightbox__frame::after {
@@ -1994,16 +1996,16 @@ a:hover .cover--book {
 
 .lightbox__close {
   position: absolute;
-  top: 20px;
-  right: 22px;
-  z-index: 3;
+  top: max(20px, env(safe-area-inset-top));
+  right: max(22px, env(safe-area-inset-right));
+  z-index: 100;
   width: 44px;
   height: 44px;
   display: grid;
   place-items: center;
   border-radius: 50%;
   border: 1px solid rgba(247, 243, 236, 0.3);
-  background: rgba(14, 12, 10, 0.5);
+  background: rgba(14, 12, 10, 0.6);
   color: rgba(247, 243, 236, 0.9);
   cursor: pointer;
   transition: background 0.25s, border-color 0.25s;
@@ -2016,7 +2018,7 @@ a:hover .cover--book {
 
 .lightbox__hint {
   position: absolute;
-  bottom: 22px;
+  bottom: max(22px, env(safe-area-inset-bottom));
   left: 0;
   right: 0;
   text-align: center;
@@ -2024,6 +2026,7 @@ a:hover .cover--book {
   font-size: 10px;
   letter-spacing: 0.2em;
   color: rgba(247, 243, 236, 0.5);
+  pointer-events: none;
 }
 
 /* --- video section ------------------------------------------------------ */
@@ -2055,7 +2058,8 @@ a:hover .cover--book {
 
 .video-modal__frame {
   position: relative;
-  width: min(960px, 100%);
+  width: min(960px, 92vw);
+  max-height: 80svh;
   aspect-ratio: 16/9;
   background: var(--ink);
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
@@ -2087,16 +2091,57 @@ a:hover .cover--book {
   gap: 18px;
   max-height: 100%;
   max-width: 100%;
+  touch-action: pan-y;
 }
 
 .magazine-preview__img {
   max-width: 100%;
   max-height: 78vh;
+  max-height: 78svh;
   width: auto;
   height: auto;
   object-fit: contain;
   background: var(--ink);
   box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+@keyframes flipSlideInRight {
+  from {
+    opacity: 0.4;
+    transform: translateX(24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes flipSlideInLeft {
+  from {
+    opacity: 0.4;
+    transform: translateX(-24px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.magazine-preview__img.is-sliding-forward {
+  animation: flipSlideInRight 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.magazine-preview__img.is-sliding-backward {
+  animation: flipSlideInLeft 0.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .magazine-preview__img.is-sliding-forward,
+  .magazine-preview__img.is-sliding-backward {
+    animation: none !important;
+  }
 }
 
 .magazine-preview__nav {
@@ -2112,6 +2157,34 @@ a:hover .cover--book {
   color: rgba(247, 243, 236, 0.85);
   min-width: 64px;
   text-align: center;
+}
+
+@media (max-width: 1023px) {
+  .magazine-preview__frame {
+    max-height: 100svh;
+    justify-content: center;
+  }
+
+  .magazine-preview__img {
+    max-height: calc(100svh - 96px);
+    max-width: calc(100vw - 28px);
+  }
+
+  .magazine-preview__nav {
+    position: fixed;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 105;
+    background: rgba(22, 19, 15, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(247, 243, 236, 0.2);
+    border-radius: 9999px;
+    padding: 6px 14px;
+    gap: 14px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.5);
+  }
 }
 
 /* --- reveal / motion ---------------------------------------------------- */

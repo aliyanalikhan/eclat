@@ -13,6 +13,8 @@ export default function Lightbox() {
   const { lightbox, closeLightbox, flipFrom } = useApp()
   const closeRef = useRef(null)
   const restoreTo = useRef(null)
+  const touchStartX = useRef(null)
+  const touchStartY = useRef(null)
 
   const open = Boolean(lightbox)
 
@@ -51,6 +53,26 @@ export default function Lightbox() {
     }
   }, [open, closeLightbox, flipFrom])
 
+  function handleTouchStart(e) {
+    if (!e.touches || e.touches.length === 0) return
+    touchStartX.current = e.touches[0].clientX
+    touchStartY.current = e.touches[0].clientY
+  }
+
+  function handleTouchEnd(e) {
+    if (touchStartX.current === null || touchStartY.current === null) return
+    const touch = e.changedTouches[0]
+    const deltaX = touch.clientX - touchStartX.current
+    const deltaY = touch.clientY - touchStartY.current
+    touchStartX.current = null
+    touchStartY.current = null
+
+    // Downward swipe > 60px and predominantly vertical (at least 1.5x deltaX)
+    if (deltaY > 60 && Math.abs(deltaY) > Math.abs(deltaX) * 1.5) {
+      closeLightbox()
+    }
+  }
+
   if (!open) return null
 
   const { tint, img, label, alt, ratio = '16/10' } = lightbox
@@ -83,6 +105,8 @@ export default function Lightbox() {
         className="lightbox__frame"
         style={{ '--tint': tint, '--lb-ratio': ratio, aspectRatio: ratio }}
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
       >
         {img && (
           <img
