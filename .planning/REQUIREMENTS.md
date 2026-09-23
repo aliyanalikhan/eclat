@@ -29,9 +29,9 @@ Requirements for this milestone. Each maps to roadmap phases.
 
 ### Overlays & Chrome Adaptation (OVERLAY)
 
-- [ ] **OVERLAY-01**: Magazine preview flipbook modal scales dynamically to viewport aspect ratio and height on mobile, tablet, and desktop without clipping.
-- [ ] **OVERLAY-02**: Lightbox zoom overlay maintains image proportions, touch-action, and prevents background rubber-band scrolling on mobile and desktop.
-- [ ] **OVERLAY-03**: Global header navigation and footer adapt seamlessly across mobile drawer and desktop bar with safe-area inset support.
+- [x] **OVERLAY-01**: Magazine preview flipbook modal scales dynamically to viewport aspect ratio and height on mobile, tablet, and desktop without clipping.
+- [x] **OVERLAY-02**: Lightbox zoom overlay maintains image proportions, touch-action, and prevents background rubber-band scrolling on mobile and desktop.
+- [x] **OVERLAY-03**: Global header navigation and footer adapt seamlessly across mobile drawer and desktop bar with safe-area inset support.
 
 ## v2 Requirements
 
@@ -66,9 +66,9 @@ Explicitly excluded. Documented to prevent scope creep.
 | GRID-01 | Phase 9 | Complete |
 | GRID-02 | Phase 9 | Complete |
 | GRID-03 | Phase 9 | Complete |
-| OVERLAY-01 | Phase 10 | Pending |
-| OVERLAY-02 | Phase 10 | Pending |
-| OVERLAY-03 | Phase 10 | Pending |
+| OVERLAY-01 | Phase 10 | Complete |
+| OVERLAY-02 | Phase 10 | Complete |
+| OVERLAY-03 | Phase 10 | Complete |
 
 **Coverage:**
 
