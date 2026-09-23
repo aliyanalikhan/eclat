@@ -40,6 +40,26 @@ export default function Writing() {
       </p>
       <h1 className="display">{w.title}</h1>
 
+      {w.pdf && (
+        <div style={{ margin: '28px 0 36px' }}>
+          <iframe
+            src={w.pdf}
+            title={`${w.title} — full document`}
+            style={{
+              display: 'block',
+              width: '100%',
+              height: '80vh',
+              border: '1px solid var(--line)',
+            }}
+          />
+          <p className="prose__open" style={{ marginTop: 12 }}>
+            <a href={w.pdf} target="_blank" rel="noopener noreferrer">
+              Open / download PDF
+            </a>
+          </p>
+        </div>
+      )}
+
       <div className="prose">
         {w.body && w.body.length > 0 ? (
           w.body.map((p, i) => (
