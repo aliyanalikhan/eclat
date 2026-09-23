@@ -5,6 +5,6 @@
 export const SITE = {
   name: 'Éclat',
   tagline: 'Discover EcLat',
-  url: 'https://eclat.example',
+  url: 'https://eclat.lifestyle',
   locale: 'en',
 }
