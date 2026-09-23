@@ -2057,6 +2057,52 @@ a:hover .cover--book {
   pointer-events: none;
 }
 
+.lightbox__navbtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  border: 1px solid rgba(247, 243, 236, 0.3);
+  background: rgba(14, 12, 10, 0.6);
+  color: rgba(247, 243, 236, 0.9);
+  cursor: pointer;
+  transition: background 0.25s, border-color 0.25s;
+}
+
+.lightbox__navbtn:hover {
+  background: rgba(247, 243, 236, 0.14);
+  border-color: rgba(247, 243, 236, 0.6);
+}
+
+.lightbox__navbtn--prev {
+  left: 12px;
+}
+
+.lightbox__navbtn--next {
+  right: 12px;
+}
+
+.lightbox__navbtn:disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.lightbox__pageindicator {
+  position: absolute;
+  right: 22px;
+  bottom: 18px;
+  z-index: 2;
+  font-family: var(--narrow);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  color: rgba(255, 255, 255, 0.8);
+}
+
 /* --- video section ------------------------------------------------------ */
 .video-card__thumb {
   position: relative;

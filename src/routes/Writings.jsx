@@ -34,6 +34,7 @@ export default function Writings() {
                 {
                   tint: w.tint,
                   img: w.img,
+                  images: w.pages,
                   label: w.title,
                   alt: `Opening image for ${w.title}`,
                   ratio: w.ratio || '3/2',

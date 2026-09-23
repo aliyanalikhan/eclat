@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useApp } from '../store.jsx'
 import { runFlip } from '../lib/motion.js'
 
@@ -15,12 +15,17 @@ export default function Lightbox() {
   const restoreTo = useRef(null)
   const touchStartX = useRef(null)
   const touchStartY = useRef(null)
+  const [pageIndex, setPageIndex] = useState(0)
 
   const open = Boolean(lightbox)
+  const images = lightbox?.images
+  const hasPages = Array.isArray(images) && images.length > 1
+  const pageCount = hasPages ? images.length : 1
 
   useEffect(() => {
     if (!open) return
 
+    setPageIndex(0)
     restoreTo.current = document.activeElement
     closeRef.current?.focus()
 
@@ -37,6 +42,16 @@ export default function Lightbox() {
         closeLightbox()
         return
       }
+      if (hasPages && e.key === 'ArrowLeft') {
+        e.preventDefault()
+        setPageIndex((i) => Math.max(0, i - 1))
+        return
+      }
+      if (hasPages && e.key === 'ArrowRight') {
+        e.preventDefault()
+        setPageIndex((i) => Math.min(pageCount - 1, i + 1))
+        return
+      }
       // Only the close button is focusable in here, so keep Tab on it.
       if (e.key === 'Tab') {
         e.preventDefault()
@@ -51,7 +66,7 @@ export default function Lightbox() {
       document.body.style.paddingRight = paddingRight
       if (restoreTo.current instanceof HTMLElement) restoreTo.current.focus()
     }
-  }, [open, closeLightbox, flipFrom])
+  }, [open, closeLightbox, flipFrom, hasPages, pageCount])
 
   function handleTouchStart(e) {
     if (!e.touches || e.touches.length === 0) return
@@ -70,12 +85,23 @@ export default function Lightbox() {
     // Downward swipe > 60px and predominantly vertical (at least 1.5x deltaX)
     if (deltaY > 60 && Math.abs(deltaY) > Math.abs(deltaX) * 1.5) {
       closeLightbox()
+      return
+    }
+
+    // Horizontal swipe > 60px and predominantly horizontal (at least 1.5x deltaY) pages a multi-image item
+    if (hasPages && Math.abs(deltaX) > 60 && Math.abs(deltaX) > Math.abs(deltaY) * 1.5) {
+      if (deltaX < 0) {
+        setPageIndex((i) => Math.min(pageCount - 1, i + 1))
+      } else {
+        setPageIndex((i) => Math.max(0, i - 1))
+      }
     }
   }
 
   if (!open) return null
 
   const { tint, img, label, alt, ratio = '16/10' } = lightbox
+  const currentSrc = hasPages ? images[pageIndex] : img
 
   return (
     <div
@@ -108,17 +134,55 @@ export default function Lightbox() {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
-        {img && (
+        {currentSrc && (
           <img
-            src={img}
-            alt={alt || label || ''}
+            key={currentSrc}
+            src={currentSrc}
+            alt={hasPages ? `${alt || label || ''} — page ${pageIndex + 1} of ${pageCount}` : alt || label || ''}
             className="cover__img is-loaded"
             onError={(e) => {
               e.currentTarget.style.display = 'none'
             }}
           />
         )}
+        {hasPages && (
+          <button
+            type="button"
+            className="lightbox__navbtn lightbox__navbtn--prev"
+            onClick={(e) => {
+              e.stopPropagation()
+              setPageIndex((i) => Math.max(0, i - 1))
+            }}
+            disabled={pageIndex === 0}
+            aria-label="Previous page"
+          >
+            <svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true">
+              <path d="M11 3 5 9l6 6" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        )}
+        {hasPages && (
+          <button
+            type="button"
+            className="lightbox__navbtn lightbox__navbtn--next"
+            onClick={(e) => {
+              e.stopPropagation()
+              setPageIndex((i) => Math.min(pageCount - 1, i + 1))
+            }}
+            disabled={pageIndex === pageCount - 1}
+            aria-label="Next page"
+          >
+            <svg width="14" height="14" viewBox="0 0 18 18" aria-hidden="true">
+              <path d="M7 3l6 6-6 6" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </button>
+        )}
         {label && <figcaption className="lightbox__caption">{label}</figcaption>}
+        {hasPages && (
+          <p className="lightbox__pageindicator" aria-live="polite">
+            Page {pageIndex + 1} of {pageCount}
+          </p>
+        )}
       </figure>
 
       <p className="lightbox__hint">Press Esc or click anywhere to close</p>
