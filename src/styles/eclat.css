@@ -423,6 +423,31 @@ a:hover {
   display: block;
 }
 
+.nav-backdrop {
+  position: fixed;
+  inset: var(--nav-h) 0 0 0;
+  background: rgba(14, 12, 10, 0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 55;
+  animation: fadeIn 0.2s ease-out both;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@media (min-width: 901px) {
+  .nav-backdrop {
+    display: none;
+  }
+}
+
 /* --- auth-aware nav slot -------------------------------------------------
    Three states (02-UI-SPEC.md Component Notes §1-2): an invisible
    reserved-width placeholder while the session check is in flight, a plain
@@ -1913,6 +1938,9 @@ a:hover .cover--book {
 .footer {
   border-top: 1px solid var(--line);
   padding: var(--footer-pad-y) var(--gut);
+  padding-bottom: max(var(--footer-pad-y), env(safe-area-inset-bottom));
+  padding-left: max(var(--gut), env(safe-area-inset-left));
+  padding-right: max(var(--gut), env(safe-area-inset-right));
   background: var(--bg);
 }
 
@@ -2302,18 +2330,24 @@ a:hover .cover--book {
     gap: 0;
     background: var(--bg);
     border-bottom: 1px solid var(--line);
-    padding: 8px var(--gut) 22px;
+    padding: 12px var(--gut) 24px;
     padding-left: max(var(--gut), env(safe-area-inset-left));
     padding-right: max(var(--gut), env(safe-area-inset-right));
-    padding-bottom: max(22px, env(safe-area-inset-bottom));
+    padding-bottom: max(24px, env(safe-area-inset-bottom));
     box-shadow: 0 18px 40px rgba(22, 19, 15, 0.12);
     max-height: calc(100vh - var(--nav-h));
     max-height: calc(100svh - var(--nav-h));
     overflow-y: auto;
+    z-index: 70;
+    transform: translateY(-8px);
+    opacity: 0;
+    transition: transform 0.25s var(--ease), opacity 0.25s var(--ease);
   }
 
   .nav.is-open {
     display: flex;
+    transform: translateY(0);
+    opacity: 1;
   }
 
   .nav[hidden] {
@@ -2467,9 +2501,45 @@ a:hover .cover--book {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .footer {
+    padding-bottom: max(36px, env(safe-area-inset-bottom));
+  }
+
   .footer__inner {
     flex-direction: column;
-    gap: 24px;
+    align-items: center;
+    text-align: center;
+    gap: 32px;
+  }
+
+  .footer__mark {
+    margin-inline: auto;
+  }
+
+  .footer__nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 20px;
+    width: 100%;
+    max-width: 320px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .footer__nav .link-quiet {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 4px;
+  }
+
+  .footer__fine {
+    margin-inline: auto;
+    max-width: 44ch;
+    font-size: 11px;
+    line-height: 1.6;
+    text-align: center;
   }
 }
 

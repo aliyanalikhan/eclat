@@ -53,6 +53,16 @@ export default function Header() {
     setAuthMenuOpen(false)
   }, [pathname])
 
+  // Lock body scrolling while the mobile nav drawer is open
+  useEffect(() => {
+    if (!open || !isMobile) return
+    const originalOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = originalOverflow
+    }
+  }, [open, isMobile])
+
   useEffect(() => {
     if (!open) return
     const onKey = (e) => {
@@ -244,6 +254,14 @@ export default function Header() {
           </Link>
         </nav>
       </div>
+
+      {open && isMobile && (
+        <div
+          className="nav-backdrop"
+          onClick={() => setOpen(false)}
+          aria-hidden="true"
+        />
+      )}
     </header>
   )
 }
