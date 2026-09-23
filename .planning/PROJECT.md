@@ -45,14 +45,14 @@ A signed-in subscriber's paid access is real and enforced server-side — no pag
 - ✓ User can manage their subscription (view status, cancel) from the Account page, backed by real Stripe data instead of mocked invoices/plan — Phase 5 (code-complete; human UAT still pending, see STATE.md Blockers)
 - ✓ Losing/cancelling a subscription revokes access to gated content on the next request — Phase 4/5 (code-complete; human UAT still pending, see STATE.md Blockers)
 - ✓ Mobile breakpoint tokens and global chrome touch optimization (Phase 6 foundation) — Phase 6
+- ✓ Unified 4-tier breakpoint architecture, fluid clamp() tokens, and site-wide zero-horizontal-overflow guarantee — Milestone v1.2 (Phase 7)
+- ✓ Signature scroll-driven hero fan animation adapted dynamically across all screen tiers with luxury entrance reveals — Milestone v1.2 (Phase 8)
+- ✓ Content-aware listing grids (Archive 2-col mobile, Books 1-col, Writings) and 68ch reading measures — Milestone v1.2 (Phase 9)
+- ✓ Interactive overlays (touch swipe Magazine Preview, hardened iOS scroll-lock Lightbox, safe areas) and global chrome — Milestone v1.2 (Phase 10)
 
 ### Active
 
-- [ ] Complete responsive layout reflow across Mobile (<768px), Tablet (768–1024px), Desktop (1024–1440px), and Large screens (>1440px)
-- [ ] High-fidelity hero animation (entrance reveal and interactive fan carousel transitions across all viewport sizes)
-- [ ] Content pages (Home, Archive, Edition, Books, Writings) fully responsive with zero horizontal overflow
-- [ ] Interactive overlays (Magazine preview flipbook modal, Lightbox zoom) fully responsive across touch and desktop
-- [ ] Subscribe, Account, and Checkout flows polished and responsive across all device tiers
+*No active milestone. Run `/gsd-new-milestone` to start the next cycle.*
 
 ### Out of Scope
 

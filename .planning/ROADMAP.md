@@ -13,23 +13,15 @@ Milestone v1.2 builds directly upon the existing codebase and validated backend,
 - Integer phases (1, 2, 3...): Planned milestone work
 - Decimal phases (2.1, 2.2): Urgent insertions (marked with INSERTED)
 
-### Completed Phases
+### Completed Milestones
 
-- [x] **Phase 1: Foundation — Environment, Secrets & Data Layer** - Server-only secrets boundary and database schema in place before any auth or billing code exists (completed 2026-09-08)
-- [x] **Phase 2: Authentication — Google Sign-In & Server-Side Sessions** - Users sign in with Google only, verified server-side, with persistent sessions (completed 2026-09-09)
-- [x] **Phase 3: Billing & Webhooks — Stripe Checkout and Subscription Sync** - Users subscribe via Stripe Checkout; webhook-verified events are the single source of truth for subscription state (completed 2026-09-09)
-- [x] **Phase 4: Content Gating — Real Server-Side Entitlement Enforcement** - Every gated page checks real per-user entitlement server-side (completed 2026-09-10)
-- [x] **Phase 5: Account Management — Real Status, Cancellation & Billing Portal** - The Account page shows real subscription status, invoices, and billing portal access (completed 2026-09-10)
-- [x] **Phase 6: Foundation & Global Chrome — Breakpoint Tokens, Header, Nav & Footer** - Initial mobile breakpoint tokens and navigation drawer touch optimization (completed 2026-09-13)
+- [x] **Milestone v1.0: Real Subscriber Gating & Stripe Billing** (Phases 1–5, completed 2026-09-10)
+- [x] **Milestone v1.1: Foundation & Global Chrome** (Phase 6, completed 2026-09-13)
+- [x] **Milestone v1.2: All-Screen Responsive & Hero Animation** (Phases 7–10, completed 2026-09-23) — See [v1.2-ROADMAP.md](./milestones/v1.2-ROADMAP.md)
 
-### Milestone v1.2: All-Screen Responsive & Hero Animation
+## Active / Next Milestone
 
-- [x] **Phase 7: Breakpoint Architecture & Fluid Foundation** - Unified 4-tier breakpoint system, fluid clamp() typography and spacing tokens, and site-wide zero-horizontal-overflow guarantee (completed 2026-09-23)
-- [x] **Phase 8: Hero Animation Multi-Device Adaptation** - Preserve and adapt the signature scroll-driven fan carousel animation in `useScrollFx` to scale and fit gracefully across phone, tablet, desktop, and ultra-wide viewports (completed 2026-09-23)
-- [x] **Phase 9: Content Pages & Responsive Multi-Device Grids** - Reflow listing grids (Editions, Books, Writings, Archive) and editorial reading pages across all 4 breakpoint tiers (completed 2026-09-23)
-- [x] **Phase 10: Interactive Overlays & Global Chrome Refinement** - Fully responsive Magazine Preview flipbook modal, Lightbox zoom overlay, and header/footer refinement across all viewports (completed 2026-09-23)
-
-## Phase Details
+*No active milestone. Run `/gsd-new-milestone` to define the next cycle.*
 
 ### Phase 7: Breakpoint Architecture & Fluid Foundation
 
