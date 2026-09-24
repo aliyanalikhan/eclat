@@ -9,18 +9,40 @@ import { runFlip } from '../lib/motion.js'
  * This one is a real modal: Escape closes it, focus moves in and is restored on
  * close, focus is trapped while open, and the page behind it cannot scroll.
  */
+function parseRatio(r) {
+  if (typeof r === 'number' && !isNaN(r) && r > 0) return r
+  if (typeof r === 'string' && r.includes('/')) {
+    const [w, h] = r.split('/').map(Number)
+    if (w && h && !isNaN(w) && !isNaN(h) && h > 0) return w / h
+  }
+  const n = parseFloat(r)
+  return isNaN(n) || n <= 0 ? 1 : n
+}
+
 export default function Lightbox() {
   const { lightbox, closeLightbox, flipFrom } = useApp()
   const closeRef = useRef(null)
+  const imgRef = useRef(null)
   const restoreTo = useRef(null)
   const touchStartX = useRef(null)
   const touchStartY = useRef(null)
   const [pageIndex, setPageIndex] = useState(0)
+  const [naturalRatio, setNaturalRatio] = useState(null)
 
   const open = Boolean(lightbox)
   const images = lightbox?.images
   const hasPages = Array.isArray(images) && images.length > 1
   const pageCount = hasPages ? images.length : 1
+
+  const currentSrc = hasPages ? images[pageIndex] : lightbox?.img
+
+  useEffect(() => {
+    setNaturalRatio(null)
+    const el = imgRef.current
+    if (el && el.complete && el.naturalWidth && el.naturalHeight) {
+      setNaturalRatio(el.naturalWidth / el.naturalHeight)
+    }
+  }, [currentSrc])
 
   useEffect(() => {
     if (!open) return
@@ -100,8 +122,8 @@ export default function Lightbox() {
 
   if (!open) return null
 
-  const { tint, img, label, alt, ratio = '16/10' } = lightbox
-  const currentSrc = hasPages ? images[pageIndex] : img
+  const { tint, label, alt, ratio = '16/10' } = lightbox
+  const activeRatioNum = naturalRatio || parseRatio(ratio)
 
   return (
     <div
@@ -129,17 +151,28 @@ export default function Lightbox() {
       <figure
         data-lb-frame="1"
         className="lightbox__frame"
-        style={{ '--tint': tint, '--lb-ratio': ratio, aspectRatio: ratio }}
+        style={{
+          '--tint': tint,
+          '--lb-ratio': activeRatioNum,
+          aspectRatio: `${activeRatioNum}`,
+        }}
         onClick={(e) => e.stopPropagation()}
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
         {currentSrc && (
           <img
+            ref={imgRef}
             key={currentSrc}
             src={currentSrc}
             alt={hasPages ? `${alt || label || ''} — page ${pageIndex + 1} of ${pageCount}` : alt || label || ''}
             className="cover__img is-loaded"
+            onLoad={(e) => {
+              const { naturalWidth, naturalHeight } = e.currentTarget
+              if (naturalWidth && naturalHeight) {
+                setNaturalRatio(naturalWidth / naturalHeight)
+              }
+            }}
             onError={(e) => {
               e.currentTarget.style.display = 'none'
             }}

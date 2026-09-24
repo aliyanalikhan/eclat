@@ -1,13 +1,17 @@
 import { Link, useParams } from 'react-router-dom'
 import Cover from '../components/Cover.jsx'
 import NotFound from './NotFound.jsx'
-import { writingBySlug } from '../data/content.js'
+import { writingBySlug, seriesBySlug, writings } from '../data/content.js'
 import { writingSeo } from '../data/seo.js'
 import { useSeo } from '../lib/useSeo.js'
+
+const ROMAN = ['', 'I', 'II', 'III', 'IV', 'V']
 
 export default function Writing() {
   const { slug } = useParams()
   const w = writingBySlug(slug)
+  const series = w && seriesBySlug(w.series)
+  const members = series ? writings.filter((m) => m.series === series.slug) : []
 
   useSeo(
     w
@@ -36,7 +40,7 @@ export default function Writing() {
       </div>
 
       <p className="writing__type">
-        {w.type} · {w.year}
+        {series ? `${series.title} · Part ${ROMAN[w.part]} of ${ROMAN[series.count]}` : `${w.type} · ${w.year}`}
       </p>
       <h1 className="display">{w.title}</h1>
 
@@ -51,6 +55,29 @@ export default function Writing() {
           <p className="prose__open">{w.dek}</p>
         )}
       </div>
+
+      {series && (
+        <nav className="series-nav" aria-label={series.title}>
+          <p className="series-nav__label">{series.title}</p>
+          <ol className="series-nav__list">
+            {members.map((m) => (
+              <li key={m.slug}>
+                {m.slug === w.slug ? (
+                  <span className="series-nav__item is-current" aria-current="page">
+                    <span className="series-nav__part">Part {ROMAN[m.part]}</span>
+                    {m.title}
+                  </span>
+                ) : (
+                  <Link to={`/writings/${m.slug}`} className="series-nav__item">
+                    <span className="series-nav__part">Part {ROMAN[m.part]}</span>
+                    {m.title}
+                  </Link>
+                )}
+              </li>
+            ))}
+          </ol>
+        </nav>
+      )}
     </main>
   )
 }
