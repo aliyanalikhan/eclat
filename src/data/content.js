@@ -495,6 +495,22 @@ export const videos = [
     dek: 'Prof. Yemi Osinbajo — Nigeria’s Vice President from 2015 to 2023 — on leadership, service, and the work of building a nation.',
     source: 'ATILOYE GLOBAL TV',
   },
+  {
+    slug: 'mandela-on-his-imprisonment',
+    youtubeId: 'XaxvHkLbRwc',
+    kicker: 'World Voices · Freedom',
+    title: 'In His Own Words: Nelson Mandela on His Imprisonment',
+    dek: 'Nelson Mandela reflects, in his own voice, on his years of imprisonment — and on the resolve that carried him through them.',
+    source: 'American Archive of Public Broadcasting',
+  },
+  {
+    slug: 'better-days-inauguration-2021',
+    youtubeId: 'u4HkM6WzmFY',
+    kicker: 'Inauguration · 2021',
+    title: 'Ant Clemons & Justin Timberlake — "Better Days"',
+    dek: 'A performance from the Biden-Harris Inauguration 2021 celebration — a song of hope offered to a nation looking ahead.',
+    source: 'Biden Inaugural Committee',
+  },
 ]
 
 export const invoices = [
