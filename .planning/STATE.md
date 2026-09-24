@@ -119,6 +119,7 @@ None yet.
 |---|-------------|------|--------|-----------|
 | 260925-3u3 | Add two videos to the Videos section | 2026-09-25 | eaf5521 | [260925-3u3-add-two-videos-xaxvhklbrwc-u4hkm6wzmfy-t](./quick/260925-3u3-add-two-videos-xaxvhklbrwc-u4hkm6wzmfy-t/) |
 | 260925-60j | Present Adams / Van Gogh / Einstein letters as a single trilogy in Writings | 2026-09-25 | 587a8e8 | [260925-60j-present-abigail-adams-van-gogh-einstein-](./quick/260925-60j-present-abigail-adams-van-gogh-einstein-/) |
+| 260925-66a | Visually separate the letters trilogy from the documents below it on /writings | 2026-09-25 | 96fd947 | [260925-66a-visually-separate-the-letters-trilogy-fr](./quick/260925-66a-visually-separate-the-letters-trilogy-fr/) |
 | 260909-kco | Fix checkout.js hard-failing on a stale/invalid stored stripe_customer_id | 2026-09-09 | 5916f7f | [260909-kco-fix-checkout-js-hard-failing-on-a-stale-](./quick/260909-kco-fix-checkout-js-hard-failing-on-a-stale-/) |
 | 260909-l31 | Fix /subscribe page card grid layout: equal-height cards, no orphaned card, aligned buttons | 2026-09-09 | 7b337a2 | [260909-l31-fix-subscribe-page-card-grid-layout-equa](./quick/260909-l31-fix-subscribe-page-card-grid-layout-equa/) |
 | 260910-vid | Separate hero fan to magazines-only; add /videos section (8 oEmbed-verified American culture/history clips, click-to-play modal, CSP update) | 2026-09-10 | 50dc6af, 378e1e6 | [260910-vid-add-videos-section-separate-hero-fan](./quick/260910-vid-add-videos-section-separate-hero-fan/) |
