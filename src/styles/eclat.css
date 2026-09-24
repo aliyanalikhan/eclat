@@ -2657,8 +2657,32 @@ a:hover .cover--book {
   }
 }
 /* --- writings: series (trilogy) ------------------------------------------ */
+/* The trilogy is drawn as its own panel so it can't be mistaken for the first
+   rows of the plain list that follows it. */
+.writings__group {
+  margin: 56px 0;
+  background: var(--paper);
+  border: 1px solid var(--line-hard);
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.writings__group .writing {
+  padding-left: 32px;
+  padding-right: 32px;
+}
+
+.writings__group .writing:hover {
+  padding-left: 46px;
+}
+
+.writings__group .writing:last-child {
+  border-bottom: 0;
+}
+
 .writings__series {
-  padding: 56px 0 30px;
+  padding: 40px 32px 32px;
+  background: rgba(22, 19, 15, 0.035);
   border-bottom: 1px solid var(--line);
 }
 
@@ -2741,8 +2765,17 @@ a.series-nav__item:hover {
 }
 
 @media (max-width: 640px) {
+  .writings__group {
+    margin: 40px 0;
+  }
+
+  .writings__group .writing {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
   .writings__series {
-    padding: 40px 0 24px;
+    padding: 32px 20px 24px;
   }
 
   .series-nav__list {
