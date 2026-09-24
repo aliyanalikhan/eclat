@@ -6,9 +6,9 @@ current_phase: 10
 current_phase_name: Interactive Overlays & Global Chrome Refinement
 status: completed
 stopped_at: "Milestone v1.2 execution complete"
-last_updated: "2026-09-23T12:45:21.000Z"
-last_activity: 2026-09-23
-last_activity_desc: "Completed quick task 260923-o9g: Replaced raw iframe PDF viewer with rasterized Lightbox pages (PyMuPDF page JPGs, real Writings thumbnails, multi-page Lightbox paging)"
+last_updated: "2026-09-25T02:29:00.000Z"
+last_activity: 2026-09-25
+last_activity_desc: "Completed quick task 260925-add: Add writings: The Girl Who Changed Lincoln's Face, A Trilogy, 13th Amendment"
 progress:
   total_phases: 4
   completed_phases: 4
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-23)
 Phase: 10 (Interactive Overlays & Global Chrome Refinement) — COMPLETE
 Plan: 10-01, 10-02 (all complete)
 Status: Phase 10 verified & closed. Milestone v1.2 fully complete (4/4 phases, 13/13 requirements).
-Last activity: 2026-09-23 - Completed quick task 260923-o9g: Replaced raw iframe PDF viewer with rasterized Lightbox pages (PyMuPDF page JPGs, real Writings thumbnails, multi-page Lightbox paging)
+Last activity: 2026-09-25 - Completed quick task 260925-add: Add writings: The Girl Who Changed Lincoln's Face, A Trilogy, 13th Amendment
 
 Progress: [██████████] 100% (4/4 phases complete in v1.2)
 
@@ -144,6 +144,7 @@ None yet.
 | 260923-lhx | Add the Einstein–Szilard 1939 letter to Writings (new 'Letter' type entry, transcribed from user-supplied archival-facsimile PDF) | 2026-09-23 | 6ed104a | [260923-lhx-add-the-einstein-szilard-1939-letter-to-](./quick/260923-lhx-add-the-einstein-szilard-1939-letter-to-/) |
 | 260923-nof | Add real PDF previews for 6 archival Writings letters (inline iframe + download link on detail pages, 5 new chronologically-ordered entries + Einstein-Szilard letter gains its pdf field, CSP frame-src widened to 'self') | 2026-09-23 | 03f3aa3, 6486840, 6ad641b | [260923-nof-add-real-pdf-previews-for-archival-lette](./quick/260923-nof-add-real-pdf-previews-for-archival-lette/) |
 | 260923-o9g | Replace raw iframe PDF viewer with rasterized Lightbox pages: PyMuPDF-rasterized 14 page JPGs for the 6 archival letters, real thumbnails on /writings, Writing.jsx reverted to plain prose, Lightbox.jsx gains multi-page Prev/Next + keyboard + swipe paging | 2026-09-23 | ceb43b2, 212392f, e5946d9 | [260923-o9g-replace-the-raw-iframe-pdf-viewer-added-](./quick/260923-o9g-replace-the-raw-iframe-pdf-viewer-added-/) |
+| 260925-add | Add writings: The Girl Who Changed Lincoln's Face, A Trilogy, 13th Amendment | 2026-09-25 | 9d56cce | [20260925-add-writings](./quick/20260925-add-writings/) |
 
 ## Deferred Items
 
