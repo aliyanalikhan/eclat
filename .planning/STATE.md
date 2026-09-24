@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-23)
 Phase: 10 (Interactive Overlays & Global Chrome Refinement) — COMPLETE
 Plan: 10-01, 10-02 (all complete)
 Status: Phase 10 verified & closed. Milestone v1.2 fully complete (4/4 phases, 13/13 requirements).
-Last activity: 2026-09-25 - Completed quick task 260925-fix: Fix aspect ratio for recent writings
+Last activity: 2026-09-25 - Completed quick task 260925-3u3: Add two videos to the Videos section
 
 Progress: [██████████] 100% (4/4 phases complete in v1.2)
 
@@ -117,6 +117,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 260925-3u3 | Add two videos to the Videos section | 2026-09-25 | eaf5521 | [260925-3u3-add-two-videos-xaxvhklbrwc-u4hkm6wzmfy-t](./quick/260925-3u3-add-two-videos-xaxvhklbrwc-u4hkm6wzmfy-t/) |
 | 260909-kco | Fix checkout.js hard-failing on a stale/invalid stored stripe_customer_id | 2026-09-09 | 5916f7f | [260909-kco-fix-checkout-js-hard-failing-on-a-stale-](./quick/260909-kco-fix-checkout-js-hard-failing-on-a-stale-/) |
 | 260909-l31 | Fix /subscribe page card grid layout: equal-height cards, no orphaned card, aligned buttons | 2026-09-09 | 7b337a2 | [260909-l31-fix-subscribe-page-card-grid-layout-equa](./quick/260909-l31-fix-subscribe-page-card-grid-layout-equa/) |
 | 260910-vid | Separate hero fan to magazines-only; add /videos section (8 oEmbed-verified American culture/history clips, click-to-play modal, CSP update) | 2026-09-10 | 50dc6af, 378e1e6 | [260910-vid-add-videos-section-separate-hero-fan](./quick/260910-vid-add-videos-section-separate-hero-fan/) |
