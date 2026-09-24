@@ -218,7 +218,59 @@ export const writings = [
       '/assets/images/writings/the-einstein-szilard-letter-p2.jpg',
     ],
   },
-].map((w) => ({ ...w, img: `/assets/images/writings/${w.slug}.jpg` }))
+  {
+    slug: 'the-girl-who-changed-lincolns-face',
+    title: 'THE GIRL WHO CHANGED LINCOLN’S FACE',
+    dek: 'She was eleven years old. She wrote to a presidential candidate with a suggestion. Abraham Lincoln listened.',
+    type: 'Letter',
+    origin: 'Grace Bedell & Abraham Lincoln',
+    date: 'October 1860',
+    tint: 'oklch(0.38 0.04 230)',
+    ratio: '1224/1584',
+    w: 1224,
+    h: 1584,
+    img: '/assets/images/writings/the-girl-who-changed-lincolns-face.png',
+    pages: [
+      '/assets/images/writings/the-girl-who-changed-lincolns-face.png',
+    ],
+  },
+  {
+    slug: 'a-trilogy',
+    title: 'A Trilogy',
+    dek: 'The 3 is like a trilogy I don’t know how you wanna pitch it but I trust you’d figure it out',
+    type: 'Letter',
+    origin: 'Unknown',
+    date: 'Unknown',
+    tint: 'oklch(0.38 0.04 230)',
+    ratio: '1224/1584',
+    w: 1224,
+    h: 1584,
+    img: '/assets/images/writings/trilogy-1.png',
+    pages: [
+      '/assets/images/writings/trilogy-1.png',
+      '/assets/images/writings/trilogy-2.png',
+      '/assets/images/writings/trilogy-3.png',
+      '/assets/images/writings/trilogy-4.png',
+    ],
+  },
+  {
+    slug: '13th-amendment',
+    title: '13th Amendment to the U.S. Constitution',
+    dek: 'Abolition of Slavery',
+    type: 'Document',
+    origin: 'U.S. Constitution',
+    date: '1865',
+    tint: 'oklch(0.38 0.04 230)',
+    ratio: '1224/1584',
+    w: 1224,
+    h: 1584,
+    img: '/assets/images/writings/13th-amendment.png',
+    pages: [
+      '/assets/images/writings/13th-amendment.png',
+      '/assets/images/writings/13th-amendment-p2.png',
+    ],
+  },
+].map((w) => ({ ...w, img: w.img || `/assets/images/writings/${w.slug}.jpg` }))
 
 export const articles = [
   {
