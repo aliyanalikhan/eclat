@@ -351,6 +351,33 @@ export const writings = [
 
 export const articles = [
   {
+    slug: 'the-legacy-ola-brown',
+    editionNo: 3,
+    kicker: 'The Conversation · No. 3',
+    title: 'Making of an Investable Asset Class',
+    dek: 'Dr. Ola Brown of HealthCap Africa on moving from medicine to investment — and what it takes to build institutional capital around African healthcare.',
+    alt: 'A boardroom conversation with Dr. Ola Brown of HealthCap Africa, with a city skyline behind.',
+    tint: 'oklch(0.3 0.05 260)',
+  },
+  {
+    slug: 'kigali-after-dark-before-dawn',
+    editionNo: 3,
+    kicker: 'Travel · No. 3',
+    title: 'Kigali: After Dark, Before Dawn',
+    dek: 'Five days eating, drinking, wandering and discovering the African capital that has mastered the art of understatement.',
+    alt: 'Kigali Convention Centre dome lit in blue, yellow and green at night.',
+    tint: 'oklch(0.25 0.06 265)',
+  },
+  {
+    slug: 'the-ride-home',
+    editionNo: 3,
+    kicker: 'Journeys · No. 3',
+    title: 'The Ride Home',
+    dek: 'A story about bicycles that turns into a story about friendship, fathers, and the journey of return and rediscovery.',
+    alt: 'A cyclist riding a wet London street toward Big Ben at dusk.',
+    tint: 'oklch(0.4 0.03 240)',
+  },
+  {
     slug: 'the-power-of-vision',
     editionNo: 2,
     kicker: 'The Interview · No. 2',
