@@ -17,6 +17,29 @@ export const SITE = {
 
 export const editions = [
   {
+    no: 3,
+    slug: 'eclat-vol-3',
+    title: 'The Legacy Issue',
+    date: 'October 2026',
+    year: '2026',
+    pages: 70,
+    previewPageCount: 70,
+    tint: 'oklch(0.24 0.05 260)',
+    isNew: true,
+    plateSuppressed: true, // real cover art — wordmark and coverlines are already printed in
+    ratio: '1200/1698',
+    w: 1200,
+    h: 1698,
+    blurb:
+      'Dr. Ola Brown on building Africa’s healthcare investment ecosystem — plus Kigali after dark and before dawn, the art and science of working minds, emergency funds, and the journey of return in The Ride Home.',
+    // FREE-ONLY (D-11) — everything but the last paragraph. The gated
+    // third paragraph lives only in lib/gated-content.js, server-side.
+    excerpt: [
+      'The Legacy Issue is built around Dr. Ola Brown — a journey across medicine, entrepreneurship, investment, and leadership that reaches far beyond professional titles, and the woman, ideas, and experiences behind the work.',
+      'Also inside: Kigali after dark and before dawn, Beyond Companionship on the art and science of working minds, Made in Africa, emergency funds as your safety net, The Ride Home, and The Wedding Story.',
+    ],
+  },
+  {
     no: 2,
     slug: 'eclat-vol-2',
     title: 'The Power of Vision',
@@ -25,7 +48,6 @@ export const editions = [
     pages: 62,
     previewPageCount: 62,
     tint: 'oklch(0.24 0.03 255)',
-    isNew: true,
     plateSuppressed: true, // real cover art — wordmark and coverlines are already printed in
     ratio: '1200/1698',
     w: 1200,

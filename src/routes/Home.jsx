@@ -22,6 +22,15 @@ const FAN_SLOTS = [
 ]
 const FAN_FILL_ORDER = [2, 3, 1, 4, 0] // centre, then outward alternating right/left
 
+// Once three real issues exist the fan is a clean triptych — newest in the
+// centre flanked by the two previous issues — so the far-edge "Coming Soon"
+// placeholders drop away and the side covers sit a little wider apart.
+const TRIPTYCH_SLOTS = [
+  { fx: -290, fy: 24, fr: -10, cls: 'fan-card--mid' },
+  { fx: 0, fy: -14, fr: 0, cls: 'fan-card--lead', lead: true },
+  { fx: 290, fy: 24, fr: 10, cls: 'fan-card--mid', mirror: true },
+]
+
 // Muted, deliberately un-editorial tint so a "coming soon" placeholder never
 // reads as a real, uncovered edition (those use rich per-issue oklch tints)
 // — it's the same tint+stripe-texture fallback Cover already renders for a
@@ -29,6 +38,14 @@ const FAN_FILL_ORDER = [2, 3, 1, 4, 0] // centre, then outward alternating right
 const COMING_SOON_TINT = 'oklch(0.4 0.01 80)'
 
 function buildFan(eds) {
+  if (eds.length >= 3) {
+    // Newest centre, previous issue right, the one before it left.
+    return TRIPTYCH_SLOTS.map((slot, i) => ({
+      ...slot,
+      ed: eds[[2, 0, 1][i]],
+      comingSoon: false,
+    }))
+  }
   const slots = new Array(FAN_SLOTS.length).fill(null)
   eds.slice(0, FAN_SLOTS.length).forEach((ed, i) => {
     slots[FAN_FILL_ORDER[i]] = { ed, comingSoon: false }
@@ -272,11 +289,7 @@ export default function Home() {
 
           <div className="reveal" data-rev="2">
             <p className="pull">{newest.blurb}</p>
-            <p className="body-copy">
-              An editorial on essence over excess, a Minneapolis city guide, and LaDidiér
-              Bridal&rsquo;s elegance reimagined. Free preview opens the first eighteen pages to
-              everyone.
-            </p>
+            <p className="body-copy">{newest.excerpt[1]}</p>
             <div className="btn-row">
               <Link to={`/editions/${newest.no}`} className="btn">
                 See inside this edition
