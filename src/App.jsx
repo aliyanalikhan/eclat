@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Route, Routes, useLocation } from 'react-router-dom'
+import { Analytics } from '@vercel/analytics/react'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
 import Lightbox from './components/Lightbox.jsx'
@@ -79,6 +80,7 @@ export default function App() {
 
       <Footer />
       <Lightbox />
+      <Analytics />
     </>
   )
 }

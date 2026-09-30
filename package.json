@@ -15,6 +15,7 @@
     "serve": "vite preview --port 4173"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "@vercel/functions": "^3.9.5",
     "@vercel/postgres": "0.10.0",
     "cookie": "^2.0.1",
