@@ -7,8 +7,8 @@ current_phase_name: Interactive Overlays & Global Chrome Refinement
 status: completed
 stopped_at: "Milestone v1.2 execution complete"
 last_updated: "2026-09-25T02:38:00.000Z"
-last_activity: 2026-09-25
-last_activity_desc: "Completed quick task 260925-fix: Fix aspect ratio for recent writings"
+last_activity: 2026-10-02
+last_activity_desc: "Completed quick task 261002-6e5: Add publishing location to Footer copyright message"
 progress:
   total_phases: 4
   completed_phases: 4
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-23)
 Phase: 10 (Interactive Overlays & Global Chrome Refinement) — COMPLETE
 Plan: 10-01, 10-02 (all complete)
 Status: Phase 10 verified & closed. Milestone v1.2 fully complete (4/4 phases, 13/13 requirements).
-Last activity: 2026-09-25 - Completed quick task 260925-3u3: Add two videos to the Videos section
+Last activity: 2026-10-02 - Completed quick task 261002-6e5: Add publishing location to Footer copyright message
 
 Progress: [██████████] 100% (4/4 phases complete in v1.2)
 
@@ -117,6 +117,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261002-6e5 | Add publishing location to Footer copyright message | 2026-10-02 | 36fbc26 | [261002-6e5-add-publishing-location-to-footer-copyri](./quick/261002-6e5-add-publishing-location-to-footer-copyri/) |
 | 260925-3u3 | Add two videos to the Videos section | 2026-09-25 | eaf5521 | [260925-3u3-add-two-videos-xaxvhklbrwc-u4hkm6wzmfy-t](./quick/260925-3u3-add-two-videos-xaxvhklbrwc-u4hkm6wzmfy-t/) |
 | 260925-60j | Present Adams / Van Gogh / Einstein letters as a single trilogy in Writings | 2026-09-25 | 587a8e8 | [260925-60j-present-abigail-adams-van-gogh-einstein-](./quick/260925-60j-present-abigail-adams-van-gogh-einstein-/) |
 | 260925-66a | Visually separate the letters trilogy from the documents below it on /writings | 2026-09-25 | 96fd947 | [260925-66a-visually-separate-the-letters-trilogy-fr](./quick/260925-66a-visually-separate-the-letters-trilogy-fr/) |
