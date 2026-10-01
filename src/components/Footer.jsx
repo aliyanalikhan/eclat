@@ -29,7 +29,7 @@ export default function Footer() {
         </nav>
 
         <p className="footer__fine">
-          &copy; {year} {SITE.name}. Éclat bi-monthly online magazine and the children's books are published by Éclat Life Style LLC.
+          &copy; {year} {SITE.name}. Éclat bi-monthly online magazine and the children's books are published by Éclat Life Style LLC in Maple Grove, Minnesota.
         </p>
       </div>
     </footer>
