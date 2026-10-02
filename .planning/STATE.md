@@ -7,8 +7,8 @@ current_phase_name: Interactive Overlays & Global Chrome Refinement
 status: completed
 stopped_at: "Milestone v1.2 execution complete"
 last_updated: "2026-09-25T02:38:00.000Z"
-last_activity: 2026-10-02
-last_activity_desc: "Completed quick task 261002-6e5: Add publishing location to Footer copyright message"
+last_activity: 2026-10-03
+last_activity_desc: "Completed quick task 261003-5a3: Add glow/flash animation to complimentary copy links"
 progress:
   total_phases: 4
   completed_phases: 4
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-23)
 Phase: 10 (Interactive Overlays & Global Chrome Refinement) — COMPLETE
 Plan: 10-01, 10-02 (all complete)
 Status: Phase 10 verified & closed. Milestone v1.2 fully complete (4/4 phases, 13/13 requirements).
-Last activity: 2026-10-02 - Completed quick task 261002-6e5: Add publishing location to Footer copyright message
+Last activity: 2026-10-03 - Completed quick task 261003-5a3: Add glow/flash animation to complimentary copy links
 
 Progress: [██████████] 100% (4/4 phases complete in v1.2)
 
@@ -150,6 +150,7 @@ None yet.
 | 260923-o9g | Replace raw iframe PDF viewer with rasterized Lightbox pages: PyMuPDF-rasterized 14 page JPGs for the 6 archival letters, real thumbnails on /writings, Writing.jsx reverted to plain prose, Lightbox.jsx gains multi-page Prev/Next + keyboard + swipe paging | 2026-09-23 | ceb43b2, 212392f, e5946d9 | [260923-o9g-replace-the-raw-iframe-pdf-viewer-added-](./quick/260923-o9g-replace-the-raw-iframe-pdf-viewer-added-/) |
 | 260925-add | Add writings: The Girl Who Changed Lincoln's Face, A Trilogy, 13th Amendment | 2026-09-25 | 9d56cce | [20260925-add-writings](./quick/20260925-add-writings/) |
 | 260925-fix | Fix aspect ratio for recent writings | 2026-09-25 | 258f3bd | [20260925-fix-writings-ratio](./quick/20260925-fix-writings-ratio/) |
+| 261003-5a3 | Add looping glow/flash animation (with prefers-reduced-motion override) to hero and closing-CTA complimentary copy links | 2026-10-03 | 29ff83e | [261003-5a3-make-the-complimentary-copy-link-more-vi](./quick/261003-5a3-make-the-complimentary-copy-link-more-vi/) |
 
 ## Deferred Items
 
