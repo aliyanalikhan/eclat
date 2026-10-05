@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-23)
 Phase: 10 (Interactive Overlays & Global Chrome Refinement) — COMPLETE
 Plan: 10-01, 10-02 (all complete)
 Status: Phase 10 verified & closed. Milestone v1.2 fully complete (4/4 phases, 13/13 requirements).
-Last activity: 2026-10-03 - Completed quick task 261003-5a3: Add glow/flash animation to complimentary copy links
+Last activity: 2026-10-05 - Completed quick task 261005-9la: Apply client website copy changes
 
 Progress: [██████████] 100% (4/4 phases complete in v1.2)
 
@@ -117,6 +117,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261005-9la | Apply client website copy changes from Eclat_Client_Website_Changes_for_Claude_Code.pdf | 2026-10-05 | 6cadfc1 | [261005-9la-apply-client-website-copy-changes-from-e](./quick/261005-9la-apply-client-website-copy-changes-from-e/) |
 | 261002-6e5 | Add publishing location to Footer copyright message | 2026-10-02 | 36fbc26 | [261002-6e5-add-publishing-location-to-footer-copyri](./quick/261002-6e5-add-publishing-location-to-footer-copyri/) |
 | 260925-3u3 | Add two videos to the Videos section | 2026-09-25 | eaf5521 | [260925-3u3-add-two-videos-xaxvhklbrwc-u4hkm6wzmfy-t](./quick/260925-3u3-add-two-videos-xaxvhklbrwc-u4hkm6wzmfy-t/) |
 | 260925-60j | Present Adams / Van Gogh / Einstein letters as a single trilogy in Writings | 2026-09-25 | 587a8e8 | [260925-60j-present-abigail-adams-van-gogh-einstein-](./quick/260925-60j-present-abigail-adams-van-gogh-einstein-/) |
