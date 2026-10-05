@@ -7,8 +7,8 @@ current_phase_name: Interactive Overlays & Global Chrome Refinement
 status: completed
 stopped_at: "Milestone v1.2 execution complete"
 last_updated: "2026-09-25T02:38:00.000Z"
-last_activity: 2026-10-03
-last_activity_desc: "Completed quick task 261003-5a3: Add glow/flash animation to complimentary copy links"
+last_activity: 2026-10-05
+last_activity_desc: "Completed quick task 261005-9td: Fix React Router future flags and local dev/preview API endpoints"
 progress:
   total_phases: 4
   completed_phases: 4
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-23)
 Phase: 10 (Interactive Overlays & Global Chrome Refinement) — COMPLETE
 Plan: 10-01, 10-02 (all complete)
 Status: Phase 10 verified & closed. Milestone v1.2 fully complete (4/4 phases, 13/13 requirements).
-Last activity: 2026-10-05 - Completed quick task 261005-9la: Apply client website copy changes
+Last activity: 2026-10-05 - Completed quick task 261005-9td: Fix React Router future flags and local dev/preview API endpoints
 
 Progress: [██████████] 100% (4/4 phases complete in v1.2)
 
@@ -117,6 +117,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261005-9td | Fix React Router future flags and local dev/preview API endpoints | 2026-10-05 | e6ec0d1 | [261005-9td-fix-console-warnings-future-flags-and-lo](./quick/261005-9td-fix-console-warnings-future-flags-and-lo/) |
 | 261005-9la | Apply client website copy changes from Eclat_Client_Website_Changes_for_Claude_Code.pdf | 2026-10-05 | 6cadfc1 | [261005-9la-apply-client-website-copy-changes-from-e](./quick/261005-9la-apply-client-website-copy-changes-from-e/) |
 | 261002-6e5 | Add publishing location to Footer copyright message | 2026-10-02 | 36fbc26 | [261002-6e5-add-publishing-location-to-footer-copyri](./quick/261002-6e5-add-publishing-location-to-footer-copyri/) |
 | 260925-3u3 | Add two videos to the Videos section | 2026-09-25 | eaf5521 | [260925-3u3-add-two-videos-xaxvhklbrwc-u4hkm6wzmfy-t](./quick/260925-3u3-add-two-videos-xaxvhklbrwc-u4hkm6wzmfy-t/) |
