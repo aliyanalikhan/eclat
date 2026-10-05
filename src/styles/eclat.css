@@ -1190,13 +1190,6 @@ a:hover .cover--book {
 
 .cta__complimentary {
   margin: 0 auto 34px;
-  padding: 10px 14px;
-  border-radius: 14px;
-  animation: ctaBarFlash 2.6s ease-in-out infinite;
-}
-
-.cta__complimentary:hover {
-  animation-play-state: paused;
 }
 
 .cta__complimentary-link {
@@ -1253,31 +1246,20 @@ a:hover .cover--book {
   transform: translateX(4px);
 }
 
-@keyframes ctaBarFlash {
-  0%, 100% {
-    background: transparent;
-    box-shadow: none;
-  }
-  50% {
-    background: color-mix(in srgb, var(--accent-lit) 16%, transparent);
-    box-shadow: 0 0 28px 6px color-mix(in srgb, var(--accent-lit) 30%, transparent);
-  }
-}
-
 @keyframes ctaLinkGlow {
   0%, 100% {
     box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent-lit) 0%, transparent);
     border-color: rgba(255, 255, 255, 0.16);
   }
   50% {
-    box-shadow: 0 0 20px 4px color-mix(in srgb, var(--accent-lit) 55%, transparent);
+    box-shadow: 0 0 16px 3px color-mix(in srgb, var(--accent-lit) 50%, transparent),
+                0 0 32px 6px color-mix(in srgb, var(--accent-lit) 25%, transparent);
     border-color: var(--accent-lit);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero__btn-complimentary,
-  .cta__complimentary,
   .cta__complimentary-link {
     animation: none !important;
   }
