@@ -209,7 +209,7 @@ export default function Home() {
           </p>
           <div className="hero__actions" data-hero-copy="1">
             <Link to={`/editions/${newest.no}`} className="btn">
-              Read the New Issue
+              Read the Latest Edition
             </Link>
             <a
               href="https://ladidier.com/read"
@@ -422,12 +422,15 @@ export default function Home() {
                 rel="noopener noreferrer"
                 className="cta__complimentary-link"
               >
-                Complimentary copy available to read at LaDidiér
-                <span className="cta__complimentary-arrow" aria-hidden="true"> &rarr;</span>
+                <span className="cta__complimentary-row">
+                  Complimentary copy available to read at LaDidier.com
+                  <span className="cta__complimentary-arrow" aria-hidden="true"> &rarr;</span>
+                </span>
+                <span className="cta__complimentary-tap">Tap here</span>
               </a>
             </div>
             <p className="cta__lede">
-              New editions land bimonthly.
+              New Edition Bimonthly
             </p>
             <Link to="/subscribe" className="btn btn--light btn--lg">
               Subscribe

@@ -1201,8 +1201,10 @@ a:hover .cover--book {
 
 .cta__complimentary-link {
   display: inline-flex;
+  flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
+  max-width: 100%;
   font-family: var(--narrow);
   font-size: 13px;
   font-weight: 500;
@@ -1229,6 +1231,17 @@ a:hover .cover--book {
   transform: translateY(-2px);
   box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
   animation-play-state: paused;
+}
+
+.cta__complimentary-row {
+  display: block;
+}
+
+.cta__complimentary-tap {
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.2em;
+  opacity: 0.85;
 }
 
 .cta__complimentary-arrow {
@@ -2019,6 +2032,12 @@ a:hover .cover--book {
 }
 
 .footer__fine {
+  flex: 1 1 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px 24px;
   font-size: 13px;
   color: var(--faint);
 }
@@ -2638,6 +2657,10 @@ a:hover .cover--book {
   }
 
   .footer__fine {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
     margin-inline: auto;
     max-width: 44ch;
     font-size: 11px;
