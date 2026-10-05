@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom'
-import { SITE } from '../data/content.js'
 
 export default function Footer() {
   const year = 2026 // Build-time constant; bump on rebuild rather than drifting per-visitor.
@@ -28,9 +27,10 @@ export default function Footer() {
           </Link>
         </nav>
 
-        <p className="footer__fine">
-          &copy; {year} {SITE.name}. Éclat bi-monthly online magazine and the children's books are published by Éclat Life Style LLC. PUBLISHED IN MINNESOTA, USA.
-        </p>
+        <div className="footer__fine">
+          <span className="footer__copy">&copy; {year} Éclat</span>
+          <span className="footer__publisher">Published by Éclat lifestyle LLC, Minnesota, USA</span>
+        </div>
       </div>
     </footer>
   )
