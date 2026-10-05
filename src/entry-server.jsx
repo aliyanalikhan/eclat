@@ -6,7 +6,7 @@ import { AppProvider } from './store.jsx'
 /** Called by prerender.js once per route at build time. */
 export function render(url) {
   return renderToString(
-    <StaticRouter location={url}>
+    <StaticRouter location={url} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AppProvider>
         <App />
       </AppProvider>

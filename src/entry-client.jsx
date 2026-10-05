@@ -6,7 +6,7 @@ import { AppProvider } from './store.jsx'
 
 const tree = (
   <StrictMode>
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <AppProvider>
         <App />
       </AppProvider>
