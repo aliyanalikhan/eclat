@@ -8,7 +8,7 @@ status: completed
 stopped_at: "Milestone v1.2 execution complete"
 last_updated: "2026-09-25T02:38:00.000Z"
 last_activity: 2026-10-05
-last_activity_desc: "Completed quick task 261005-9td: Fix React Router future flags and local dev/preview API endpoints"
+last_activity_desc: "Completed quick task 261005-ptq: Eliminate rectangular container glow bar in closing CTA section"
 progress:
   total_phases: 4
   completed_phases: 4
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-23)
 Phase: 10 (Interactive Overlays & Global Chrome Refinement) — COMPLETE
 Plan: 10-01, 10-02 (all complete)
 Status: Phase 10 verified & closed. Milestone v1.2 fully complete (4/4 phases, 13/13 requirements).
-Last activity: 2026-10-05 - Completed quick task 261005-9td: Fix React Router future flags and local dev/preview API endpoints
+Last activity: 2026-10-05 - Completed quick task 261005-ptq: Eliminate rectangular container glow bar in closing CTA section
 
 Progress: [██████████] 100% (4/4 phases complete in v1.2)
 
@@ -117,6 +117,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261005-ptq | Eliminate rectangular container glow bar in closing CTA section | 2026-10-05 | 5fd4cf6 | [261005-ptq-fix-glow-of-complimentary-copy-link-in-c](./quick/261005-ptq-fix-glow-of-complimentary-copy-link-in-c/) |
 | 261005-9td | Fix React Router future flags and local dev/preview API endpoints | 2026-10-05 | e6ec0d1 | [261005-9td-fix-console-warnings-future-flags-and-lo](./quick/261005-9td-fix-console-warnings-future-flags-and-lo/) |
 | 261005-9la | Apply client website copy changes from Eclat_Client_Website_Changes_for_Claude_Code.pdf | 2026-10-05 | 6cadfc1 | [261005-9la-apply-client-website-copy-changes-from-e](./quick/261005-9la-apply-client-website-copy-changes-from-e/) |
 | 261002-6e5 | Add publishing location to Footer copyright message | 2026-10-02 | 36fbc26 | [261002-6e5-add-publishing-location-to-footer-copyri](./quick/261002-6e5-add-publishing-location-to-footer-copyri/) |
