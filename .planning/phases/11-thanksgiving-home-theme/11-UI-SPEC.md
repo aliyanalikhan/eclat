@@ -18,15 +18,15 @@ created: 2026-11-16
 
 ---
 
-## 0. Defaults Applied to Open Decisions (confirm or override before planning)
+## 0. Locked Decisions (user-confirmed 2026-11-16)
 
-There was no CONTEXT.md and no channel to ask the user, so these three decisions use the defaults below. Each one can be changed in a single line and does not alter the rest of the contract.
+The user confirmed all three decisions below through the orchestrator. D-01 and D-02 were accepted as proposed. D-03 was widened to also rewrite the hero headline and lede.
 
-| # | Decision | Default applied | Why | How to override |
+| # | Decision | Locked choice | Why | How to change later |
 |---|----------|-----------------|-----|-----------------|
 | D-01 | Permanent or seasonal? | **Seasonal and removable with one constant.** `const THANKSGIVING = true` at the top of `Home.jsx` gates every themed element. All CSS lives in one block scoped under `.home--thanksgiving`. Turning it off means changing the constant to `false` and redeploying. | The site is prerendered at build time. A runtime `new Date()` window would bake one state into the HTML and then flip on hydration, causing a mismatch and a flash. A build-time date check still needs a redeploy. A constant is the honest version. | Delete the block and the constant to remove it permanently. |
 | D-02 | How strong? | **Medium.** The hero wash shifts to a warm harvest tone, six drawn leaves sit around the edges of the hero, the books band gets a warmer surface, and the dark CTA gets a low ember glow. The fan, cards, covers, typography and layout do not change. | This keeps the "quiet luxury" editorial voice. The existing `--accent` is already a rust/terracotta, so the theme reads as an extension of the brand rather than a costume. | Subtle: keep only the wash, the band and the flag copy (drop the leaves and the ember). Full reskin is out of scope (§ Out of Scope). |
-| D-03 | Copy changes? | **Two strings only.** The hero flag becomes `HAPPY THANKSGIVING · {TITLE}` and the CTA eyebrow becomes `With gratitude`. The brand headline, lede, buttons and CTA heading do not change. | A greeting is enough to make the season obvious. The h1 is the brand line and was set by the client (quick task 260910-onm). | Swap the strings in the `THANKSGIVING` ternaries. |
+| D-03 | Copy changes? | **Four strings.** The hero flag becomes `HAPPY THANKSGIVING · {TITLE}`, the hero h1 and hero lede are rewritten for Thanksgiving, and the CTA eyebrow becomes `With gratitude`. Buttons and the CTA heading do not change. The original strings stay in code as the `false` branch of each ternary. | User request. Each new string stays within the character count of the string it replaces (see Copywriting Contract), so the hero copy block cannot grow and the fan keeps its position. | Edit the strings in the `THANKSGIVING` ternaries, keeping within the stated character limits. |
 
 **Removal reminder (required):** the executor adds a line to the Blockers/Concerns list in `.planning/STATE.md`: *"Thanksgiving Home theme is live: set `THANKSGIVING = false` in `src/routes/Home.jsx` and redeploy on or after 2026-11-30."* This follows the existing `TEMP_FREE_PREVIEW` reminder pattern.
 
@@ -71,9 +71,9 @@ Exceptions: leaf **positions** use percentages of the `.hero` box (see §Leaves)
 | Role | Size | Weight | Line Height | Where |
 |------|------|--------|-------------|-------|
 | Label | 11px, letter-spacing 0.2em, uppercase, `--narrow` | 500 | 1.5 (inherited) | `.hero__flag` ("HAPPY THANKSGIVING · …"), `.cta__eyebrow` ("With gratitude") |
-| Body | `var(--fs-lede)` = clamp(17px, 1.8vw, 22px), `--sans` | 400 | 1.55 | `.hero__lede` (copy unchanged) |
+| Body | `var(--fs-lede)` = clamp(17px, 1.8vw, 22px), `--sans` | 400 | 1.55 | `.hero__lede` (themed copy, same style) |
 | Heading | clamp(30px, 4vw, 52px), `--serif` | 400 | 1.2 (browser default on `.h2`, unchanged) | `.h2` section heads (unchanged) |
-| Display | `var(--fs-h1)` = clamp(38px, 6vw, 78px), `--serif` | 400 | 0.95 | `.hero h1` (copy unchanged). The CTA h2 is clamp(38px, 6.4vw, 88px) at 0.98, also unchanged. |
+| Display | `var(--fs-h1)` = clamp(38px, 6vw, 78px), `--serif` | 400 | 0.95 | `.hero h1` (themed copy, same style). The CTA h2 is clamp(38px, 6.4vw, 88px) at 0.98, also unchanged. |
 
 Weights in use: **400** (serif/body) and **500** (Narrow labels). The `.hero__btn-complimentary` 600 is pre-existing and not touched.
 
@@ -141,8 +141,8 @@ Use `left`/`right` and percentages only, never negative offsets. `.hero` is alre
 | Element | Copy |
 |---------|------|
 | Hero flag (themed) | `HAPPY THANKSGIVING · {newest.title.toUpperCase()}`, which renders **"HAPPY THANKSGIVING · THE LEGACY ISSUE"**. The date is dropped so the line is *shorter* than the current 47-character `JUST LAUNCHED · … · OCTOBER 2026`, and the hero copy block cannot grow taller. The date still appears in "Just released" directly below. |
-| Hero h1 | unchanged: "Where remarkable stories come to light." |
-| Hero lede | unchanged |
+| Hero h1 (themed) | **"Giving thanks for remarkable stories."** (37 characters). Off/original: "Where remarkable stories come to light." (39 characters). **Limit: no more than 39 characters.** The longest word, "remarkable", matches the original, so the line-breaking behaviour cannot get worse. |
+| Hero lede (themed) | **"Éclat gives thanks for the visionaries, leaders, creators, and changemakers whose stories we share."** (99 characters). Off/original: "Éclat celebrates the visionaries, leaders, creators, and changemakers whose stories deserve to be told." (103 characters). **Limit: no more than 103 characters.** The longest word, "changemakers", matches the original. |
 | Primary CTA | unchanged: **"Read the Latest Edition"** (hero) and **"Subscribe"** (closing CTA) |
 | Secondary hero link | unchanged: "Complimentary Copy Available Here →" |
 | CTA eyebrow (themed) | **"With gratitude"** (replaces "One subscription") |
@@ -152,7 +152,9 @@ Use `left`/`right` and percentages only, never negative offsets. `.hero` is alre
 | Error state | Not applicable. The phase adds no network request, no fetch and no failure path. The existing `useOnlinePrice` fallback ("Subscribe" without a price) is untouched. |
 | Destructive confirmation | None. The phase has no destructive actions. |
 
-Off state: when `THANKSGIVING` is `false`, every string above reverts to the current production copy ("JUST LAUNCHED · {TITLE} · {DATE}", "One subscription") **exactly**, implemented as ternaries next to the original strings.
+Off state: when `THANKSGIVING` is `false`, every string above reverts **exactly** to the current production copy: flag "JUST LAUNCHED · {TITLE} · {DATE}", h1 "Where remarkable stories come to light.", lede "Éclat celebrates the visionaries, leaders, creators, and changemakers whose stories deserve to be told.", and eyebrow "One subscription". Each is implemented as a ternary with the original string kept in the `false` branch.
+
+Character limits: counts are Unicode code points (`[...str].length`), with "É" counting as one. A themed string must never exceed the count of the original it replaces: flag ≤ 47 (current 37), h1 ≤ 39 (current 37), lede ≤ 103 (current 99). The editorial voice matches the originals: sentence case, no exclamation marks, no emoji, "Éclat" spelled with the accent.
 
 ---
 
@@ -163,7 +165,7 @@ Off state: when `THANKSGIVING` is `false`, every string above reverts to the cur
 | Touch only `src/routes/Home.jsx`, `src/styles/eclat.css` (one new labeled block: `/* --- seasonal: thanksgiving (remove after season) --- */`, placed after the dark-CTA block) and `.planning/STATE.md` (removal reminder) | Touch `motion.js`, `Header.jsx`, `Footer.jsx`, `content.js`, `seo.js`, `prerender.js`, `vercel.json`, `public/_headers` |
 | Scope every new selector under `.home--thanksgiving` (class added to `<main id="main">` when the flag is on) | Use `new Date()` or any runtime date logic (hydration mismatch with the prerendered HTML) |
 | Add the leaves as decoration with `aria-hidden="true"` and `focusable="false"` | Add images, fonts, scripts, emoji glyphs, or any external URL |
-| Keep the hero copy block the same height or shorter (the fan seats itself against `copy.getBoundingClientRect().bottom`) | Add new lines or elements inside `.hero__copy` |
+| Keep the hero copy block the same height or shorter (the fan seats itself against `copy.getBoundingClientRect().bottom`), and keep every themed string within its character limit | Add new lines, `<br>`s or elements inside `.hero__copy`, or exceed the h1 limit (39 characters) or the lede limit (103 characters) |
 | Run the existing `verify-hero.mjs` / manual fan check at phone, tablet and desktop widths | Change fan geometry, `FAN_SLOTS`, card sizes or z-indices |
 
 ---
@@ -172,13 +174,14 @@ Off state: when `THANKSGIVING` is `false`, every string above reverts to the cur
 
 > State coverage for a static seasonal layer. Copy rows live in the Copywriting Contract above.
 
-Applicable state considerations resolved: 5 covered, 3 backstop, 0 unresolved
+Applicable state considerations resolved: 5 covered, 4 backstop, 0 unresolved
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
 | reduced-motion | `.tg-leaf` sway | ✅ covered | Under `prefers-reduced-motion: reduce` the leaves render static at `rotate(var(--r))` with `animation: none` |
 | overflow | `.tg-leaves` in `.hero` | ✅ covered | Leaves use only non-negative `left`/`right` percentages inside `overflow: hidden` `.hero`, and `document.documentElement.scrollWidth === clientWidth` holds at 320, 768, 1024, 1440 and 2560px |
-| long-text | `.hero__flag` themed string | ✅ covered | The themed flag string is shorter than the current string, so the hero copy block height does not increase at any tier |
+| long-text | `.hero__flag`, `.hero h1`, `.hero__lede` themed strings | ✅ covered | Each themed string is no longer (in characters) than the original it replaces (flag 37 ≤ 47, h1 37 ≤ 39, lede 99 ≤ 103) and has the same longest word, so the hero copy block height does not increase at any tier |
+| long-text | hero line count per tier | 🧪 backstop | With the theme on, the h1 and lede render in the same number of lines or fewer as with it off, at 320, 390, 768, 1024 and 1440px (measure `.hero__copy` height in both states and confirm on ≤ off) |
 | layering | leaves vs. fan/copy | ✅ covered | Leaves sit at z-index 1, below the fan (2) and copy (4). No leaf overlaps or obscures hero text or buttons, and no leaf intercepts clicks (`pointer-events: none`) |
 | toggle-off | entire theme | ✅ covered | With `THANKSGIVING = false`, Home renders the pre-phase copy and no `.tg-leaves` node, and `<main>` has no `home--thanksgiving` class |
 | hydration | prerendered Home | 🧪 backstop | `npm run build` then `vite preview`: the console shows no React hydration warning on `/`, and the prerendered `dist/index.html` already contains "HAPPY THANKSGIVING" |
