@@ -209,10 +209,13 @@ export default function Home() {
               ? `HAPPY THANKSGIVING · ${newest.title.toUpperCase()}`
               : `JUST LAUNCHED · ${newest.title.toUpperCase()} · ${newest.date.toUpperCase()}`}
           </p>
-          <h1 data-hero-copy="1">Where remarkable stories come to light.</h1>
+          <h1 data-hero-copy="1">
+            {THANKSGIVING ? 'A season of remarkable stories.' : 'Where remarkable stories come to light.'}
+          </h1>
           <p className="hero__lede" data-hero-copy="1">
-            Éclat celebrates the visionaries, leaders, creators, and changemakers whose stories
-            deserve to be told.
+            {THANKSGIVING
+              ? 'Éclat gives thanks for the visionaries, leaders, creators, and changemakers whose stories we share.'
+              : 'Éclat celebrates the visionaries, leaders, creators, and changemakers whose stories deserve to be told.'}
           </p>
           <div className="hero__actions" data-hero-copy="1">
             <Link to={`/editions/${newest.no}`} className="btn">
@@ -416,7 +419,7 @@ export default function Home() {
         <div className="cta__weave" data-par="10" aria-hidden="true" />
         <div className="cta__inner">
           <div className="cta__scale" data-cta="1">
-            <p className="cta__eyebrow">One subscription</p>
+            <p className="cta__eyebrow">{THANKSGIVING ? 'With gratitude' : 'One subscription'}</p>
             <h2 id="cta-h">
               Our stories, our voice, our Éclat.
               <br />

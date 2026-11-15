@@ -1288,6 +1288,14 @@ a:hover .cover--book {
   );
 }
 
+.home--thanksgiving {
+  --band: #f1e3cd;
+}
+
+.home--thanksgiving .cta {
+  background: radial-gradient(70% 55% at 50% 100%, oklch(0.34 0.09 40) 0%, var(--ink) 72%);
+}
+
 /* --- archive ------------------------------------------------------------ */
 .filters {
   display: flex;

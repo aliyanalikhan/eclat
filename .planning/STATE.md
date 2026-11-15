@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: All-Screen Responsive & Hero Animation
-current_phase: 10
-current_phase_name: Interactive Overlays & Global Chrome Refinement
-status: completed
+current_phase: 11
+current_phase_name: Thanksgiving Home Theme
+status: executing
 stopped_at: Phase 11 context gathered
-last_updated: "2026-11-15T23:04:14.727Z"
-last_activity: 2026-10-05
-last_activity_desc: "Completed quick task 261005-ptq: Eliminate rectangular container glow bar in closing CTA section"
+last_updated: "2026-11-15T23:05:20.686Z"
+last_activity: 2026-11-16
+last_activity_desc: Phase 11 execution started
 progress:
   total_phases: 1
   completed_phases: 0
@@ -23,14 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-23)
 
 **Core value:** A signed-in subscriber's paid access is real and enforced server-side — no page, download, or API response leaks paid content to someone who hasn't actually paid for it.
-**Current focus:** Milestone v1.2 Complete (All-Screen Responsive & Hero Animation)
+**Current focus:** Phase 11 — Thanksgiving Home Theme
 
 ## Current Position
 
-Phase: 10 (Interactive Overlays & Global Chrome Refinement) — COMPLETE
-Plan: 10-01, 10-02 (all complete)
-Status: Phase 10 verified & closed. Milestone v1.2 fully complete (4/4 phases, 13/13 requirements).
-Last activity: 2026-10-05 - Completed quick task 261005-ptq: Eliminate rectangular container glow bar in closing CTA section
+Phase: 11 (Thanksgiving Home Theme) — EXECUTING
+Plan: 1 of 1
+Status: Executing Phase 11
+Last activity: 2026-11-16 — Phase 11 execution started
 
 Progress: [██████████] 100% (4/4 phases complete in v1.2)
 
@@ -99,6 +99,7 @@ None yet.
 
 ### Blockers/Concerns
 
+- **ACTION NEEDED — seasonal theme (Phase 11):** Thanksgiving Home theme is live: set `THANKSGIVING = false` in `src/routes/Home.jsx` and redeploy — take-down date to be chosen by the user (no fixed date).
 - **v1.1 verification requirement (research, 2026-09-13):** every mobile-responsive fix in Phases 6-9 must be verified on a real device or real touch-emulation (Chrome DevTools touch flag), not a resized-viewport-only DevTools check — bfcache staleness (SUB-04), iOS Safari scroll-lock (MODAL-01), dvh toolbar-collapse jump (FOUND-03), and VoiceOver/TalkBack swipe-trap (MODAL-04) do not reproduce under plain desktop viewport resize.
 - **ACTION NEEDED — temporary security posture change (2026-09-10, quick-260910-pj6):** `api/content/editions/[no].js` currently has `TEMP_FREE_PREVIEW = true`, which serves full gated edition content to EVERY caller (no session or subscription check) as a time-boxed marketing promotion, explicitly requested by the site owner. All real entitlement logic (`getSessionUser`, the live `subscriptions` DB query, both not-entitled branches) remains fully intact and unmodified beneath the flag. **Revert by setting `TEMP_FREE_PREVIEW = false` in that file and redeploying** once the promotion period ends — no other file changes needed. Do not let this be forgotten.
 - **RESOLVED (2026-09-10, plan 05-03): all 3 of Phase 5's confirmed critical defects are closed**, plus a 4th emergent critical bug found during 05-03's own code review. (1) CR-01 fixed: `src/lib/useSafeFetch.js` now throws before parsing the body for any non-2xx/non-401 response, and `api/billing/account.js`'s DB-failure branch returns a distinct 500 instead of reusing the "no session" 401 shape — verified not to regress Phase 3/4's `useEntitlements`/`useGatedContent` (both untouched by the fix, 401 stays exempt). (2) CR-02 fixed: invoices now read from a single held product key instead of being flattened across all held products. (3) CR-03 fixed: `cancelAtPeriodEnd` now drives the "Access until" label plus a new confirmation notice, with the "Manage" CTA deliberately left reachable. (4) **Emergent bug found+fixed during 05-03's code review**: `api/billing/account.js` was assigning the raw `@vercel/postgres` `QueryResult` object to `rows` instead of destructuring `{ rows }` — every other query site in the codebase does this correctly — which threw an unhandled `TypeError` on every authenticated request to `/api/billing/account`, meaning the endpoint had never returned real data for any user since Plan 05-01 first shipped it. Fixed in commit `a01e33c`. Phase re-verified 5/5 must-haves after these fixes; 5 items remain in `05-UAT.md` requiring a live environment.
