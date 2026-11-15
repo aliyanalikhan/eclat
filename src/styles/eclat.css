@@ -1273,6 +1273,21 @@ a:hover .cover--book {
   color: rgba(247, 243, 236, 0.66);
 }
 
+/* --- seasonal: thanksgiving (remove after season) --- */
+/* Everything here is scoped under .home--thanksgiving (the class Home adds to main#main); flipping THANKSGIVING in Home.jsx turns it all off. */
+.home--thanksgiving .hero__wash {
+  background: radial-gradient(120% 80% at 50% 4%, #fffaf2 0%, #f4e6d2 55%, #e9d2b4 100%);
+}
+
+.home--thanksgiving .hero__halo {
+  background: radial-gradient(
+    closest-side,
+    rgba(255, 250, 242, 0.94) 0%,
+    rgba(255, 250, 242, 0.78) 52%,
+    rgba(255, 250, 242, 0) 100%
+  );
+}
+
 /* --- archive ------------------------------------------------------------ */
 .filters {
   display: flex;

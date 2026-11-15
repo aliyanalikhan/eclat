@@ -28,6 +28,11 @@ const FAN_FILL_ORDER = [2, 3, 1, 4, 0] // centre, then outward alternating right
 // missing img, just visually flagged as "not yet real" via the blur overlay.
 const COMING_SOON_TINT = 'oklch(0.4 0.01 80)'
 
+// Seasonal Home theme: set to false and redeploy to remove it. A build-time
+// constant, not a date check, because / is prerendered: a runtime clock check
+// would bake one state into the HTML and then flip on hydration.
+const THANKSGIVING = true
+
 function buildFan(eds) {
   const slots = new Array(FAN_SLOTS.length).fill(null)
   eds.slice(0, FAN_SLOTS.length).forEach((ed, i) => {
@@ -78,7 +83,7 @@ export default function Home() {
   }
 
   return (
-    <main id="main">
+    <main id="main" className={THANKSGIVING ? 'home--thanksgiving' : undefined}>
       <section className="hero" data-hero="1">
         <div className="hero__wash" />
 
@@ -200,7 +205,9 @@ export default function Home() {
           <div className="hero__halo" aria-hidden="true" />
           <p className="hero__flag" data-hero-copy="1">
             <span className="dot" aria-hidden="true" />
-            JUST LAUNCHED · {newest.title.toUpperCase()} · {newest.date.toUpperCase()}
+            {THANKSGIVING
+              ? `HAPPY THANKSGIVING · ${newest.title.toUpperCase()}`
+              : `JUST LAUNCHED · ${newest.title.toUpperCase()} · ${newest.date.toUpperCase()}`}
           </p>
           <h1 data-hero-copy="1">Where remarkable stories come to light.</h1>
           <p className="hero__lede" data-hero-copy="1">
