@@ -162,8 +162,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 **Requirements**: TBD
 **Depends on:** Phase 10 (v1.2 complete)
 **UI hint**: yes
-**Plans:** 1 plan
+**Plans:** 1/1 plans executed
 
 Plans:
 
-- [ ] 11-01-PLAN.md — THANKSGIVING constant + scoped seasonal CSS block: warm hero wash/halo, 4 themed strings, warm band, CTA ember, 6 maple/oak leaves, dateless STATE.md take-down reminder
+- [x] 11-01-PLAN.md — THANKSGIVING constant + scoped seasonal CSS block: warm hero wash/halo, 4 themed strings, warm band, CTA ember, 6 maple/oak leaves, dateless STATE.md take-down reminder

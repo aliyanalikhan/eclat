@@ -4,16 +4,16 @@ milestone: v1.2
 milestone_name: All-Screen Responsive & Hero Animation
 current_phase: 11
 current_phase_name: Thanksgiving Home Theme
-status: executing
-stopped_at: Phase 11 context gathered
-last_updated: "2026-11-15T23:05:20.686Z"
+status: verifying
+stopped_at: Completed 11-01-PLAN.md
+last_updated: "2026-11-15T23:10:54.637Z"
 last_activity: 2026-11-16
 last_activity_desc: Phase 11 execution started
 progress:
   total_phases: 1
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 1
-  completed_plans: 0
+  completed_plans: 1
 ---
 
 # Project State
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-09-23)
 
 Phase: 11 (Thanksgiving Home Theme) — EXECUTING
 Plan: 1 of 1
-Status: Executing Phase 11
+Status: Phase complete — ready for verification
 Last activity: 2026-11-16 — Phase 11 execution started
 
 Progress: [██████████] 100% (4/4 phases complete in v1.2)
@@ -69,6 +69,7 @@ Progress: [██████████] 100% (4/4 phases complete in v1.2)
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 05 P03 | 4min | 3 tasks | 3 files |
+| Phase 11 P01 | 5min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -92,6 +93,7 @@ Recent decisions affecting current work:
 - Phase 5 (via /gsd-plan-phase 5, locked D-01..D-16): two-wave plan — Wave 1 (05-01, server) adds lib/products.js reverse maps (PRODUCT_ID_TO_KEY / PRICE_ID_TO_PRODUCT_KEY / planLabelFor), the new sibling GET /api/billing/account (DB-always-200 + three independent best-effort live Stripe sections; no-store every branch), and POST /api/billing/portal (CSRF-first via isSameOriginNavigation, own-customer scoped, PUBLIC_ORIGIN return_url); Wave 2 (05-02, client) adds src/lib/useAccount.js (the third useSafeFetch consumer) and rebuilds src/routes/Account.jsx (per-product panels in D-16 order, 3-state status, D-13 plan label, D-14 state-aware Renews/Access-until, ACCT-04 Payment-failed notice, one D-12 invoice table, portal POST handlers fixing WR-01). Both plans carry <threat_model> blocks (security gate); plan-checker passed with 0 blockers
 - Phase 5 (executed 2026-09-10, commits 362c693..83ce821): **both waves complete.** Wave 1 shipped server-only reverse maps + GET /api/billing/account (locked per-slug contract; renews server-pre-formatted 'D MMM YYYY'; DB-always-200 with three best-effort Stripe sections) + POST /api/billing/portal (CSRF-first, own-customer, PUBLIC_ORIGIN return_url). Wave 2 shipped src/lib/useAccount.js (fail-closed, single-shot) and the full Account.jsx rebuild (real per-product panels in PRODUCTS order, 3-state status map with '—' fail-closed, state-aware CTA, ACCT-04 --bad notice with zero new CSS, one all-products invoice table, openPortal = POST + location.assign, WR-06/WR-01 verified). `npm run build` green, check-secrets clean, 31/31 client verifier checks PASS. **PLAN-DEFECTS documented in 05-02-SUMMARY/VERIFICATION:** plan's "Subscribe == exactly 1" and "Update payment method ≥ 2" counts are unsatisfiable vs the Copywriting Contract (implemented per contract); `node --check` cannot parse .jsx (build gate used instead). Remaining: end-of-phase human verification matrix (M1–M12) with `vercel dev` + real Google session + seeded DB.
 - [Phase ?]: Phase 5 gap-closure (05-03): closed CR-01 (useSafeFetch now fails closed on any non-2xx/non-401 response; account.js DB-catch returns distinct 500), CR-02 (invoiceItems reads a single held key instead of duplicating the shared invoice list across held products), and CR-03 (cancelAtPeriodEnd now drives the Access-until label plus a confirmation notice, CTA left reachable) — zero regression to Phase 3/4 signed-out rendering, confirmed structurally via git diff.
+- [Phase 11]: Thanksgiving theme gated by build-time THANKSGIVING constant in Home.jsx; leaf position/size in CSS (.tg-leaf--n) so the phone media query can override
 
 ### Pending Todos
 
@@ -163,6 +165,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-11-15T22:47:48.863Z
-Stopped at: Phase 11 context gathered
-Resume file: .planning/phases/11-thanksgiving-home-theme/11-CONTEXT.md
+Last session: 2026-11-15T23:10:54.624Z
+Stopped at: Completed 11-01-PLAN.md
+Resume file: None
