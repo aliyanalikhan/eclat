@@ -155,3 +155,15 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 3. Billing & Webhooks — Stripe Checkout and Subscription Sync | 3/3 | Complete    | 2026-09-09 |
 | 4. Content Gating — Real Server-Side Entitlement Enforcement | 2/2 | Pending human verification | - |
 | 5. Account Management — Real Status, Cancellation & Billing Portal | 3/3 | Pending human verification | - |
+
+### Phase 11: Thanksgiving Home Theme
+
+**Goal:** The Éclat main page (Home route) carries a seasonal Thanksgiving visual theme while keeping the existing design, routing, and content model intact
+**Requirements**: TBD
+**Depends on:** Phase 10 (v1.2 complete)
+**UI hint**: yes
+**Plans:** 0 plans
+
+Plans:
+
+- [ ] TBD (run /gsd-plan-phase 11 to break down)

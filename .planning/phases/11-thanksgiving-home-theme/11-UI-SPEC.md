@@ -1,7 +1,8 @@
 ---
 phase: 11
 slug: thanksgiving-home-theme
-status: draft
+status: approved
+reviewed_at: 2026-11-16
 shadcn_initialized: false
 preset: none
 created: 2026-11-16
@@ -187,6 +188,7 @@ Applicable state considerations resolved: 5 covered, 4 backstop, 0 unresolved
 | hydration | prerendered Home | 🧪 backstop | `npm run build` then `vite preview`: the console shows no React hydration warning on `/`, and the prerendered `dist/index.html` already contains "HAPPY THANKSGIVING" |
 | visual | fan animation on all tiers | 🧪 backstop | The fan opens and seats identically to pre-phase at phone (real touch emulation), tablet and desktop, and the leaves read as decoration rather than clutter (human visual check) |
 | a11y | screen reader on hero | 🧪 backstop | A screen reader announces "Happy Thanksgiving · The Legacy Issue" once and announces nothing for the leaves |
+| loading / error | CTA band, THANKSGIVING toggle | ➖ dismissed | Probe-raised; content is static, prerendered at build time, no fetch on Home, so no loading or error state exists |
 
 ---
 
