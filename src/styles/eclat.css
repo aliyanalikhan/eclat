@@ -1304,12 +1304,24 @@ a:hover .cover--book {
   pointer-events: none;
 }
 
+/* The span is a full-height column, so translateY percentages are percentages of the hero height on every tier. */
 .home--thanksgiving .tg-leaf {
   position: absolute;
+  top: 0;
+  left: var(--x);
+  width: var(--s);
+  height: 100%;
   fill: currentColor;
-  opacity: 0.85;
-  transform: rotate(var(--r));
-  animation: tgLeafSway 7s ease-in-out var(--d) infinite alternate;
+  opacity: 0;
+  animation: tgLeafFall var(--t) linear var(--d) infinite;
+}
+
+.home--thanksgiving .tg-leaf svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  animation: tgLeafSway var(--w) ease-in-out var(--d) infinite alternate;
 }
 
 .home--thanksgiving .tg-leaf--line {
@@ -1319,83 +1331,43 @@ a:hover .cover--book {
   stroke-linejoin: round;
 }
 
-.home--thanksgiving .tg-leaf--1 {
-  left: 4%;
-  top: 16%;
-  width: 64px;
-  height: 64px;
-}
-
-.home--thanksgiving .tg-leaf--2 {
-  left: 11%;
-  top: 40%;
-  width: 32px;
-  height: 32px;
-}
-
-.home--thanksgiving .tg-leaf--3 {
-  left: 3%;
-  top: 58%;
-  width: 48px;
-  height: 48px;
-}
-
-.home--thanksgiving .tg-leaf--4 {
-  right: 5%;
-  top: 20%;
-  width: 48px;
-  height: 48px;
-}
-
-.home--thanksgiving .tg-leaf--5 {
-  right: 12%;
-  top: 44%;
-  width: 32px;
-  height: 32px;
-}
-
-.home--thanksgiving .tg-leaf--6 {
-  right: 3%;
-  top: 62%;
-  width: 64px;
-  height: 64px;
+@keyframes tgLeafFall {
+  0% {
+    transform: translateY(-8%);
+    opacity: 0;
+  }
+  8%,
+  85% {
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
 }
 
 @keyframes tgLeafSway {
   from {
-    transform: rotate(var(--r)) translateY(0);
+    transform: translateX(-14px) rotate(var(--r));
   }
   to {
-    transform: rotate(calc(var(--r) + 8deg)) translateY(8px);
+    transform: translateX(14px) rotate(calc(var(--r) + 50deg));
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .home--thanksgiving .tg-leaf {
-    animation: none !important;
+  .home--thanksgiving .tg-leaves {
+    display: none;
   }
 }
 
 @media (max-width: 767px) { /* bp:phone */
-  .home--thanksgiving .tg-leaf--2,
-  .home--thanksgiving .tg-leaf--3,
-  .home--thanksgiving .tg-leaf--5,
-  .home--thanksgiving .tg-leaf--6 {
+  .home--thanksgiving .tg-leaf--wide {
     display: none;
   }
 
-  .home--thanksgiving .tg-leaf--1 {
-    left: 3%;
-    top: 12%;
-    width: 32px;
-    height: 32px;
-  }
-
-  .home--thanksgiving .tg-leaf--4 {
-    right: 4%;
-    top: 14%;
-    width: 24px;
-    height: 24px;
+  .home--thanksgiving .tg-leaf {
+    width: calc(var(--s) * 0.75);
   }
 }
 

@@ -33,15 +33,24 @@ const COMING_SOON_TINT = 'oklch(0.4 0.01 80)'
 // would bake one state into the HTML and then flip on hydration.
 const THANKSGIVING = true
 
-// Hero leaves. Position and size live in CSS (.tg-leaf--n) because the phone
-// tier overrides them in a media query, which inline styles would beat.
+// Fixed values, not random, because / is prerendered and hydrated; they ride in as CSS custom properties so the phone tier can hide or scale leaves with classes and calc.
 const TG_LEAVES = [
-  { n: 1, shape: 'maple', line: true, hue: 'var(--accent)', r: '-18deg', d: '0s' },
-  { n: 2, shape: 'oak', line: false, hue: 'oklch(0.74 0.13 75)', r: '24deg', d: '-2s' },
-  { n: 3, shape: 'maple', line: false, hue: 'oklch(0.46 0.14 18)', r: '-40deg', d: '-4s' },
-  { n: 4, shape: 'oak', line: false, hue: 'oklch(0.74 0.13 75)', r: '32deg', d: '-1s' },
-  { n: 5, shape: 'maple', line: true, hue: 'oklch(0.46 0.14 18)', r: '-12deg', d: '-3s' },
-  { n: 6, shape: 'oak', line: true, hue: 'var(--accent)', r: '48deg', d: '-5s' },
+  { shape: 'maple', line: true, hue: 'var(--accent)', x: '4%', s: '32px', t: '14s', d: '-2s', r: '-18deg', w: '3.2s', wide: false },
+  { shape: 'oak', line: false, hue: 'oklch(0.74 0.13 75)', x: '16%', s: '24px', t: '17s', d: '-9s', r: '24deg', w: '4s', wide: false },
+  { shape: 'maple', line: false, hue: 'oklch(0.46 0.14 18)', x: '28%', s: '16px', t: '12s', d: '-5s', r: '-40deg', w: '2.8s', wide: false },
+  { shape: 'oak', line: true, hue: 'var(--accent)', x: '40%', s: '32px', t: '15s', d: '-12s', r: '32deg', w: '3.6s', wide: false },
+  { shape: 'maple', line: false, hue: 'oklch(0.74 0.13 75)', x: '54%', s: '24px', t: '13s', d: '-1s', r: '-12deg', w: '3s', wide: false },
+  { shape: 'oak', line: false, hue: 'oklch(0.46 0.14 18)', x: '66%', s: '40px', t: '18s', d: '-7s', r: '48deg', w: '4.4s', wide: false },
+  { shape: 'maple', line: true, hue: 'oklch(0.46 0.14 18)', x: '80%', s: '24px', t: '16s', d: '-14s', r: '-28deg', w: '3.4s', wide: false },
+  { shape: 'oak', line: false, hue: 'var(--accent)', x: '92%', s: '32px', t: '14s', d: '-4s', r: '16deg', w: '3.8s', wide: false },
+  { shape: 'oak', line: true, hue: 'oklch(0.74 0.13 75)', x: '9%', s: '16px', t: '19s', d: '-11s', r: '36deg', w: '4.2s', wide: true },
+  { shape: 'maple', line: false, hue: 'var(--accent)', x: '22%', s: '40px', t: '15s', d: '-3s', r: '-24deg', w: '3.4s', wide: true },
+  { shape: 'oak', line: false, hue: 'oklch(0.46 0.14 18)', x: '34%', s: '24px', t: '13s', d: '-10s', r: '20deg', w: '3s', wide: true },
+  { shape: 'maple', line: true, hue: 'oklch(0.74 0.13 75)', x: '47%', s: '32px', t: '17s', d: '-6s', r: '-36deg', w: '4s', wide: true },
+  { shape: 'oak', line: false, hue: 'var(--accent)', x: '60%', s: '16px', t: '12s', d: '-8s', r: '44deg', w: '2.8s', wide: true },
+  { shape: 'maple', line: false, hue: 'oklch(0.46 0.14 18)', x: '73%', s: '32px', t: '16s', d: '-13s', r: '-8deg', w: '3.6s', wide: true },
+  { shape: 'oak', line: true, hue: 'oklch(0.46 0.14 18)', x: '86%', s: '24px', t: '14s', d: '-5s', r: '28deg', w: '3.2s', wide: true },
+  { shape: 'maple', line: false, hue: 'oklch(0.74 0.13 75)', x: '96%', s: '40px', t: '18s', d: '-15s', r: '-44deg', w: '4.4s', wide: true },
 ]
 
 function buildFan(eds) {
@@ -114,16 +123,16 @@ export default function Home() {
                 />
               </symbol>
             </svg>
-            {TG_LEAVES.map(({ n, shape, line, hue, r, d }) => (
-              <svg
-                key={n}
-                className={`tg-leaf tg-leaf--${n}${line ? ' tg-leaf--line' : ''}`}
-                viewBox="0 0 64 64"
-                focusable="false"
-                style={{ '--r': r, '--d': d, color: hue }}
+            {TG_LEAVES.map(({ shape, line, hue, x, s, t, d, r, w, wide }, i) => (
+              <span
+                key={i}
+                className={`tg-leaf${line ? ' tg-leaf--line' : ''}${wide ? ' tg-leaf--wide' : ''}`}
+                style={{ '--x': x, '--s': s, '--t': t, '--d': d, '--r': r, '--w': w, color: hue }}
               >
-                <use href={`#tg-${shape}`} />
-              </svg>
+                <svg viewBox="0 0 64 64" focusable="false">
+                  <use href={`#tg-${shape}`} />
+                </svg>
+              </span>
             ))}
           </div>
         )}
