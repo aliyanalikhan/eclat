@@ -33,6 +33,17 @@ const COMING_SOON_TINT = 'oklch(0.4 0.01 80)'
 // would bake one state into the HTML and then flip on hydration.
 const THANKSGIVING = true
 
+// Hero leaves. Position and size live in CSS (.tg-leaf--n) because the phone
+// tier overrides them in a media query, which inline styles would beat.
+const TG_LEAVES = [
+  { n: 1, shape: 'maple', line: true, hue: 'var(--accent)', r: '-18deg', d: '0s' },
+  { n: 2, shape: 'oak', line: false, hue: 'oklch(0.74 0.13 75)', r: '24deg', d: '-2s' },
+  { n: 3, shape: 'maple', line: false, hue: 'oklch(0.46 0.14 18)', r: '-40deg', d: '-4s' },
+  { n: 4, shape: 'oak', line: false, hue: 'oklch(0.74 0.13 75)', r: '32deg', d: '-1s' },
+  { n: 5, shape: 'maple', line: true, hue: 'oklch(0.46 0.14 18)', r: '-12deg', d: '-3s' },
+  { n: 6, shape: 'oak', line: true, hue: 'var(--accent)', r: '48deg', d: '-5s' },
+]
+
 function buildFan(eds) {
   const slots = new Array(FAN_SLOTS.length).fill(null)
   eds.slice(0, FAN_SLOTS.length).forEach((ed, i) => {
@@ -86,6 +97,36 @@ export default function Home() {
     <main id="main" className={THANKSGIVING ? 'home--thanksgiving' : undefined}>
       <section className="hero" data-hero="1">
         <div className="hero__wash" />
+
+        {THANKSGIVING && (
+          <div className="tg-leaves" aria-hidden="true">
+            <svg width="0" height="0" style={{ position: 'absolute' }}>
+              <symbol id="tg-maple" viewBox="0 0 64 64">
+                <path
+                  vectorEffect="non-scaling-stroke"
+                  d="M31 60L31 49L22 52L12 47L17 43L11 39L16 35L6 25L12 24L9 16L17 20L20 13L27 24L24 11L29 13L32 4L35 13L40 11L37 24L44 13L47 20L55 16L52 24L58 25L48 35L53 39L47 43L52 47L42 52L33 49L33 60Z"
+                />
+              </symbol>
+              <symbol id="tg-oak" viewBox="0 0 64 64">
+                <path
+                  vectorEffect="non-scaling-stroke"
+                  d="M31 60L31 52C20 54 16 43 28 41C14 44 11 33 25 32C12 34 11 23 25 23C15 24 16 15 28 15C24 3 40 3 36 15C48 15 49 24 39 23C53 23 52 34 39 32C53 33 50 44 36 41C48 43 44 54 33 52L33 60Z"
+                />
+              </symbol>
+            </svg>
+            {TG_LEAVES.map(({ n, shape, line, hue, r, d }) => (
+              <svg
+                key={n}
+                className={`tg-leaf tg-leaf--${n}${line ? ' tg-leaf--line' : ''}`}
+                viewBox="0 0 64 64"
+                focusable="false"
+                style={{ '--r': r, '--d': d, color: hue }}
+              >
+                <use href={`#tg-${shape}`} />
+              </svg>
+            ))}
+          </div>
+        )}
 
         <div className="fan-origin" data-fan-origin="1" aria-hidden="true">
           {fan.map((f) => {
