@@ -1,0 +1,1 @@
+No external API integration: Phase 11 is a static seasonal CSS/JSX layer on src/routes/Home.jsx and src/styles/eclat.css (plus a STATE.md reminder). It adds no fetch, SDK, endpoint or service; the detector matched "rest" (the verify-hero "AT REST" fan state) and CSS "wrapping" media queries.
