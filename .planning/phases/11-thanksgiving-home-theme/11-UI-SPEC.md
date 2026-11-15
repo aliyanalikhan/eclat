@@ -29,7 +29,7 @@ The user confirmed all three decisions below through the orchestrator. D-01 and 
 | D-02 | How strong? | **Medium.** The hero wash shifts to a warm harvest tone, six drawn leaves sit around the edges of the hero, the books band gets a warmer surface, and the dark CTA gets a low ember glow. The fan, cards, covers, typography and layout do not change. | This keeps the "quiet luxury" editorial voice. The existing `--accent` is already a rust/terracotta, so the theme reads as an extension of the brand rather than a costume. | Subtle: keep only the wash, the band and the flag copy (drop the leaves and the ember). Full reskin is out of scope (§ Out of Scope). |
 | D-03 | Copy changes? | **Four strings.** The hero flag becomes `HAPPY THANKSGIVING · {TITLE}`, the hero h1 and hero lede are rewritten for Thanksgiving, and the CTA eyebrow becomes `With gratitude`. Buttons and the CTA heading do not change. The original strings stay in code as the `false` branch of each ternary. | User request. Each new string stays within the character count of the string it replaces (see Copywriting Contract), so the hero copy block cannot grow and the fan keeps its position. | Edit the strings in the `THANKSGIVING` ternaries, keeping within the stated character limits. |
 
-**Removal reminder (required):** the executor adds a line to the Blockers/Concerns list in `.planning/STATE.md`: *"Thanksgiving Home theme is live: set `THANKSGIVING = false` in `src/routes/Home.jsx` and redeploy on or after 2026-11-30."* This follows the existing `TEMP_FREE_PREVIEW` reminder pattern.
+**Removal reminder (required):** the executor adds a line to the Blockers/Concerns list in `.planning/STATE.md`: *"Thanksgiving Home theme is live: set `THANKSGIVING = false` in `src/routes/Home.jsx` and redeploy — take-down date to be chosen by the user (no fixed date)."* This follows the existing `TEMP_FREE_PREVIEW` reminder pattern.
 
 ---
 
@@ -108,12 +108,12 @@ Contrast checks: `--ink` h1 on the halo's 0.94 `#fffaf2` center is greater than 
 
 ```
 <div class="tg-leaves" aria-hidden="true">  // pointer-events:none; position:absolute; inset:0; z-index:1
-  <svg width="0" height="0" style="position:absolute"><symbol id="tg-leaf" viewBox="0 0 64 64">…one maple-leaf path…</symbol></svg>
-  6 × <svg class="tg-leaf tg-leaf--{n}" focusable="false"><use href="#tg-leaf"/></svg>
+  <svg width="0" height="0" style="position:absolute"><symbol id="tg-maple" viewBox="0 0 64 64">…maple path…</symbol><symbol id="tg-oak" viewBox="0 0 64 64">…oak path…</symbol></svg>
+  6 × <svg class="tg-leaf tg-leaf--{n}" focusable="false"><use href="#tg-maple|#tg-oak"/></svg>
 </div>
 ```
 
-The leaf list is a small constant array in `Home.jsx` (size, hue, position, rest rotation, delay). Values are passed as CSS custom properties `--r` (rest rotation) and `--d` (animation delay) through inline `style`, which matches the codebase's inline-style convention. `fill: currentColor` with `color:` set to the hue.
+The leaf list is a small constant array in `Home.jsx` (size, hue, position, rest rotation, delay). Values are passed as CSS custom properties `--r` (rest rotation) and `--d` (animation delay) through inline `style`, which matches the codebase's inline-style convention. `fill: currentColor` with `color:` set to the hue. **Shapes and style (user-chosen 2026-11-16):** maple and oak alternate (3 each). The style is mixed: 3 leaves solid-filled, and 3 drawn as fine-line outlines (`fill: none; stroke: currentColor; stroke-width: 1.5`, plus a faint fill at ≤0.15 opacity). The outline and filled leaves are spread across both shapes and both sides of the hero.
 
 **Layering:** wash (auto) < **leaves (z 1)** < fan (z 2) < copy (z 4). Leaves never sit above text or covers. Where a far fan card overlaps a leaf, the leaf tucks behind the card, which is intended.
 
@@ -142,7 +142,7 @@ Use `left`/`right` and percentages only, never negative offsets. `.hero` is alre
 | Element | Copy |
 |---------|------|
 | Hero flag (themed) | `HAPPY THANKSGIVING · {newest.title.toUpperCase()}`, which renders **"HAPPY THANKSGIVING · THE LEGACY ISSUE"**. The date is dropped so the line is *shorter* than the current 47-character `JUST LAUNCHED · … · OCTOBER 2026`, and the hero copy block cannot grow taller. The date still appears in "Just released" directly below. |
-| Hero h1 (themed) | **"Giving thanks for remarkable stories."** (37 characters). Off/original: "Where remarkable stories come to light." (39 characters). **Limit: no more than 39 characters.** The longest word, "remarkable", matches the original, so the line-breaking behaviour cannot get worse. |
+| Hero h1 (themed) | **"A season of remarkable stories."** (31 characters; user-chosen in discuss-phase 2026-11-16). Off/original: "Where remarkable stories come to light." (39 characters). **Limit: no more than 39 characters.** The longest word, "remarkable", matches the original, so the line-breaking behaviour cannot get worse. |
 | Hero lede (themed) | **"Éclat gives thanks for the visionaries, leaders, creators, and changemakers whose stories we share."** (99 characters). Off/original: "Éclat celebrates the visionaries, leaders, creators, and changemakers whose stories deserve to be told." (103 characters). **Limit: no more than 103 characters.** The longest word, "changemakers", matches the original. |
 | Primary CTA | unchanged: **"Read the Latest Edition"** (hero) and **"Subscribe"** (closing CTA) |
 | Secondary hero link | unchanged: "Complimentary Copy Available Here →" |
@@ -181,7 +181,7 @@ Applicable state considerations resolved: 5 covered, 4 backstop, 0 unresolved
 |----------|------------|--------|---------------------|
 | reduced-motion | `.tg-leaf` sway | ✅ covered | Under `prefers-reduced-motion: reduce` the leaves render static at `rotate(var(--r))` with `animation: none` |
 | overflow | `.tg-leaves` in `.hero` | ✅ covered | Leaves use only non-negative `left`/`right` percentages inside `overflow: hidden` `.hero`, and `document.documentElement.scrollWidth === clientWidth` holds at 320, 768, 1024, 1440 and 2560px |
-| long-text | `.hero__flag`, `.hero h1`, `.hero__lede` themed strings | ✅ covered | Each themed string is no longer (in characters) than the original it replaces (flag 37 ≤ 47, h1 37 ≤ 39, lede 99 ≤ 103) and has the same longest word, so the hero copy block height does not increase at any tier |
+| long-text | `.hero__flag`, `.hero h1`, `.hero__lede` themed strings | ✅ covered | Each themed string is no longer (in characters) than the original it replaces (flag 37 ≤ 47, h1 31 ≤ 39, lede 99 ≤ 103) and has the same longest word, so the hero copy block height does not increase at any tier |
 | long-text | hero line count per tier | 🧪 backstop | With the theme on, the h1 and lede render in the same number of lines or fewer as with it off, at 320, 390, 768, 1024 and 1440px (measure `.hero__copy` height in both states and confirm on ≤ off) |
 | layering | leaves vs. fan/copy | ✅ covered | Leaves sit at z-index 1, below the fan (2) and copy (4). No leaf overlaps or obscures hero text or buttons, and no leaf intercepts clicks (`pointer-events: none`) |
 | toggle-off | entire theme | ✅ covered | With `THANKSGIVING = false`, Home renders the pre-phase copy and no `.tg-leaves` node, and `<main>` has no `home--thanksgiving` class |
