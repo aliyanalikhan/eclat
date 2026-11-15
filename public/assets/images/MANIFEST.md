@@ -17,6 +17,7 @@ the path below and it appears on the next page load, with no code change.
 
 | File | Edition |
 |---|---|
+| `covers/no-4-eclat-vol-4.jpg` | No. 4 — The Legacy of Giving (Dec 2026) |
 | `covers/no-2-eclat-vol-2.jpg` | No. 2 — The Power of Vision (Sep 2026) |
 | `covers/no-1-eclat-vol-1.jpg` | No. 1 — The New Architect of Modern Living (Maiden Edition) |
 
@@ -33,9 +34,14 @@ the path below and it appears on the next page load, with no code change.
 
 | File | Article |
 |---|---|
+| `features/the-frequency-of-success.jpg` | The Frequency of Success |
+| `features/nollywoods-new-wave.jpg` | Nollywood’s New Wave |
+| `features/why-african-money-does-not-become-capital.jpg` | Why African Money Does Not Become Capital |
 | `features/essence-over-excess.jpg` | Essence Over Excess |
 | `features/a-minneapolis-city-guide.jpg` | A Minneapolis City Guide |
 | `features/ladidier-bridal-elegance-reimagined.jpg` | Elegance Reimagined |
+
+No. 4 preview pages: `magazine-preview/4/page-01.jpg` … `page-100.jpg` (1400 px wide, 100 pages).
 
 ## Children's books — `books/` · natural cover ratio (see `ratio` field per book)
 

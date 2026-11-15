@@ -373,6 +373,33 @@ export const writings = [
 
 export const articles = [
   {
+    slug: 'the-frequency-of-success',
+    editionNo: 4,
+    kicker: 'The Cover Story · No. 4',
+    title: 'The Frequency of Success',
+    dek: 'Chris Ubosi, the man behind Beat 99.9 FM, on vision, values, family and the future — and why the next point matters more than the last mistake.',
+    alt: 'Portrait of Chris Ubosi smiling against a white backdrop, in a dark jacket and white shirt.',
+    tint: 'oklch(0.3 0.05 45)',
+  },
+  {
+    slug: 'nollywoods-new-wave',
+    editionNo: 4,
+    kicker: 'Culture · No. 4',
+    title: 'Nollywood’s New Wave',
+    dek: 'From Lagos multiplexes to Cannes and Toronto, a generation of Nigerian filmmakers is telling the nation’s stories with new polish, scale and unmistakable confidence.',
+    alt: 'Illustrated silhouette of a camera operator at a crane-mounted film camera between two studio umbrella lights.',
+    tint: 'oklch(0.3 0.03 220)',
+  },
+  {
+    slug: 'why-african-money-does-not-become-capital',
+    editionNo: 4,
+    kicker: 'The Big Idea · No. 4',
+    title: 'Why African Money Does Not Become Capital',
+    dek: 'Governance is only half the story. Physician turned investor Dr. Ola Brown asks a harder question: what do we do with our wealth once we have it, and why does so little of it build anything that lasts?',
+    alt: 'The essay’s opening page: its title in cream serif type on deep burgundy, above Dr. Ola Brown’s dek and byline.',
+    tint: 'oklch(0.3 0.08 15)',
+  },
+  {
     slug: 'the-legacy-ola-brown',
     editionNo: 3,
     kicker: 'The Conversation · No. 3',
