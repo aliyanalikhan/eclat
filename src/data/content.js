@@ -17,6 +17,29 @@ export const SITE = {
 
 export const editions = [
   {
+    no: 4,
+    slug: 'eclat-vol-4',
+    title: 'The Legacy of Giving',
+    date: 'December 2026',
+    year: '2026',
+    pages: 100,
+    previewPageCount: 100,
+    tint: 'oklch(0.24 0.03 50)',
+    isNew: true,
+    plateSuppressed: true, // real cover art — wordmark and coverlines are already printed in
+    ratio: '1200/1698',
+    w: 1200,
+    h: 1698,
+    blurb:
+      'Chris Ubosi, the man behind Beat 99.9 FM, on vision, values, family and the future — plus Nollywood’s new wave, Dr. Ola Brown on why African money does not become capital, Cape Town, the 2026 US Open, 48 hours in Lagos, and a house in Enugu that gives back.',
+    // FREE-ONLY (D-11) — everything but the last paragraph. The gated
+    // third paragraph lives only in lib/gated-content.js, server-side.
+    excerpt: [
+      'The Legacy of Giving is built around Chris Ubosi — the man behind Beat 99.9 FM — on vision, values, family, and why the next point matters more than the last mistake.',
+      'Also inside: Nollywood’s new wave, why African art belongs in more homes, Cape Town’s beautiful complication, the 2026 US Open, 48 hours in Lagos, Dr. Ola Brown on why African money does not become capital, the trees of Bruges, Lifelines on Four Legs, The House That Gives, and the Human Race Foundation.',
+    ],
+  },
+  {
     no: 3,
     slug: 'eclat-vol-3',
     title: 'The Legacy Issue',
@@ -25,7 +48,6 @@ export const editions = [
     pages: 70,
     previewPageCount: 70,
     tint: 'oklch(0.24 0.05 260)',
-    isNew: true,
     plateSuppressed: true, // real cover art — wordmark and coverlines are already printed in
     ratio: '1200/1698',
     w: 1200,
