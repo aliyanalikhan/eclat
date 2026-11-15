@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-23)
 Phase: 11 (Thanksgiving Home Theme) — EXECUTING
 Plan: 1 of 1
 Status: Phase complete — ready for verification
-Last activity: 2026-11-16 - Completed quick task 261116-67d: Thanksgiving hero leaves now fall (16 desktop / 8 phone); supersedes Phase 11 static-leaf layout and its leaf/text overlap gap — re-verify Phase 11
+Last activity: 2026-11-16 - Completed quick task 261116-6i2: Added Issue 4 "The Legacy of Giving" as newest edition
 
 Progress: [██████████] 100% (4/4 phases complete in v1.2)
 
@@ -117,6 +117,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261116-6i2 | Add Issue 4 "The Legacy of Giving" (Dec 2026, 100 pages) as newest edition — hero fan centre, Just released, 3 highlights | 2026-11-16 | 9755da7 | [261116-6i2-add-issue-4-the-legacy-of-giving-as-newe](./quick/261116-6i2-add-issue-4-the-legacy-of-giving-as-newe/) |
 | 261116-67d | Make the Thanksgiving hero leaves fall-animate and increase them (16 desktop / 8 phone) | 2026-11-16 | c3584cf | [261116-67d-make-the-thanksgiving-leaves-fall-animat](./quick/261116-67d-make-the-thanksgiving-leaves-fall-animat/) |
 | 261005-ptq | Eliminate rectangular container glow bar in closing CTA section | 2026-10-05 | 5fd4cf6 | [261005-ptq-fix-glow-of-complimentary-copy-link-in-c](./quick/261005-ptq-fix-glow-of-complimentary-copy-link-in-c/) |
 | 261005-9td | Fix React Router future flags and local dev/preview API endpoints | 2026-10-05 | e6ec0d1 | [261005-9td-fix-console-warnings-future-flags-and-lo](./quick/261005-9td-fix-console-warnings-future-flags-and-lo/) |
