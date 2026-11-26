@@ -12,6 +12,7 @@
     "build": "node --env-file-if-exists=.env.local scripts/migrate.js && vite build && vite build --ssr src/entry-server.jsx --outDir dist/server && node prerender.js && node --env-file-if-exists=.env.local scripts/check-secrets.js",
     "build:client": "vite build",
     "preview": "vite preview",
+    "test:signup": "node scripts/test-signup.js",
     "serve": "vite preview --port 4173"
   },
   "dependencies": {

@@ -192,6 +192,7 @@ export default function Subscribe() {
             />
           ))}
         </div>
+        <p className="fine">Signing in with Google adds you to our email list.</p>
       </div>
     </main>
   )

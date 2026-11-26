@@ -16,3 +16,4 @@ hero-open.png
 .vercel
 .env*
 !.env.example
+.agents/

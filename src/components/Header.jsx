@@ -242,12 +242,15 @@ export default function Header() {
               )}
             </div>
           ) : (
-            <a
-              href={`/api/auth/google?return_to=${encodeURIComponent(pathname)}`}
-              className="link-underline"
-            >
-              Sign in
-            </a>
+            <span className="signin-slot">
+              <a
+                href={`/api/auth/google?return_to=${encodeURIComponent(pathname)}`}
+                className="link-underline"
+              >
+                Sign in
+              </a>
+              <span className="signin-note">Adds you to our email list</span>
+            </span>
           )}
           <Link to="/subscribe" className="btn btn--sm">
             Subscribe

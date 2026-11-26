@@ -60,6 +60,7 @@ export default function App() {
           <p className="demo-notice__text">
             Sign-in failed —{' '}
             <a href={`/api/auth/google?return_to=${encodeURIComponent(pathname)}`}>try again</a>.
+            Signing in adds you to our email list.
           </p>
         </div>
       )}

@@ -2982,3 +2982,72 @@ a.series-nav__item:hover {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+/* --- email signup ------------------------------------------------------- */
+.signup {
+  max-width: 560px;
+  margin: 0 auto;
+  padding: var(--section-space) var(--gut);
+  text-align: center;
+}
+
+.signup__form {
+  display: grid;
+  gap: 16px;
+  margin-top: 28px;
+  text-align: left;
+}
+
+.signup__consent {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 14px;
+  color: var(--ink-soft);
+}
+
+.signup__consent input {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  accent-color: var(--accent);
+}
+
+.signup__trap {
+  position: absolute;
+  left: -9999px;
+}
+
+.signup__msg {
+  font-size: 14px;
+  text-align: center;
+  color: var(--ok);
+}
+
+.signup__msg--error {
+  color: var(--bad);
+}
+
+.signin-slot {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.signin-note {
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* Above the nav breakpoint (src/lib/breakpoints.js) hang the note under the
+   link, so the header row keeps its alignment. */
+@media (min-width: 901px) {
+  .signin-note {
+    position: absolute;
+    top: 100%;
+    right: 0;
+  }
+}

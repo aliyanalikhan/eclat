@@ -23,6 +23,7 @@
  *     oauth_return_to value (D-08).
  */
 import { timingSafeEqual } from 'node:crypto'
+import { waitUntil } from '@vercel/functions'
 import { createRemoteJWKSet, jwtVerify } from 'jose'
 import { sql } from '../../../lib/db.js'
 import {
@@ -32,6 +33,7 @@ import {
   parseCookies,
   serializeCookie,
 } from '../../../lib/session.js'
+import { detectCountry, normalizeEmail, signup } from '../../../lib/signup.js'
 
 const GOOGLE_JWKS = createRemoteJWKSet(new URL('https://www.googleapis.com/oauth2/v3/certs'))
 
@@ -142,6 +144,17 @@ export default {
       // as every other failure path in this file, not an unhandled
       // rejection (WR-01).
       return redirectWithError(returnTo, headers)
+    }
+
+    // Email list: runs after the response, so it can never delay or fail sign-in.
+    const listEmail = payload.email_verified === true && normalizeEmail(email)
+    if (listEmail) {
+      waitUntil(
+        signup(
+          { email: listEmail, country: detectCountry(request.headers), method: 'Google sign-in' },
+          { sql },
+        ).catch((err) => console.error(`signup: sign-in add failed: ${err.message}`)),
+      )
     }
 
     headers.append(

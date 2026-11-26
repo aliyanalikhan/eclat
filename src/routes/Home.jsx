@@ -1,5 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
 import Cover from '../components/Cover.jsx'
+import SignupForm from '../components/SignupForm.jsx'
 import { articles, books, editions, icons } from '../data/content.js'
 import { siteJsonLd, staticSeo } from '../data/seo.js'
 import { useSeo } from '../lib/useSeo.js'
@@ -512,6 +513,8 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      <SignupForm />
     </main>
   )
 }
