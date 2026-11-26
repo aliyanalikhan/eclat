@@ -138,22 +138,22 @@ export const books = [
     title: 'African Folklores',
     meta: 'As Told by My Grandmother · By Ebuka Osuorah',
     dek: 'When Grandmother speaks, the savanna listens — animals talk, rivers remember, and every tale leaves a lasting spark of truth.',
-    tint: 'oklch(0.30 0.06 260)',
+    tint: '#201404',
     plateSuppressed: true, // real cover art — title is already printed in
     ratio: '2/3',
-    w: 515,
-    h: 772,
+    w: 474,
+    h: 711,
   },
   {
     slug: 'we-come-from-kings',
     title: 'We Come From Kings',
     meta: 'A Journey Through West African History · By Ebuka Osuorah',
     dek: 'Long before today, kings and queens ruled vast lands of gold, courage, and wisdom — for the sons and daughters of the diaspora.',
-    tint: 'oklch(0.55 0.12 40)',
+    tint: '#f5ead5',
     plateSuppressed: true,
     ratio: '2/3',
-    w: 1066,
-    h: 1600,
+    w: 1200,
+    h: 1800,
   },
 ].map((b) => ({ ...b, img: `/assets/images/books/${b.slug}.jpg` }))
 
