@@ -8,7 +8,7 @@ status: verifying
 stopped_at: Completed 11-01-PLAN.md
 last_updated: "2026-11-15T23:10:54.637Z"
 last_activity: 2026-11-26
-last_activity_desc: Completed quick task 261126-bka: Fix alignment of last book (We Come From Kings) via standardized 2:3 aspect ratio
+last_activity_desc: Completed quick task 261126-rcv: Update remade covers for previous books (We Come From Kings, African Folklores)
 progress:
   total_phases: 1
   completed_phases: 1
@@ -117,6 +117,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261126-rcv | Update remade covers for previous books (We Come From Kings from PDF, African Folklores from JPEG) | 2026-11-26 | 827ac9e | [261126-rcv-update-remade-covers-for-previous-books](./quick/261126-rcv-update-remade-covers-for-previous-books/) |
 | 261126-bka | Fix alignment and height of last book ("We Come From Kings") to match other covers via uniform 2:3 ratio | 2026-11-26 | 59fbf69 | [261126-bka-fix-alignment-of-last-book](./quick/261126-bka-fix-alignment-of-last-book/) |
 | 261126-obi | Add Peter Gregory Obi tribute card to Cultural Icons section on home page after Pelé | 2026-11-26 | 19597a3 | [261126-obi-add-peter-obi-to-cultural-icons](./quick/261126-obi-add-peter-obi-to-cultural-icons/) |
 | 261126-bkc | Upload book covers ("Heir to the Obi" and "Under the Baobab") and scale down display sizes across /books and home shelf | 2026-11-26 | 4aefc0e | [261126-bkc-upload-book-covers-and-scale-display-sizes](./quick/261126-bkc-upload-book-covers-and-scale-display-sizes/) |
