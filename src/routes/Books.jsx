@@ -63,6 +63,16 @@ export default function Books() {
             <p className="card__dek" style={{ marginTop: 12 }}>
               {b.dek}
             </p>
+            {b.amazonUrl && (
+              <a
+                href={b.amazonUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="book-buy-link"
+              >
+                Available on Amazon &rarr;
+              </a>
+            )}
           </div>
         ))}
       </div>

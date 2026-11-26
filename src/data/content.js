@@ -143,6 +143,7 @@ export const books = [
     ratio: '2/3',
     w: 474,
     h: 711,
+    amazonUrl: 'https://www.amazon.com/dp/B0HSP7J3XW',
   },
   {
     slug: 'we-come-from-kings',
@@ -154,6 +155,7 @@ export const books = [
     ratio: '2/3',
     w: 1200,
     h: 1800,
+    amazonUrl: 'https://www.amazon.com/dp/B0HSQG8KLY',
   },
 ].map((b) => ({ ...b, img: `/assets/images/books/${b.slug}.jpg` }))
 

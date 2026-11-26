@@ -410,22 +410,36 @@ export default function Home() {
 
           <div className="shelf">
             {homeBooks.map((b, i) => (
-              <Link key={b.slug} to="/books" className="reveal" data-rev={i}>
-                <Cover
-                  tint={b.tint}
-                  img={b.img}
-                  alt={`Cover of ${b.title}`}
-                  ratio={b.ratio}
-                  width={b.w}
-                  height={b.h}
-                  className="cover--lift cover--book"
-                >
-                  {!b.plateSuppressed && <span className="shelf__title">{b.title}</span>}
-                </Cover>
+              <div key={b.slug} className="reveal" data-rev={i}>
+                <Link to="/books" style={{ display: 'block' }}>
+                  <Cover
+                    tint={b.tint}
+                    img={b.img}
+                    alt={`Cover of ${b.title}`}
+                    ratio={b.ratio}
+                    width={b.w}
+                    height={b.h}
+                    className="cover--lift cover--book"
+                  >
+                    {!b.plateSuppressed && <span className="shelf__title">{b.title}</span>}
+                  </Cover>
+                </Link>
                 <p className="label" style={{ marginTop: 12 }}>
                   {b.meta}
                 </p>
-              </Link>
+                {b.amazonUrl && (
+                  <div>
+                    <a
+                      href={b.amazonUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="book-buy-link"
+                    >
+                      Available on Amazon &rarr;
+                    </a>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </div>
