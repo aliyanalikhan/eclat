@@ -565,6 +565,14 @@ export const icons = [
     w: 1254,
     h: 1254,
   },
+  {
+    slug: 'peter-obi',
+    name: 'Peter Gregory Obi',
+    bio: 'Nigerian businessman, philanthropist, and statesman (b. 1961), former Governor of Anambra State and 2023 presidential candidate acclaimed for fiscal discipline and good governance.',
+    ratio: '1086/1448',
+    w: 1086,
+    h: 1448,
+  },
 ].map((i) => ({ ...i, img: `/assets/images/icons/${i.slug}.png` }))
 
 // American culture, told through speeches and moments people actually lived
