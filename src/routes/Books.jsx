@@ -23,7 +23,7 @@ export default function Books() {
           <em>books</em>
         </h1>
         <p className="lede" style={{ margin: '24px 0 0' }}>
-          Two picture books, read aloud in the subscriber library. First spread of each is free.
+          Picture books and cultural stories, read aloud in the subscriber library. First spread of each is free.
         </p>
       </div>
 

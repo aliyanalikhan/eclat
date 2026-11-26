@@ -112,6 +112,28 @@ export const editions = [
 
 export const books = [
   {
+    slug: 'heir-to-the-obi',
+    title: 'Heir to the Obi',
+    meta: 'Honour, Inheritance and the Weight of the First Son · By Ebuka Osuorah',
+    dek: '“You are the head that was seen, so the cap was placed on you.” A timeless exploration of heritage, responsibility, and the ancestral weight carried by the first son.',
+    tint: '#efe7d4',
+    plateSuppressed: true,
+    ratio: '1066/1600',
+    w: 1066,
+    h: 1600,
+  },
+  {
+    slug: 'under-the-baobab',
+    title: 'Under the Baobab',
+    meta: 'Stories and Proverbs from all 54 Countries of Africa',
+    dek: 'A gift from Éclat Magazine & LaDidiér — 54 stories and 162 proverbs from every corner of the African continent, gathered beneath one sacred canopy.',
+    tint: '#1a1511',
+    plateSuppressed: true,
+    ratio: '1064/1600',
+    w: 1064,
+    h: 1600,
+  },
+  {
     slug: 'african-folklores',
     title: 'African Folklores',
     meta: 'As Told by My Grandmother · By Ebuka Osuorah',

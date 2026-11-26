@@ -1120,8 +1120,12 @@ a:hover .cover--lift,
 
 .shelf {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-  gap: 34px;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 32px;
+}
+
+.cover--book {
+  max-width: 270px;
 }
 
 .shelf__title {
@@ -1680,9 +1684,10 @@ a:hover .cover--book {
 /* --- books page --------------------------------------------------------- */
 .books-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 44px 32px;
-  margin-top: 80px;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 36px 24px;
+  margin-top: 64px;
+  max-width: 1140px;
 }
 
 .books-grid .cover__plate {
@@ -2509,8 +2514,9 @@ a:hover .cover--book {
 
   .books-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 36px 24px;
-    margin-top: 56px;
+    gap: 32px 20px;
+    margin-top: 48px;
+    max-width: 640px;
   }
 }
 
@@ -2659,10 +2665,26 @@ a:hover .cover--book {
     gap: 24px 14px;
   }
 
+  .shelf {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px 14px;
+  }
+
   .books-grid {
-    grid-template-columns: minmax(0, 1fr);
-    margin-top: 40px;
-    gap: 40px;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px 14px;
+    margin-top: 36px;
+  }
+
+  .books-grid .book-meta {
+    flex-direction: column;
+    gap: 4px;
+    margin-top: 10px;
+  }
+
+  .books-grid .card__dek {
+    font-size: 13px;
+    line-height: 1.45;
   }
 
   .writing {

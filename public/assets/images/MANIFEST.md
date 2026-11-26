@@ -47,6 +47,8 @@ No. 4 preview pages: `magazine-preview/4/page-01.jpg` … `page-100.jpg` (1400 p
 
 | File | Title |
 |---|---|
+| `books/heir-to-the-obi.jpg` | Heir to the Obi |
+| `books/under-the-baobab.jpg` | Under the Baobab |
 | `books/african-folklores.jpg` | African Folklores — As Told by My Grandmother |
 | `books/we-come-from-kings.jpg` | We Come From Kings |
 

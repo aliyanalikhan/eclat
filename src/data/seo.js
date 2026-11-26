@@ -19,7 +19,7 @@ export const staticSeo = {
   '/books': {
     title: 'Children’s Books — Éclat',
     description:
-      'Two picture books by Ebuka Osuorah, read aloud in the subscriber library. The first spread of each is free.',
+      'Picture books and cultural stories by Ebuka Osuorah, read aloud in the subscriber library. The first spread of each is free.',
     og: DEFAULT_OG,
   },
   '/writings': {
