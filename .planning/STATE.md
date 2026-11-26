@@ -117,6 +117,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261127-4sy | Email signup system: home form, sign-in capture, Resend welcome and owner emails | 2026-11-27 | 50c04c4 | [261127-4sy-email-signup-system](./quick/261127-4sy-email-signup-system/) |
 | 261126-rbk | Rename "Children's books" to "Books" site-wide across nav, headings, links, SEO, and product titles | 2026-11-26 | f3c0ea3 | [261126-rbk-rename-children-books-to-books](./quick/261126-rbk-rename-children-books-to-books/) |
 | 261126-amz | Add "Available on Amazon" purchase links to African Folklores and We Come From Kings on /books and Home shelf | 2026-11-26 | 200e641 | [261126-amz-add-amazon-links-for-books](./quick/261126-amz-add-amazon-links-for-books/) |
 | 261126-rcv | Update remade covers for previous books (We Come From Kings from PDF, African Folklores from JPEG) | 2026-11-26 | 827ac9e | [261126-rcv-update-remade-covers-for-previous-books](./quick/261126-rcv-update-remade-covers-for-previous-books/) |
