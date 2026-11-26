@@ -110,7 +110,7 @@ export default function Header() {
   async function handleSignOut() {
     setSignOutState('pending')
     try {
-      const res = await fetch('/api/auth/logout', { method: 'POST' })
+      const res = await fetch('/api/auth/session', { method: 'POST' })
       if (!res.ok) throw new Error(`logout failed: ${res.status}`)
       setSignOutState('idle')
       setAuthMenuOpen(false)
