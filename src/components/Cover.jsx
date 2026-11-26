@@ -5,6 +5,7 @@ const RATIO_CLASS = {
   '4/3': 'cover--4x3',
   '1/1': 'cover--1x1',
   '3/2': 'cover--3x2',
+  '2/3': 'cover--2x3',
 }
 
 /**

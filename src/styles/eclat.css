@@ -998,6 +998,10 @@ a:hover {
   aspect-ratio: 3 / 2;
 }
 
+.cover--2x3 {
+  aspect-ratio: 2 / 3;
+}
+
 .cover--lift {
   box-shadow: 0 8px 20px rgba(22, 19, 15, 0.12);
   transition: transform 0.55s var(--ease), box-shadow 0.55s;
