@@ -43,7 +43,7 @@ the path below and it appears on the next page load, with no code change.
 
 No. 4 preview pages: `magazine-preview/4/page-01.jpg` … `page-100.jpg` (1400 px wide, 100 pages).
 
-## Children's books — `books/` · natural cover ratio (see `ratio` field per book)
+## Books — `books/` · natural cover ratio (see `ratio` field per book)
 
 | File | Title |
 |---|---|

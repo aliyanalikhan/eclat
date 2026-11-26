@@ -14,7 +14,7 @@ export default function Footer() {
             Archive
           </Link>
           <Link to="/books" className="link-quiet">
-            Children&rsquo;s Books
+            Books
           </Link>
           <Link to="/writings" className="link-quiet">
             Writings

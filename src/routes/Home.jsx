@@ -400,7 +400,7 @@ export default function Home() {
             </h2>
             <div style={{ display: 'flex', gap: 22, paddingBottom: 8, flexWrap: 'wrap' }}>
               <Link to="/books" className="link-quiet">
-                Children&rsquo;s books →
+                Books →
               </Link>
               <Link to="/writings" className="link-quiet">
                 Writings →

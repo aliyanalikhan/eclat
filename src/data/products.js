@@ -9,8 +9,8 @@
 export const PRODUCTS = Object.freeze([
   Object.freeze({ key: 'eclat-online', name: 'Éclat Online', kind: 'online' }),
   Object.freeze({ key: 'eclat-hardcopy', name: 'Éclat Hard Copy', kind: 'hardcopy' }),
-  Object.freeze({ key: 'book-online', name: "Children's Book Online", kind: 'online' }),
-  Object.freeze({ key: 'book-hardcopy', name: "Children's Book Hard Copy", kind: 'hardcopy' }),
+  Object.freeze({ key: 'book-online', name: 'Book Online', kind: 'online' }),
+  Object.freeze({ key: 'book-hardcopy', name: 'Book Hard Copy', kind: 'hardcopy' }),
 ])
 
 /**

@@ -6,7 +6,7 @@ import { QUERIES } from '../lib/breakpoints.js'
 
 const LINKS = [
   { to: '/archive', label: 'Archive' },
-  { to: '/books', label: "Children's Books" },
+  { to: '/books', label: 'Books' },
   { to: '/writings', label: 'Writings' },
   { to: '/videos', label: 'Videos' },
 ]

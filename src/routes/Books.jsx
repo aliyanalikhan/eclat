@@ -18,9 +18,7 @@ export default function Books() {
           By Ebuka Osuorah
         </p>
         <h1 className="display">
-          Children&rsquo;s
-          <br />
-          <em>books</em>
+          Books
         </h1>
         <p className="lede" style={{ margin: '24px 0 0' }}>
           Picture books and cultural stories, read aloud in the subscriber library. First spread of each is free.

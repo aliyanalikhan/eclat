@@ -148,7 +148,7 @@ export default function Subscribe() {
           Subscribe to Éclat
         </h1>
         <p className="lede" style={{ margin: '0 0 16px', maxWidth: '52ch', fontSize: 16 }}>
-          Full archive, all children&rsquo;s books, every essay, and each new edition as it
+          Full archive, all books, every essay, and each new edition as it
           publishes.
         </p>
 

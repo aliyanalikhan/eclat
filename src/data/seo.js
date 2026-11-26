@@ -7,7 +7,7 @@ export const staticSeo = {
   '/': {
     title: 'Discover EcLat',
     description:
-      'Two issues of Éclat by LaDidiér, two children’s books and every essay — one subscription, every edition, from No. 1 to whatever comes next.',
+      'The complete library of Éclat by LaDidiér, books and every essay — one subscription, every edition, from No. 1 to whatever comes next.',
     og: DEFAULT_OG,
   },
   '/archive': {
@@ -17,9 +17,9 @@ export const staticSeo = {
     og: DEFAULT_OG,
   },
   '/books': {
-    title: 'Children’s Books — Éclat',
+    title: 'Books — Éclat',
     description:
-      'Picture books and cultural stories by Ebuka Osuorah, read aloud in the subscriber library. The first spread of each is free.',
+      'Books and cultural stories by Ebuka Osuorah, read aloud in the subscriber library. The first spread of each is free.',
     og: DEFAULT_OG,
   },
   '/writings': {
@@ -36,7 +36,7 @@ export const staticSeo = {
   '/subscribe': {
     title: 'Subscribe — Éclat',
     description:
-      'Full archive, all children’s books, every essay, and each new edition as it publishes. $9/month or $84/year.',
+      'Full archive, all books, every essay, and each new edition as it publishes. $9/month or $84/year.',
     og: DEFAULT_OG,
     robots: 'noindex,follow',
   },
