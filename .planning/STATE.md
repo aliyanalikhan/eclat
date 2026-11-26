@@ -7,8 +7,8 @@ current_phase_name: Thanksgiving Home Theme
 status: verifying
 stopped_at: Completed 11-01-PLAN.md
 last_updated: "2026-11-15T23:10:54.637Z"
-last_activity: 2026-11-16
-last_activity_desc: Phase 11 execution started
+last_activity: 2026-11-26
+last_activity_desc: Completed quick task 261126-bkc: Upload book covers (Heir to the Obi, Under the Baobab) and scale down display sizes
 progress:
   total_phases: 1
   completed_phases: 1
@@ -117,6 +117,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261126-bkc | Upload book covers ("Heir to the Obi" and "Under the Baobab") and scale down display sizes across /books and home shelf | 2026-11-26 | 4aefc0e | [261126-bkc-upload-book-covers-and-scale-display-sizes](./quick/261126-bkc-upload-book-covers-and-scale-display-sizes/) |
 | 261116-6i2 | Add Issue 4 "The Legacy of Giving" (Dec 2026, 100 pages) as newest edition — hero fan centre, Just released, 3 highlights | 2026-11-16 | 9755da7 | [261116-6i2-add-issue-4-the-legacy-of-giving-as-newe](./quick/261116-6i2-add-issue-4-the-legacy-of-giving-as-newe/) |
 | 261116-67d | Make the Thanksgiving hero leaves fall-animate and increase them (16 desktop / 8 phone) | 2026-11-16 | c3584cf | [261116-67d-make-the-thanksgiving-leaves-fall-animat](./quick/261116-67d-make-the-thanksgiving-leaves-fall-animat/) |
 | 261005-ptq | Eliminate rectangular container glow bar in closing CTA section | 2026-10-05 | 5fd4cf6 | [261005-ptq-fix-glow-of-complimentary-copy-link-in-c](./quick/261005-ptq-fix-glow-of-complimentary-copy-link-in-c/) |
