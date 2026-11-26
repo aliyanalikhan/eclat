@@ -8,7 +8,7 @@ status: verifying
 stopped_at: Completed 11-01-PLAN.md
 last_updated: "2026-11-15T23:10:54.637Z"
 last_activity: 2026-11-26
-last_activity_desc: Completed quick task 261126-obi: Add Peter Obi to Cultural Icons on home page after Pele
+last_activity_desc: Completed quick task 261126-bka: Fix alignment of last book (We Come From Kings) via standardized 2:3 aspect ratio
 progress:
   total_phases: 1
   completed_phases: 1
@@ -117,6 +117,7 @@ None yet.
 
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
+| 261126-bka | Fix alignment and height of last book ("We Come From Kings") to match other covers via uniform 2:3 ratio | 2026-11-26 | 59fbf69 | [261126-bka-fix-alignment-of-last-book](./quick/261126-bka-fix-alignment-of-last-book/) |
 | 261126-obi | Add Peter Gregory Obi tribute card to Cultural Icons section on home page after Pelé | 2026-11-26 | 19597a3 | [261126-obi-add-peter-obi-to-cultural-icons](./quick/261126-obi-add-peter-obi-to-cultural-icons/) |
 | 261126-bkc | Upload book covers ("Heir to the Obi" and "Under the Baobab") and scale down display sizes across /books and home shelf | 2026-11-26 | 4aefc0e | [261126-bkc-upload-book-covers-and-scale-display-sizes](./quick/261126-bkc-upload-book-covers-and-scale-display-sizes/) |
 | 261116-6i2 | Add Issue 4 "The Legacy of Giving" (Dec 2026, 100 pages) as newest edition — hero fan centre, Just released, 3 highlights | 2026-11-16 | 9755da7 | [261116-6i2-add-issue-4-the-legacy-of-giving-as-newe](./quick/261116-6i2-add-issue-4-the-legacy-of-giving-as-newe/) |
