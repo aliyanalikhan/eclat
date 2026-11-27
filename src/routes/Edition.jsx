@@ -89,6 +89,17 @@ export default function Edition() {
               <span>{ed.pages} pages</span>
             </div>
             <p className="ed-hero__blurb">{ed.blurb}</p>
+            {Number(ed.no) === 4 && (
+  <a
+    href="https://svc.lulu.com/?items=db861319-6807-48c8-b318-33c5263ca4fe"
+    target="_blank"
+    rel="noopener noreferrer"
+    className="btn"
+    style={{ marginTop: 20 }}
+  >
+    Buy Print Edition — $39.99
+  </a>
+)}
           </div>
         </div>
       </section>
