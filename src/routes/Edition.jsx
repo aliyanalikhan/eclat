@@ -89,12 +89,63 @@ export default function Edition() {
               <span>{ed.pages} pages</span>
             </div>
             <p className="ed-hero__blurb">{ed.blurb}</p>
+            {[1, 2, 3, 4].includes(Number(ed.no)) && (
+  <a
+    href={`https://svc.lulu.com/?items=${{
+      1: '64837ac4-2867-413d-9ea1-ddbe27556118',
+      2: '7e8856d5-b3cf-476e-9b86-6452ebc0c670',
+      3: '94586b28-6fa4-47cb-a36e-67b9208205ae',
+      4: 'db861319-6807-48c8-b318-33c5263ca4fe',
+    }[Number(ed.no)]}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    className="btn"
+    style={{ marginTop: 20 }}
+  >
+    Buy Print Edition — $29.99
+  </a>
+)}
           </div>
         </div>
       </section>
 
+      {ed.no === 4 && editionArticles.length > 0 && (
+        <section className="section" aria-labelledby="issue-four-stories" style={{ padding: '72px var(--gut) 40px' }}>
+          <div className="section-head">
+            <h2 id="issue-four-stories" className="h2">Inside this edition</h2>
+          </div>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', gap: 32 }}>
+            {editionArticles.map((article, index) => (
+              <article key={article.slug} style={index === 0 ? { gridColumn: '1 / -1', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 280px), 1fr))', alignItems: 'center', gap: 24 } : undefined}>
+                <button
+                  type="button"
+                  className="strip__item"
+                  style={{ '--tint': article.tint, width: '100%', aspectRatio: '4/3' }}
+                  aria-label={'Zoom image for ' + article.title}
+                  onClick={(event) =>
+                    openLightbox(
+                      { tint: article.tint, img: article.img, alt: article.alt, label: article.title, ratio: '4/3' },
+                      event.currentTarget.getBoundingClientRect(),
+                    )
+                  }
+                >
+                  <img src={article.img} alt={article.alt} className="cover__img is-loaded" style={{ objectFit: 'contain' }} loading="lazy" decoding="async" />
+                </button>
+                <div style={{ padding: '16px 0' }}>
+                  <p className="eyebrow eyebrow--accent">{article.kicker.split(' · ')[0]}</p>
+                  <h3 className="h2" style={{ fontSize: index === 0 ? 'clamp(32px, 5vw, 58px)' : '28px', margin: '10px 0' }}>
+                    {article.title}
+                  </h3>
+                  <p style={{ maxWidth: '52ch', lineHeight: 1.6 }}>{article.dek}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* --- preview strip --- */}
-      {editionArticles.length > 0 && (
+      {ed.no !== 4 && editionArticles.length > 0 && (
         <section className="section" style={{ padding: '96px var(--gut) 40px' }}>
           <div className="section-head">
             <div style={{ display: 'flex', alignItems: 'baseline', gap: 18, flexWrap: 'wrap' }}>
