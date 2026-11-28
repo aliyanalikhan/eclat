@@ -102,7 +102,7 @@ export default function Edition() {
     className="btn"
     style={{ marginTop: 20 }}
   >
-    Buy Print Edition — $39.99
+    Buy Print Edition — $29.99
   </a>
 )}
           </div>
