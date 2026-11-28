@@ -89,9 +89,14 @@ export default function Edition() {
               <span>{ed.pages} pages</span>
             </div>
             <p className="ed-hero__blurb">{ed.blurb}</p>
-            {Number(ed.no) === 4 && (
+            {[1, 2, 3, 4].includes(Number(ed.no)) && (
   <a
-    href="https://svc.lulu.com/?items=db861319-6807-48c8-b318-33c5263ca4fe"
+    href={`https://svc.lulu.com/?items=${{
+      1: '64837ac4-2867-413d-9ea1-ddbe27556118',
+      2: '7e8856d5-b3cf-476e-9b86-6452ebc0c670',
+      3: '94586b28-6fa4-47cb-a36e-67b9208205ae',
+      4: 'db861319-6807-48c8-b318-33c5263ca4fe',
+    }[Number(ed.no)]}`}
     target="_blank"
     rel="noopener noreferrer"
     className="btn"
